@@ -33,14 +33,14 @@ print_line() {
     local text="$1"
     local width=50
     local symbol="="
-    
+
     # 计算两侧需要的符号数量
     local text_len=${#text}
     local side_len=$(( (width - text_len) / 2 ))
-    
+
     # 构建左右两侧的符号串
     local sides=$(printf "%0${side_len}d" 0 | tr '0' "$symbol")
-    
+
     echo "${sides}${text}${sides}"
 }
 
@@ -86,7 +86,7 @@ restart_dnsmasq(){
 	else
 		echo "🔍 当前dnsmasq未运行，尝试重启！"
 	fi
-	
+
 	echo "⏳ 执行dnsmasq重启服务..."
 	service restart_dnsmasq >/dev/null 2>&1
 
@@ -101,7 +101,7 @@ restart_dnsmasq(){
 		fi
 		usleep 250000
 	done
-	
+
     print_line "dnsmasq complete"
 }
 
@@ -157,7 +157,7 @@ start_singbox() {
     else
         echo "❌ 启动失败！请检查 $SINGBOX_LOG 查看具体报错原因。"
     fi
-    
+
     print_line "singbox complete"
 }
 
@@ -194,7 +194,7 @@ start_smartdns() {
     local dnsmasq_merlin_box_postconf="${CUR_DIR}/scripts/dnsmasq.postconf"
 
     # 由于要运行在53端口接管dnsmasq的53端口，所以需要先处理下dnsmasq
- 
+
     # 将 merlin-box 自带的 dnsmasq.postconf 复制到 /jffs/scripts/
     if [ -f "$dnsmasq_merlin_box_postconf" ]; then
         echo "🔄 正在部署 $dnsmasq_merlin_box_postconf 到 /jffs/scripts/"
@@ -314,6 +314,30 @@ setup_dns_hijack()
     iptables -t nat -A PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN"
 
     print_line "lan dns hijack setup complete"
+
+    setup_dns_hijack_ipv6
+}
+
+# ==========================================
+# 局域网 DNS 53 端口劫持 (IPv6 专属)
+# ==========================================
+setup_dns_hijack_ipv6()
+{
+    [ "$MB_ENABLE_IPV6" != "1" ] && return 0
+    print_line "setting up lan dns v6 hijack"
+
+    # 🌟 核心避坑：ip6tables 没有 REDIRECT 动作，必须用 DNAT 转发到本地回环地址 [::1]
+    ip6tables -t nat -A "$MB_DNS_CHAIN_V6" -p udp --dport 53 -j DNAT --to-destination [::1]:53
+    ip6tables -t nat -A "$MB_DNS_CHAIN_V6" -p tcp --dport 53 -j DNAT --to-destination [::1]:53
+
+    # 主链去重与引流挂载
+    ip6tables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
+    ip6tables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
+
+    ip6tables -t nat -A PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6"
+    ip6tables -t nat -A PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6"
+
+    print_line "lan dns v6 hijack setup complete"
 }
 
 #=========================================
@@ -345,8 +369,41 @@ setup_lan_tproxy()
     iptables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN"
 
     print_line "lan tproxy setup complete"
+
+    setup_lan_tproxy_ipv6
 }
 
+# ==========================================
+# 局域网常规流量 TPROXY 透明代理封装 (IPv6 专属，仅 TCP)
+# ==========================================
+setup_lan_tproxy_ipv6()
+{
+    [ "$MB_ENABLE_IPV6" != "1" ] && return 0
+    print_line "setting up lan tproxy v6 and quic block"
+
+    # 1. 局域网本地特殊 v6 网段直连放行（必须放行 fe80::/10 链路本地地址和私有本地地址）
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -d ::1/128 -j RETURN
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -d fe80::/10 -j RETURN
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -d fc00::/7 -j RETURN
+
+    # 2. 匹配 IPSET 大陆 IPv6 白名单网段直接直连放行
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
+
+    # 3. 屏蔽局域网的 v6 QUIC (UDP 443)
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p udp --dport 443 -j DROP
+
+    # 4. 剩余 TCP 流量全部送入 TPROXY 本地端口
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+
+    # 5. 主链去重清理与排除 TCP DNS 53
+    ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
+    ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
+
+    ip6tables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
+    ip6tables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6"
+
+    print_line "lan tproxy v6 setup complete"
+}
 
 #=========================================
 # 初始化与重置防火墙及策略路由
@@ -379,11 +436,12 @@ reset_iptables()
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
     ipset create "$MB_IPSET_NAME" hash:net
 
-    if [ -f "$MB_CHN_IP_FILE" ]; then
-        (echo "create $MB_IPSET_NAME hash:net -exist" ; awk '{print "add '"$MB_IPSET_NAME"'" , $0}' "$MB_CHN_IP_FILE") | ipset restore 2>/dev/null
+    if [ -f "$MB_CHN_IP4_FILE" ]; then
+        dos2unix "$MB_CHN_IP4_FILE" 2>/dev/null
+        (echo "create $MB_IPSET_NAME hash:net -exist" ; awk '{print "add '"$MB_IPSET_NAME"'" , $0}' "$MB_CHN_IP4_FILE") | ipset restore 2>/dev/null
         echo "✅ 成功将白名单 IP 网段加载至 ipset 集合。"
     else
-        echo "⚠️ 未找到白名单文件: $MB_CHN_IP_FILE，分流功能将不生效！"
+        echo "⚠️ 未找到白名单文件: $MB_CHN_IP4_FILE，分流功能将不生效！"
     fi
 
     # ----------------------------------------------------------
@@ -397,6 +455,60 @@ reset_iptables()
     ip route add local default dev lo table "$MB_ROUTE_TABLE"
 
     print_line "reset complete"
+
+    reset_iptables_ipv6
+}
+
+# ==========================================
+# 初始化与重置防火墙及策略路由 (IPv6 专属)
+# ==========================================
+reset_iptables_ipv6()
+{
+    [ "$MB_ENABLE_IPV6" != "1" ] && return 0
+    print_line "resetting iptables v6 and routing rules"
+
+    # 1. 重置 ip6tables 自定义链引用，防止 ipset 销毁失败
+    ip6tables -t mangle -F "$MB_PROXY_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+
+    # 2. 初始化 IPSET 大陆 v6 白名单集合
+    echo "⏳ 正在加载 IPSET 大陆 IPv6 白名单分流集合..."
+    ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
+    # 注意：IPv6 的集合类型必须声明为 hash:net 为 family inet6
+    ipset create "$MB_IPSET_NAME_V6" hash:net family inet6 -exist
+
+    if [ -f "$MB_CHN_IP6_FILE" ]; then
+        dos2unix "$MB_CHN_IP6_FILE" 2>/dev/null
+        (echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist" ; awk '{print "add '"$MB_IPSET_NAME_V6"'" , $0}' "$MB_CHN_IP6_FILE") | ipset restore 2>/dev/null
+        echo "✅ 成功将白名单 IPv6 网段加载至 ipset 集合。"
+    else
+        echo "⚠️ 未找到 IPv6 白名单文件: $MB_CHN_IP6_FILE，IPv6 分流功能将不生效！"
+    fi
+
+    # 3. 策略路由重置 (使用 ip -6 命令)
+    while ip -6 rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
+        :
+    done
+    ip -6 route flush table "$MB_ROUTE_TABLE" 2>/dev/null
+    ip -6 rule add fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE"
+    # 将 v6 流量掉头撞向本地回环
+    ip -6 route add local default dev lo table "$MB_ROUTE_TABLE"
+
+    # 4. 自定义链重建 (ip6tables nat 表)
+    ip6tables -t nat -F "$MB_DNS_CHAIN_V6" 2>/dev/null
+    ip6tables -t nat -X "$MB_DNS_CHAIN_V6" 2>/dev/null
+    if ! ip6tables -t nat -L "$MB_DNS_CHAIN_V6" >/dev/null 2>&1; then
+        ip6tables -t nat -N "$MB_DNS_CHAIN_V6"
+    fi
+
+    # 5. 自定义链重建 (ip6tables mangle 表)
+    ip6tables -t mangle -F "$MB_PROXY_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -X "$MB_PROXY_CHAIN_V6" 2>/dev/null
+    if ! ip6tables -t mangle -L "$MB_PROXY_CHAIN_V6" >/dev/null 2>&1; then
+        ip6tables -t mangle -N "$MB_PROXY_CHAIN_V6"
+    fi
+
+    print_line "reset v6 complete"
 }
 
 #=========================================
@@ -446,8 +558,45 @@ clear_iptables()
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
 
     print_line "clear complete"
+
+    clear_iptables_ipv6
 }
 
+# ==========================================
+# 清理 iptables 规则与策略路由 (IPv6 专属)
+# ==========================================
+clear_iptables_ipv6()
+{
+    print_line "clear iptables v6 and routing rules"
+
+    # 1. 拔除主链（PREROUTING / OUTPUT）中的引流路标
+    ip6tables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
+    ip6tables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
+
+    ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
+    ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
+
+    ip6tables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+
+    # 2. 彻底销毁自定义链
+    ip6tables -t nat -F "$MB_DNS_CHAIN_V6" 2>/dev/null
+    ip6tables -t nat -X "$MB_DNS_CHAIN_V6" 2>/dev/null
+
+    ip6tables -t mangle -F "$MB_PROXY_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -X "$MB_PROXY_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -X "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+
+    # 3. 释放 v6 策略路由与清除 IPSET
+    while ip -6 rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
+        :
+    done
+    ip -6 route flush table "$MB_ROUTE_TABLE" 2>/dev/null
+
+    ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
+
+    print_line "clear v6 complete"
+}
 
 #=========================================
 # 路由器本机流量透明代理封装（仅 TCP）
@@ -468,7 +617,7 @@ setup_oneself_tproxy()
     # ----------------------------------------------------------
     # 2. 填充本机代理链规则（自上而下，严格白名单放行）
     # ----------------------------------------------------------
-    
+
     # 规则 A: 放行发往本地回环和局域网的流量（包含 SmartDNS 走 127.0.0.1 的情况，以及本地 DNS 请求）
     iptables -t mangle -A "$MB_ONESELF_CHAIN" -d 127.0.0.0/8 -j RETURN
     iptables -t mangle -A "$MB_ONESELF_CHAIN" -d 192.168.0.0/16 -j RETURN
@@ -501,4 +650,44 @@ setup_oneself_tproxy()
     iptables -t mangle -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN"
 
     print_line "router oneself tcp proxy setup complete"
+
+    setup_oneself_tproxy_ipv6
+}
+
+# ==========================================
+# 路由器本机流量透明代理封装 (IPv6 专属，仅 TCP)
+# ==========================================
+setup_oneself_tproxy_ipv6()
+{
+    [ "$MB_ENABLE_IPV6" != "1" ] && return 0
+    print_line "setting up router oneself tcp proxy v6"
+
+    ip6tables -t mangle -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -X "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    if ! ip6tables -t mangle -L "$MB_ONESELF_CHAIN_V6" >/dev/null 2>&1; then
+        ip6tables -t mangle -N "$MB_ONESELF_CHAIN_V6"
+    fi
+
+    # 规则 A: 放行回环、链路本地和 ULA 私有本地地址
+    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -d ::1/128 -j RETURN
+    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -d fe80::/10 -j RETURN
+    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -d fc00::/7 -j RETURN
+
+    # 规则 B: 放行 Sing-box 自身发出的外网 v6 流量（绝对防止本地死循环）
+    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -m mark --mark "$MB_SINGBOX_OUT_MARK" -j RETURN
+
+    # 规则 C: 路由器本机发往 IPv6 大陆白名单集合的流量直连放行
+    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
+
+    # 规则 D: 放行本机发往公网的 DNS TCP 流量
+    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp --dport 53 -j RETURN
+
+    # 规则 E: 终极捕获打标，逼迫本机剩余的 TCP 流量掉头撞向本地代理
+    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp -j MARK --set-xmark "$MB_FWMARK"
+
+    # 主链挂载与去重
+    ip6tables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6"
+
+    print_line "router oneself tcp proxy v6 setup complete"
 }
