@@ -27,7 +27,9 @@ readonly MB_SINGBOX_OUT_MARK=169
 readonly MB_IPSET_NAME="merlinkbox_chn"
 readonly MB_IPSET_NAME_V6="merlinkbox_chn_v6"
 readonly MB_CHN_IP4_FILE="${CUR_DIR}/res/chn-ip4.txt"
+readonly MB_CHN_IP4_WHITELIST_FILE="${CUR_DIR}/res/chn-ip4-whitelist.txt" #这里面的东西不会被代理
 readonly MB_CHN_IP6_FILE="${CUR_DIR}/res/chn-ip6.txt"
+readonly MB_CHN_IP6_WHITELIST_FILE="${CUR_DIR}/res/chn-ip6-whitelist.txt" #这里面的东西不会被代理
 # 是否启用 IPv6 支持 (0 DISABLE, 1 ENABLE)。注意系统会检测到 IPv6 是否可用，如果不可用则会自动禁用 IPv6 支持
 readonly MB_ENABLE_IPV6=1
 
