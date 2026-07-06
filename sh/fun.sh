@@ -235,6 +235,13 @@ start_smartdns() {
         exit 1
     fi
 
+    # 根据是否启用 IPv6 调整 smartdns 配置
+    if [ "$MB_ENABLE_IPV6" = "1" ]; then
+        sed -i 's/^[[:space:]]*force-AAAA-SOA.*/# force-AAAA-SOA yes/' "$SMARTDNS_CONF"
+    else
+        sed -i 's/^[[:space:]]*#*[[:space:]]*force-AAAA-SOA.*/force-AAAA-SOA yes/' "$SMARTDNS_CONF"
+    fi
+
     # 防御性创建日志文件夹，防止 nonexistent directory 报错
     mkdir -p "${CUR_DIR}/logs"
 
