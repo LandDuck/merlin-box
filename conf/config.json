@@ -1,0 +1,78 @@
+{
+    "log": {
+        "level": "warn",
+        "timestamp": true
+    },
+    "dns": {
+        "servers": [
+            {
+                "type": "hosts",
+                "tag": "hosts-dns",
+                "predefined": {
+                    "xxx.xxx.net": "xxx.xxx.xxx.xxx or xxxx:xxxx:..."
+                }
+            }
+        ]
+    },
+    "inbounds": [
+        {
+            "type": "socks",
+            "tag": "socks-in",
+            "listen": "::",
+            "listen_port": 65001
+        },
+        {
+            "type": "tproxy",
+            "tag": "tproxy-in",
+            "listen": "::",
+            "listen_port": 65002
+        }
+    ],
+    "outbounds": [
+        //NaiveProxy
+        {
+            "type": "naive",
+            "server": "xxx.xxx.net",
+            "server_port": 443,
+            "username": "user",
+            "password": "pwd",
+            "quic": true,
+            "tls": {
+                "enabled": true,
+                "server_name": "xxx.xxx.net"
+            },
+            "domain_resolver": {
+                "server": "hosts-dns"
+            },
+            "tag": "naive-01",
+            "routing_mark": 169
+        },
+        //Hysteria2
+        {
+            "type": "hysteria2",
+            "server": "xxx.xxx.net",
+            "server_port": 443,
+            "obfs": {
+                "type": "salamander",
+                "password": "password"
+            },
+            "password": "password",
+            "tls": {
+                "enabled": true,
+                "server_name": "xxx.xxx.net",
+                "alpn": [
+                    "h3"
+                ]
+            },
+            "domain_resolver": {
+                "server": "hosts-dns"
+            },
+            "tag": "hysteria2-01",
+            "routing_mark": 169
+        }
+    ],
+    "route": {
+        "rules": [],
+        "final": "naive-01"
+    }
+}

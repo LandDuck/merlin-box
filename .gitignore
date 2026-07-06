@@ -1,0 +1,5 @@
+/bin
+source
+logs
+check-ipv6.sh
+check-lan.sh
