@@ -161,6 +161,13 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh -v
 ```
 
+安装与卸载（开机启动）
+
+```bash
+./merlin-box.sh install
+./merlin-box.sh uninstall
+```
+
 脚本行为摘要：
 
 - ▶️ `start`：清理旧规则 -> 启动 sing-box -> 启动 smartdns -> 重启 dnsmasq
