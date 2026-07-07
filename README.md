@@ -12,14 +12,15 @@
 
 # 📋 当前功能与限制
 
-| 项目 | 状态 | 说明 |
-|------|------|------|
-| IPv4 / IPv6 | ✅ 已支持 | 启动时自动检测 IPv6，可用则启用，不可用则自动降级到 IPv4 |
-| IPv4 / IPv6 分流 | ✅ 已支持 | ipset + iptables/ip6tables |
-| LAN 侧 QUIC（UDP 443） | ✅ 已处理 | 默认拦截（DROP UDP 443），避免 UDP 直连泄露 |
-| smartdns 解析分流 | ✅ 已支持 | 由 smartdns 替代 dnsmasq 承担 DNS 解析与域名分流 |
-| UDP | ⏳ 暂不支持 | -- |
-| ping 代理 | ⏳ 暂不支持 | 不在当前代理范围内 |
+| 项目                  | 状态        | 说明 |
+|---------------------|-----------|------|
+| IPv4 / IPv6         | ✅ 已支持     | 启动时自动检测 IPv6，可用则启用，不可用则自动降级到 IPv4 |
+| IPv4 / IPv6 分流      | ✅ 已支持     | ipset + iptables/ip6tables |
+| LAN 侧 QUIC（UDP 443） | ✅ 已处理     | 默认拦截（DROP UDP 443），避免 UDP 直连泄露 |
+| smartdns 解析分流       | ✅ 已支持     | 由 smartdns 替代 dnsmasq 承担 DNS 解析与域名分流 |
+| UDP                 | ⏳ 暂不支持    | -- |
+| ping 代理             | ⏳ 暂不支持    | 不在当前代理范围内 |
+| 软件中心UI              | ⏳ 短期不考虑支持 | -- |
 
 ### 💡 说明
 
