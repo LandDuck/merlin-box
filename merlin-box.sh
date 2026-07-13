@@ -201,8 +201,8 @@ main() {
   # 根据传入的参数执行相应的操作
 	case "$1" in
 	  install)
-  			install
-  			;;
+  		install
+  		;;
   	uninstall)
 			uninstall
 			;;
