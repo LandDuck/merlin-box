@@ -362,8 +362,10 @@ setup_lan_tproxy()
     # 2. 匹配 IPSET 白名单集合的 TCP 流量直接 RETURN（直连放行）
     iptables -t mangle -A "$MB_PROXY_CHAIN" -p tcp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
 
-    # 3. 屏蔽局域网的 QUIC (UDP 443)
-    iptables -t mangle -A "$MB_PROXY_CHAIN" -p udp --dport 443 -j DROP
+    # 3. 仅在开关开启时屏蔽局域网的 QUIC (UDP 443)
+    if [ "$MB_DISABLE_QUIC_FROM_LAN" = "1" ]; then
+        iptables -t mangle -A "$MB_PROXY_CHAIN" -p udp --dport 443 -j DROP
+    fi
 
     # 4. 剩余流量全部送入 TPROXY，使用全局变量端口和打标值
     iptables -t mangle -A "$MB_PROXY_CHAIN" -p tcp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
@@ -396,8 +398,10 @@ setup_lan_tproxy_ipv6()
     # 2. 匹配 IPSET 大陆 IPv6 白名单网段直接直连放行
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
 
-    # 3. 屏蔽局域网的 v6 QUIC (UDP 443)
-    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p udp --dport 443 -j DROP
+    # 3. 仅在开关开启时屏蔽局域网的 v6 QUIC (UDP 443)
+    if [ "$MB_DISABLE_QUIC_FROM_LAN" = "1" ]; then
+        ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p udp --dport 443 -j DROP
+    fi
 
     # 4. 剩余 TCP 流量全部送入 TPROXY 本地端口
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"

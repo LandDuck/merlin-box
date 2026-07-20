@@ -31,7 +31,9 @@ readonly MB_CHN_IP4_WHITELIST_FILE="${CUR_DIR}/res/chn-ip4-whitelist.txt" #这�
 readonly MB_CHN_IP6_FILE="${CUR_DIR}/res/chn-ip6.txt"
 readonly MB_CHN_IP6_WHITELIST_FILE="${CUR_DIR}/res/chn-ip6-whitelist.txt" #这里面的东西不会被代理
 # 是否启用 IPv6 支持 (0 DISABLE, 1 ENABLE)。注意系统会检测到 IPv6 是否可用，如果不可用则会自动禁用 IPv6 支持
-readonly MB_ENABLE_IPV6=1
+MB_ENABLE_IPV6=1
+# 禁用来自局域网的QUIC协议访问
+readonly MB_DISABLE_QUIC_FROM_LAN=1
 
 # 引入fun.sh脚本, ./sh/fun.sh
 if [ -f "$CUR_DIR/sh/fun.sh" ]; then
