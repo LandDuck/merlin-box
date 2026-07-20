@@ -15,7 +15,7 @@
 <table>
   <thead>
     <tr>
-      <th width="160">项目</th>
+      <th width="180">项目</th>
       <th width="120">状态</th>
       <th>说明</th>
     </tr>
