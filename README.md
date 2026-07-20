@@ -214,6 +214,7 @@ chmod +x scripts/dnsmasq.postconf
 ```bash
 ./merlin-box.sh start
 ./merlin-box.sh stop
+./merlin-box.sh restart
 ./merlin-box.sh -h
 ./merlin-box.sh -v
 ```
