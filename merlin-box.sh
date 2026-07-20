@@ -203,6 +203,14 @@ compress_singbox() {
 }
 
 #=========================================
+#调用 compress_executable_with_upx 压缩smartdns 可执行文件
+#=========================================
+compress_smartdns() {
+  local smartdns_path="${CUR_DIR}/bin/smartdns"
+  compress_executable_with_upx "$smartdns_path"
+}
+
+#=========================================
 # 主函数
 #=========================================
 main() {
@@ -234,13 +242,16 @@ main() {
         compress_singbox)
           compress_singbox
           ;;
+        compress_smartdns)
+          compress_smartdns
+          ;;
         -h|--help|"")
           echo "用法: $SCRIPT_NAME tool <subcommand>"
-          echo "可用子命令: compress_singbox"
+          echo "可用子命令: compress_singbox, compress_smartdns"
           ;;
         *)
           echo "错误: 不支持的工具子命令 '$2'"
-          echo "可用子命令: compress_singbox"
+          echo "可用子命令: compress_singbox, compress_smartdns"
           exit 1
           ;;
       esac

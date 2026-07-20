@@ -225,14 +225,16 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh uninstall
 ```
 
-工具命令（压缩 sing-box）
+工具命令（压缩 sing-box 和 smartdns）
 
 ```bash
 ./merlin-box.sh tool compress_singbox
+./merlin-box.sh tool compress_smartdns
 ./merlin-box.sh tool -h
 ```
-
-⚠️ 警告：压缩虽然可以明显降低文件大小，但是启动时会比原始程序要慢，如果空间够用，不需要压缩。
+- 这个命令提供在本地系统（或WSL）中压缩 sing-box 或 smartdns 可执行文件的功能，需要系统安装upx工具。
+- 本仓库携带的二进制文件已经经过压缩。
+- ⚠️ 压缩虽然可以明显降低文件大小，但是启动时会比原始程序要慢。
 
 
 脚本行为摘要：
