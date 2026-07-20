@@ -7,8 +7,8 @@
 # 3. 强制应用 DNS 劫持与优化配置
 #=======================================================================
 
-# 引入科学上网插件公共库
-source /koolshare/scripts/ss_base.sh
+# 引入 Asuswrt-Merlin helper functions
+source /rom/etc/koolshare/bin/helper.sh
 
 # 接收从外部（通常是系统 dnsmasq 启动时）传进来的参数
 CONFIG=$1
@@ -27,7 +27,7 @@ prepare(){
            -e '/dhcp-script/d' \
            -e '/servers-file/d' \
            -e '/resolv-file/d' "${CONFIG}"
-    
+
     # 3. 用 grep 静默模式检查，如果没有 conf-dir= 则追加
     if ! grep -q "conf-dir=" "${CONFIG}"; then
         echo "conf-dir=/jffs/configs/dnsmasq.d" >> "${CONFIG}"
@@ -37,7 +37,7 @@ prepare(){
 #=======================================================================
 # 函数名称: merlin_box_mod
 # 功能描述: 强制应用 DNS 劫持与优化配置
-# 调用函数: pc_insert (由 ss_base.sh 提供)
+# 调用函数: pc_insert (由 helper.sh 提供)
 #=======================================================================
 merlin_box_mod(){
     # 1. 确保配置文件存在
@@ -45,7 +45,7 @@ merlin_box_mod(){
 
     # 2. 在配置文件首行插入 port=0，关闭 dnsmasq 默认的 DNS 监听端口
     sed -i '1i\port=0' "${CONFIG}"
-    
+
     # 3. 注入 DHCP 选项，让局域网设备的 DNS 自动指向路由器自身（0.0.0.0）
     pc_insert "dhcp-option" "dhcp-option=option:dns-server,0.0.0.0" "${CONFIG}"
 }
