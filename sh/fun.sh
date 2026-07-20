@@ -739,8 +739,8 @@ compress_executable_with_upx() {
     fi
 
     echo "⏳ 正在使用 upx 压缩可执行文件：$executable_path"
-    #upx --best --lzma "$executable_path" --lzma启动时会稍微慢一些
-    upx --best "$executable_path"
+    upx --lzma --ultra-brute "$executable_path" #--lzma启动时会稍微慢一些
+    #upx --best "$executable_path"
 
     if [ $? -eq 0 ]; then
         echo "✅ 压缩完成：$executable_path"
