@@ -26,7 +26,7 @@
       <td>✅ 已支持</td>
       <td>
         启动时自动检测 IPv6，可用则启用，不可用则自动降级到 IPv4。<br>
-        可修改 merlin-box.sh 中的 MB_ENABLE_IPV6 变量值直接禁用 IPv6。
+        可修改 merlin-box.sh 中的 MB_ENABLE_IPV6 变量值手动禁用 IPv6。
       </td>
     </tr>
     <tr>
@@ -41,7 +41,7 @@
       <td>✅ 已处理</td>
       <td>
         默认拦截（DROP UDP 443），避免 UDP 直连泄露。<br>
-        可修改 merlin-box.sh 中的 MB_DISABLE_QUIC_FROM_LAN 变量禁用拦截功能。
+        可修改 merlin-box.sh 中的 MB_DISABLE_QUIC_FROM_LAN 变量手动禁用拦截功能。
       </td>
     </tr>
     <tr>
@@ -78,7 +78,8 @@
 ### 💡 说明
 
 - 当前仅代理 TCP。
-- IPv6 需要本地网络和上游服务器均支持；脚本会自动检测 IPv6 可用性，不可用时自动降级到 IPv4 流程。
+- IPv6 需要本地网络和上游服务器均支持；MB_ENABLE_IPV6=1 时脚本会自动检测本地网络 IPv6 可用性，不可用时自动降级到 IPv4 流程。
+- ⚠️脚本无法检测上游服务器是否支持 IPv6，若上游不支持 IPv6，且 MB_ENABLE_IPV6=1，由于会走IPV6优先模式，可能导致无法上网。
 - QUIC 属于 UDP，项目当前采取拦截方案（DROP UDP 443），因此会导致依赖 H3/QUIC 的网站在客户端侧无法以 QUIC 访问（通常会回退到 TCP/TLS；个别站点可能表现为打不开或异常）。
 
 ---
