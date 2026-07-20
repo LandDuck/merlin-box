@@ -12,15 +12,68 @@
 
 # 📋 当前功能与限制
 
-| 项目                  | 状态        | 说明                                                                                                                    |
-|---------------------|-------------|-------------------------------------------------------------------------------------------------------------------------|
-| IPv4 / IPv6         | ✅ 已支持   | 启动时自动检测 IPv6，可用则启用，不可用则自动降级到 IPv4。<br>可修改merlin-box.sh中的MB_ENABLE_IPV6变量值直接禁用IPV6。 |
-| IPv4 / IPv6 分流      | ✅ 已支持   | ipset + iptables/ip6tables                                                                                              |
-| LAN 侧 QUIC（UDP 443） | ✅ 已处理   | 默认拦截（DROP UDP 443），避免 UDP 直连泄露。<br>可修改merlin-box.sh中的MB_DISABLE_QUIC_FROM_LAN变量禁用拦截功能。          |
-| smartdns 解析分流       | ✅ 已支持   | 由 smartdns 替代 dnsmasq 承担 DNS 解析与域名分流                                                                        |
-| UDP                 | ⏳ 暂不支持 | --                                                                                                                      |
-| ping 代理             | ⏳ 暂不支持 | 不在当前代理范围内                                                                                                      |
-| 软件中心UI              | ⏳ 暂不支持 | 长远有计划支持                                                                                                          |
+<table>
+  <thead>
+    <tr>
+      <th width="160">项目</th>
+      <th width="120">状态</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>IPv4 / IPv6</td>
+      <td>✅ 已支持</td>
+      <td>
+        启动时自动检测 IPv6，可用则启用，不可用则自动降级到 IPv4。<br>
+        可修改 merlin-box.sh 中的 MB_ENABLE_IPV6 变量值直接禁用 IPv6。
+      </td>
+    </tr>
+    <tr>
+      <td>IPv4 / IPv6 分流</td>
+      <td>✅ 已支持</td>
+      <td>
+        ipset + iptables/ip6tables
+      </td>
+    </tr>
+    <tr>
+      <td>屏蔽 LAN 侧 QUIC <br />UDP 443</td>
+      <td>✅ 已处理</td>
+      <td>
+        默认拦截（DROP UDP 443），避免 UDP 直连泄露。<br>
+        可修改 merlin-box.sh 中的 MB_DISABLE_QUIC_FROM_LAN 变量禁用拦截功能。
+      </td>
+    </tr>
+    <tr>
+      <td>smartdns 解析分流</td>
+      <td>✅ 已支持</td>
+      <td>
+        由 smartdns 替代 dnsmasq 承担 DNS 解析与域名分流。
+      </td>
+    </tr>
+    <tr>
+      <td>UDP</td>
+      <td>⏳ 暂不支持</td>
+      <td>
+        --
+      </td>
+    </tr>
+    <tr>
+      <td>ping 代理</td>
+      <td>⏳ 暂不支持</td>
+      <td>
+        不在当前代理范围内。
+      </td>
+    </tr>
+    <tr>
+      <td>软件中心 UI</td>
+      <td>⏳ 暂不支持</td>
+      <td>
+        长远有计划支持。
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### 💡 说明
 
