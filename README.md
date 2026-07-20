@@ -172,6 +172,16 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh uninstall
 ```
 
+工具命令（压缩 sing-box）
+
+```bash
+./merlin-box.sh tool compress_singbox
+./merlin-box.sh tool -h
+```
+
+⚠️ 警告：压缩虽然可以明显降低文件大小，但是启动时会比原始程序要慢，如果空间够用，不需要压缩。
+
+
 脚本行为摘要：
 
 - ▶️ `start`：清理旧规则 -> 启动 sing-box -> 启动 smartdns -> 重启 dnsmasq

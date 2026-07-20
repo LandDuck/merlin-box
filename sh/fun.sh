@@ -716,3 +716,32 @@ setup_oneself_tproxy_ipv6()
 
     print_line "router oneself tcp proxy v6 setup complete"
 }
+
+# ==========================================
+# 使用upx压缩 一个可执行文件
+# 接收一个参数：要压缩的可执行文件路径
+# ==========================================
+compress_executable_with_upx() {
+    local executable_path="$1"
+
+    if [ ! -f "$executable_path" ]; then
+        echo "❌ 错误：指定的可执行文件不存在：$executable_path"
+        return 1
+    fi
+
+    if ! command -v upx >/dev/null 2>&1; then
+        echo "⚠️ 警告：未检测到 upx 工具，无法进行压缩。请先安装 upx。https://github.com/upx/upx/releases "
+        return 1
+    fi
+
+    echo "⏳ 正在使用 upx 压缩可执行文件：$executable_path"
+    #upx --best --lzma "$executable_path" --lzma启动时会稍微慢一些
+    upx --best "$executable_path"
+
+    if [ $? -eq 0 ]; then
+        echo "✅ 压缩完成：$executable_path"
+    else
+        echo "❌ 压缩失败，请检查 upx 输出信息。"
+        return 1
+    fi
+}

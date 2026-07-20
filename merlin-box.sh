@@ -49,6 +49,10 @@ show_help() {
 命令:
   start        启动服务
   stop         停止服务
+  tool         工具命令
+
+工具子命令:
+  compress_singbox  压缩 sing-box 可执行文件
 
 选项:
   -h, --help   显示帮助信息
@@ -189,6 +193,14 @@ uninstall() {
 }
 
 #=========================================
+#调用 compress_executable_with_upx 压缩sing-box 可执行文件
+#=========================================
+compress_singbox() {
+  local singbox_path="${CUR_DIR}/bin/sing-box"
+  compress_executable_with_upx "$singbox_path"
+}
+
+#=========================================
 # 主函数
 #=========================================
 main() {
@@ -215,6 +227,22 @@ main() {
 		stop)
 			stop
 			;;
+    tool)
+      case "$2" in
+        compress_singbox)
+          compress_singbox
+          ;;
+        -h|--help|"")
+          echo "用法: $SCRIPT_NAME tool <subcommand>"
+          echo "可用子命令: compress_singbox"
+          ;;
+        *)
+          echo "错误: 不支持的工具子命令 '$2'"
+          echo "可用子命令: compress_singbox"
+          exit 1
+          ;;
+      esac
+      ;;
 	  restart)
 			restart
 			;;
