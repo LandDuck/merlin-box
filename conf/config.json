@@ -36,7 +36,7 @@
             "server_port": 443,
             "username": "user",
             "password": "pwd",
-            //某些地区TCP（HTTP2）模式长时间连接可能会被限速度，可用quic（HTTP3）模式解决但是quic模式速度慢。
+            //某些地区TCP（HTTP2）模式长时间连接可能会被限速，可用quic（HTTP3）模式解决但是quic模式速度慢。
             //如果存在限速问题且有高速要求，建议使用hysteria2模式。
             //"quic": true,
             "tls": {
