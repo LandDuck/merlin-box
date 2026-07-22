@@ -110,8 +110,8 @@
 可选白名单文件：
 
 - 在此白名单中的 IP 将被视为直连。
-    - `res/chn-ip4-whitelist.txt`
-    - `res/chn-ip6-whitelist.txt`
+    - `res/ip4-whitelist.txt`
+    - `res/ip6-whitelist.txt`
 
 ---
 
@@ -144,9 +144,11 @@ merlin-box/
 ├─ sh/
 │  └─ fun.sh                # 核心逻辑
 └─ res/
-   ├─ chn-ip4.txt
-   ├─ chn-ip6.txt
-   └─ chn-site.txt
+   ├─ chn-ip4.txt           # 中国 IPv4
+   ├─ chn-ip6.txt           # 中国 IPv6
+   ├─ chn-site.txt          # 中国域名列表
+   ├─ site-blocklist.txt    # 屏蔽域名列表(进入黑洞)
+   └─ site-blacklist.txt    # 黑名单域名列表(强制走代理)
 ```
 
 ### ⚠️ 注意
@@ -201,10 +203,16 @@ chmod +x scripts/dnsmasq.postconf
 - 按需替换中国/国际 DNS 上游
 - 保持域名分流规则（`chn-site.txt`）
 
-### 3. 如需额外直连 IP，可创建并维护：
+### 3. 如需额外直连 IP，可创建并维护(可选)：
 
-- `res/chn-ip4-whitelist.txt`
-- `res/chn-ip6-whitelist.txt`
+- `res/ip4-whitelist.txt`
+- `res/ip6-whitelist.txt`
+
+### 4. 广告拦击/屏蔽域名(黑洞)
+- `res/site-blocklist.txt` 
+
+### 5. 强制走代理域名(黑名单)
+- `res/site-blacklist.txt` 本项目此文件中收集了 Apple 相关域名，能解决访问外区苹果服务的很多问题，访问国区的小伙伴自行修改此文件。
 
 ---
 

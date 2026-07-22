@@ -455,13 +455,13 @@ reset_iptables()
         echo "⚠️ 未找到白名单文件: $MB_CHN_IP4_FILE，分流功能将不生效！"
     fi
 
-    #检测是否存在 MB_CHN_IP4_WHITELIST_FILE 这个文件, 如果存在, 也要加载到 ipset 中
-    if [ -f "$MB_CHN_IP4_WHITELIST_FILE" ]; then
-        dos2unix "$MB_CHN_IP4_WHITELIST_FILE" 2>/dev/null
-        (echo "create $MB_IPSET_NAME hash:net -exist" ; awk '{print "add '"$MB_IPSET_NAME"'" , $0}' "$MB_CHN_IP4_WHITELIST_FILE") | ipset restore 2>/dev/null
+    #检测是否存在 MB_IP4_WHITELIST_FILE 这个文件, 如果存在, 也要加载到 ipset 中
+    if [ -f "$MB_IP4_WHITELIST_FILE" ]; then
+        dos2unix "$MB_IP4_WHITELIST_FILE" 2>/dev/null
+        (echo "create $MB_IPSET_NAME hash:net -exist" ; awk '{print "add '"$MB_IPSET_NAME"'" , $0}' "$MB_IP4_WHITELIST_FILE") | ipset restore 2>/dev/null
         echo "✅ 成功将自定义白名单 IP 网段加载至 ipset 集合。"
     else
-        echo "⚠️ 未找到自定义白名单文件: $MB_CHN_IP4_WHITELIST_FILE 。"
+        echo "⚠️ 未找到自定义白名单文件: $MB_IP4_WHITELIST_FILE 。"
     fi
 
     # ----------------------------------------------------------
@@ -505,13 +505,13 @@ reset_iptables_ipv6()
         echo "⚠️ 未找到 IPv6 白名单文件: $MB_CHN_IP6_FILE，IPv6 分流功能将不生效！"
     fi
 
-    # 检测是否存在 MB_CHN_IP6_WHITELIST_FILE 这个文件, 如果存在, 也要加载到 ipset 中
-    if [ -f "$MB_CHN_IP6_WHITELIST_FILE" ]; then
-        dos2unix "$MB_CHN_IP6_WHITELIST_FILE" 2>/dev/null
-        (echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist" ; awk '{print "add '"$MB_IPSET_NAME_V6"'" , $0}' "$MB_CHN_IP6_WHITELIST_FILE") | ipset restore 2>/dev/null
+    # 检测是否存在 MB_IP6_WHITELIST_FILE 这个文件, 如果存在, 也要加载到 ipset 中
+    if [ -f "$MB_IP6_WHITELIST_FILE" ]; then
+        dos2unix "$MB_IP6_WHITELIST_FILE" 2>/dev/null
+        (echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist" ; awk '{print "add '"$MB_IPSET_NAME_V6"'" , $0}' "$MB_IP6_WHITELIST_FILE") | ipset restore 2>/dev/null
         echo "✅ 成功将自定义白名单 IPv6 网段加载至 ipset 集合。"
     else
-        echo "⚠️ 未找到自定义白名单文件: $MB_CHN_IP6_WHITELIST_FILE 。"
+        echo "⚠️ 未找到自定义白名单文件: $MB_IP6_WHITELIST_FILE 。"
     fi
 
     # 3. 策略路由重置 (使用 ip -6 命令)
