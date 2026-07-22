@@ -52,6 +52,27 @@
       </td>
     </tr>
     <tr>
+      <td>广告拦截</td>
+      <td>✅ 已支持</td>
+      <td>
+        通过配置 site-blocklist.txt 黑洞域名列表实现。
+      </td>
+    </tr>
+    <tr>
+      <td>域名黑名单</td>
+      <td>✅ 已支持</td>
+      <td>
+        通过配置 site-blacklist.txt 黑名单域名列表使指定域名强制走代理。
+      </td>
+    </tr>
+    <tr>
+      <td>IP白名单</td>
+      <td>✅ 已支持</td>
+      <td>
+        通过配置 ip4-whitelist.txt 和 ip6-whitelist.txt 文件实现，使指定 IP 强制直连。
+      </td>
+    </tr>
+    <tr>
       <td>UDP</td>
       <td>⏳ 暂不支持</td>
       <td>
@@ -156,9 +177,9 @@ merlin-box/
 - 脚本默认会在项目目录下读取 `bin/sing-box` 与 `bin/smartdns`，并写日志到 `logs/`。
 - 目前包含的二进制文件（信息见下面表格），仅在 BE-86U 测试通过（没有其它机型供测试）。
 
-| 型号     | SINGBOX                  | SMARTDNS          |
-|--------|--------------------------|-------------------|
-| BE-86U | linux-arm64-musl  | smartdns-aarch64  |
+| 型号   | SINGBOX          | SMARTDNS         |
+|--------|------------------|------------------|
+| BE-86U | linux-arm64-musl | smartdns-aarch64 |
 
 ---
 
@@ -203,15 +224,17 @@ chmod +x scripts/dnsmasq.postconf
 - 按需替换中国/国际 DNS 上游
 - 保持域名分流规则（`chn-site.txt`）
 
-### 3. 如需额外直连 IP，可创建并维护(可选)：
+### 3. 如需额外直连 IP，可创建并维护 (可选)：
 
 - `res/ip4-whitelist.txt`
 - `res/ip6-whitelist.txt`
 
-### 4. 广告拦击/屏蔽域名(黑洞)
-- `res/site-blocklist.txt` 
+### 4. 广告拦击/屏蔽域名 (黑洞)
 
-### 5. 强制走代理域名(黑名单)
+- `res/site-blocklist.txt`
+
+### 5. 强制走代理域名 (黑名单)
+
 - `res/site-blacklist.txt` 本项目此文件中收集了 Apple 相关域名，能解决访问外区苹果服务的很多问题，访问国区的小伙伴自行修改此文件。
 
 ---
@@ -242,10 +265,10 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh tool compress_smartdns
 ./merlin-box.sh tool -h
 ```
+
 - 这个命令提供在本地系统（或WSL）中压缩 sing-box 或 smartdns 可执行文件的功能，需要系统安装upx工具。
 - 本仓库携带的二进制文件已经经过压缩。
 - ⚠️ 压缩虽然可以明显降低文件大小，但是启动时会比原始程序要慢。
-
 
 脚本行为摘要：
 
@@ -274,4 +297,5 @@ chmod +x scripts/dnsmasq.postconf
 ---
 
 # 📜 LICENSE
+
 MIT License
