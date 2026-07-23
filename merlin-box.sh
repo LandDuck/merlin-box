@@ -83,6 +83,12 @@ start() {
     fi
   fi
 
+  # 如果未能成功加载 TPROXY 模块，停止执行
+  if ! check_and_load_tproxy; then
+      echo "脚本终止执行。"
+      exit 1
+  fi
+
 	# 清理iptables规则
 	reset_iptables
   # 启动singbox socks:65001  tproxy:65002

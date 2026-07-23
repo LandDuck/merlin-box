@@ -26,6 +26,32 @@ check_ipv6_support() {
     return 1
 }
 
+# ==========================================
+# 检测并加载当前路由内核的 TPROXY 模块
+# 如果支持并加载成功返回0，否则返回1
+# 注意linux系统中，函数返回值为0表示成功，非0表示失败
+# ==========================================
+check_and_load_tproxy() {
+    echo "🔍 开始检测并加载 TPROXY 模块..."
+
+    # 方法 A: 尝试直接加载 xt_TPROXY 模块
+    if modprobe xt_TPROXY >/dev/null 2>&1; then
+        echo "✅ xt_TPROXY 模块加载成功（或已处于加载状态），当前环境支持 TPROXY。"
+        return 0
+    fi
+
+    echo "⚠️ modprobe 直接加载失败，开始检查固件文件系统是否存在模块..."
+
+    # 方法 B: 检查文件系统中是否有 TPROXY 相关的 ko 文件
+    if find /lib/modules/$(uname -r) -type f -name '*TPROXY*' 2>/dev/null | grep -q .; then
+        echo "⚠️ 找到 TPROXY 模块文件，但尝试加载时可能遇到内核版本不匹配或其他问题。"
+    else
+        echo "❌ 未在系统中找到 TPROXY 模块文件，当前固件内核不支持 TPROXY。"
+    fi
+
+    return 1
+}
+
 #=========================================
 # 打印分隔线
 #=========================================
@@ -78,31 +104,31 @@ kill_process_by_name() {
 # 重启 dnsmasq 服务
 # ==========================================
 restart_dnsmasq(){
-    print_line "dnsmasq"
+    print_line "restarting dnsmasq"
 
-	local OLD_PID=$(pidof dnsmasq)
-	if [ -n "${OLD_PID}" ];then
-		echo "⚠️ 当前dnsmasq正常运行中，pid: ${OLD_PID}，准备重启！"
-	else
-		echo "🔍 当前dnsmasq未运行，尝试重启！"
-	fi
+    local OLD_PID=$(pidof dnsmasq)
+    if [ -n "${OLD_PID}" ];then
+      echo "⚠️ 当前dnsmasq正常运行中，pid: ${OLD_PID}，准备重启！"
+    else
+      echo "🔍 当前dnsmasq未运行，尝试重启！"
+    fi
 
-	echo "⏳ 执行dnsmasq重启服务..."
-	service restart_dnsmasq >/dev/null 2>&1
+    echo "⏳ 执行dnsmasq重启服务..."
+    service restart_dnsmasq >/dev/null 2>&1
 
-	local DPID
-	local i=50
-	until [ -n "${DPID}" ]; do
-		i=$(($i - 1))
-		DPID=$(pidof dnsmasq)
-		if [ "$i" -lt 1 ]; then
-			echo "❌ dnsmasq重启失败，请检查你的dnsmasq配置！"
-			return 1
-		fi
-		usleep 250000
-	done
+    local DPID
+    local i=50
+    until [ -n "${DPID}" ]; do
+      i=$(($i - 1))
+      DPID=$(pidof dnsmasq)
+      if [ "$i" -lt 1 ]; then
+        echo "❌ dnsmasq重启失败，请检查你的dnsmasq配置！"
+        return 1
+      fi
+      usleep 250000
+    done
 
-    print_line "dnsmasq complete"
+    #print_line "dnsmasq complete"
 }
 
 # ==========================================
@@ -114,7 +140,7 @@ start_singbox() {
     local SINGBOX_CONF="${CUR_DIR}/conf/config.json"
     local SINGBOX_LOG="${CUR_DIR}/logs/sing-box.log"
 
-    print_line "singbox"
+    print_line "starting singbox"
 
     # 检查并清理可能残存的旧 sing-box 进程（防止重复启动套娃）
     if ps | grep -v grep | grep -q "$SINGBOX_BIN"; then
@@ -158,7 +184,7 @@ start_singbox() {
         echo "❌ 启动失败！请检查 $SINGBOX_LOG 查看具体报错原因。"
     fi
 
-    print_line "singbox complete"
+    #print_line "singbox complete"
 }
 
 #=========================================
@@ -178,14 +204,14 @@ stop_singbox()
         echo "🔍 未发现运行中的 sing-box 实例，无需停止。"
     fi
 
-    print_line "singbox stop complete"
+    #print_line "singbox stop complete"
 }
 
 #=========================================
 # 启动 smartdns 服务
 #=========================================
 start_smartdns() {
-    print_line "smartdns"
+    print_line "starting smartdns"
     # 相关路径
     local SMARTDNS_BIN="${CUR_DIR}/bin/smartdns"
     local SMARTDNS_CONF="${CUR_DIR}/conf/smartdns.conf"
@@ -265,7 +291,7 @@ start_smartdns() {
         echo "❌ 启动失败！请检查 $SMARTDNS_LOG 查看具体报错原因。"
     fi
 
-    print_line "smartdns complete"
+    #print_line "smartdns complete"
 }
 
 #=========================================
@@ -297,7 +323,7 @@ stop_smartdns() {
         echo "🔍 未检测到 dnsmasq.postconf，无需删除。"
     fi
 
-    print_line "smartdns stop complete"
+    #print_line "smartdns stop complete"
 }
 
 
@@ -320,7 +346,7 @@ setup_dns_hijack()
     iptables -t nat -A PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN"
     iptables -t nat -A PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN"
 
-    print_line "lan dns hijack setup complete"
+    #print_line "lan dns hijack setup complete"
 
     setup_dns_hijack_ipv6
 }
@@ -344,7 +370,7 @@ setup_dns_hijack_ipv6()
     ip6tables -t nat -A PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6"
     ip6tables -t nat -A PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6"
 
-    print_line "lan dns v6 hijack setup complete"
+    #print_line "lan dns v6 hijack setup complete"
 }
 
 #=========================================
@@ -377,7 +403,7 @@ setup_lan_tproxy()
     iptables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
     iptables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN"
 
-    print_line "lan tproxy setup complete"
+    #print_line "lan tproxy setup complete"
 
     setup_lan_tproxy_ipv6
 }
@@ -413,7 +439,7 @@ setup_lan_tproxy_ipv6()
     ip6tables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
     ip6tables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6"
 
-    print_line "lan tproxy v6 setup complete"
+    #print_line "lan tproxy v6 setup complete"
 }
 
 #=========================================
@@ -474,7 +500,7 @@ reset_iptables()
     ip rule add fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE"
     ip route add local default dev lo table "$MB_ROUTE_TABLE"
 
-    print_line "reset complete"
+    #print_line "reset complete"
 
     reset_iptables_ipv6
 }
@@ -537,7 +563,7 @@ reset_iptables_ipv6()
         ip6tables -t mangle -N "$MB_PROXY_CHAIN_V6"
     fi
 
-    print_line "reset v6 complete"
+    #print_line "reset v6 complete"
 }
 
 #=========================================
@@ -586,7 +612,7 @@ clear_iptables()
     # 销毁 ipset 白名单集合
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
 
-    print_line "clear complete"
+    #print_line "clear complete"
 
     clear_iptables_ipv6
 }
@@ -624,7 +650,7 @@ clear_iptables_ipv6()
 
     ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
 
-    print_line "clear v6 complete"
+    #print_line "clear v6 complete"
 }
 
 #=========================================
@@ -678,7 +704,7 @@ setup_oneself_tproxy()
     # 正式引流：将路由器本机产生的所有 TCP 流量引入自定义链
     iptables -t mangle -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN"
 
-    print_line "router oneself tcp proxy setup complete"
+    #print_line "router oneself tcp proxy setup complete"
 
     setup_oneself_tproxy_ipv6
 }
@@ -718,7 +744,7 @@ setup_oneself_tproxy_ipv6()
     ip6tables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
     ip6tables -t mangle -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6"
 
-    print_line "router oneself tcp proxy v6 setup complete"
+    #print_line "router oneself tcp proxy v6 setup complete"
 }
 
 # ==========================================
