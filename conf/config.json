@@ -1,6 +1,8 @@
 {
     "log": {
-        "level": "warn",
+        "disabled": true,
+        "level": "error",
+        "output": "logs/singbox-bin.log",
         "timestamp": true
     },
     "dns": {

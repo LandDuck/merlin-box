@@ -174,7 +174,7 @@ merlin-box/
 
 ### ⚠️ 注意
 
-- 脚本默认会在项目目录下读取 `bin/sing-box` 与 `bin/smartdns`，并写日志到 `logs/`。
+- 脚本默认会在项目中找 `bin/sing-box` 与 `bin/smartdns` 来启动相关服务，并将控制台输出重定向到 `logs/sing-box.log` 和 `logs/smartdns.log`。
 - 目前包含的二进制文件在下面的设备上测试通过（没有更多机型供测试）。
 
 | 型号     | SINGBOX          | SMARTDNS         |
