@@ -1,28 +1,63 @@
+
+# 用于打印彩色日志
+readonly GREEN="\033[32m"
+readonly YELLOW="\033[33m"
+readonly RESET="\033[0m"
+readonly RED="\033[31m"
+
+#=========================================
+# 打印 错误信息 红色
+#=========================================
+print_error() {
+    printf "${RED}[✗] %s${RESET}\n" "$1"
+}
+
+#=========================================
+# 打印 成功信息 绿色
+#=========================================
+print_success() {
+    printf "${GREEN}[✓] %s${RESET}\n" "$1"
+}
+
+#=========================================
+# 打印 警告信息 黄色
+#=========================================
+print_warning() {
+    printf "${YELLOW}[!] %s${RESET}\n" "$1"
+}
+
+#=========================================
+# 打印 普通信息 默认颜色
+#=========================================
+print_normal() {
+    printf "%s\n" "$1"
+}
+
 # ==========================================
 # 检测当前路由是否支持 IPv6
 # 如果支持返回0，否则返回1
 # 注意linux系统中，函数返回值为0表示成功，非0表示失败
 # ==========================================
 check_ipv6_support() {
-    echo "🔍 开始检测当前路由是否支持 IPv6..."
+    print_normal "🔍 开始检测当前路由是否支持 IPv6..."
 
     # 方法 A: 检测本地路由表是否有默认的 IPv6 出口路由 (最准确)
     if ip -6 route show | grep -q "default"; then
-        echo "✅ 检测到默认 IPv6 路由，当前环境支持 IPv6。"
+        print_success "✅ 检测到默认 IPv6 路由，当前环境支持 IPv6。"
         return 0
     fi
 
-    echo "⚠️ 未检测到默认 IPv6 路由，继续尝试 IPv6 连通性检测..."
+    print_warning "⚠️ 未检测到默认 IPv6 路由，继续尝试 IPv6 连通性检测..."
 
     # 方法 B: 尝试通过 IPv6 ping 阿里云 DNS 服务器 (2400:3200::1) 来判断是否有 IPv6 网络连接
     # -c 1: 发送1个包, -W 2: 超时时间2秒
     if ping6 -c 1 -W 2 2400:3200::1 >/dev/null 2>&1; then
-        echo "✅ IPv6 连通性检测通过，当前环境支持 IPv6。"
+        print_success "✅ IPv6 连通性检测通过，当前环境支持 IPv6。"
         return 0
     fi
 
     # 如果以上检测都失败，说明不支持或未启用 IPv6
-    echo "❌ 未检测到可用的 IPv6 路由或连通性，当前环境不支持或未启用 IPv6。"
+    print_error "❌ 未检测到可用的 IPv6 路由或连通性，当前环境不支持或未启用 IPv6。"
     return 1
 }
 
@@ -32,21 +67,21 @@ check_ipv6_support() {
 # 注意linux系统中，函数返回值为0表示成功，非0表示失败
 # ==========================================
 check_and_load_tproxy() {
-    echo "🔍 开始检测并加载 TPROXY 模块..."
+    print_normal "🔍 开始检测并加载 TPROXY 模块..."
 
     # 方法 A: 尝试直接加载 xt_TPROXY 模块
     if modprobe xt_TPROXY >/dev/null 2>&1; then
-        echo "✅ xt_TPROXY 模块加载成功（或已处于加载状态），当前环境支持 TPROXY。"
+        print_success "✅ xt_TPROXY 模块加载成功（或已处于加载状态），当前环境支持 TPROXY。"
         return 0
     fi
 
-    echo "⚠️ modprobe 直接加载失败，开始检查固件文件系统是否存在模块..."
+    print_warning "⚠️ modprobe 直接加载失败，开始检查固件文件系统是否存在模块..."
 
     # 方法 B: 检查文件系统中是否有 TPROXY 相关的 ko 文件
     if find /lib/modules/$(uname -r) -type f -name '*TPROXY*' 2>/dev/null | grep -q .; then
-        echo "⚠️ 找到 TPROXY 模块文件，但尝试加载时可能遇到内核版本不匹配或其他问题。"
+        print_warning "⚠️ 找到 TPROXY 模块文件，但尝试加载时可能遇到内核版本不匹配或其他问题。"
     else
-        echo "❌ 未在系统中找到 TPROXY 模块文件，当前固件内核不支持 TPROXY。"
+        print_error "❌ 未在系统中找到 TPROXY 模块文件，当前固件内核不支持 TPROXY。"
     fi
 
     return 1
@@ -80,12 +115,12 @@ kill_process_by_name() {
     local process_pid
 
     if [ -z "$process_name" ]; then
-        echo "⚠️ 未传入进程名，跳过清理。"
+        print_warning "⚠️ 未传入进程名，跳过清理。"
         return 1
     fi
 
     if ps | grep -v grep | grep -q "$process_name"; then
-        echo "⚠️ 侦测到正在运行的 $process_name 进程，正在清理..."
+        print_normal "🔍 侦测到正在运行的 $process_name 进程，正在清理..."
         killall -9 "$process_name" 2>/dev/null
 
         process_pid=$(ps | grep -v grep | grep "$process_name" | awk '{print $1}')
@@ -94,9 +129,9 @@ kill_process_by_name() {
         fi
 
         sleep 2
-        echo "✅ $process_name 进程已清理。"
+        print_success "✅ $process_name 进程已清理。"
     else
-        echo "🔍 未发现运行中的 $process_name 进程，跳过。"
+        print_normal "🔍 未发现运行中的 $process_name 进程，跳过。"
     fi
 }
 
@@ -108,12 +143,12 @@ restart_dnsmasq(){
 
     local OLD_PID=$(pidof dnsmasq)
     if [ -n "${OLD_PID}" ];then
-      echo "⚠️ 当前dnsmasq正常运行中，pid: ${OLD_PID}，准备重启！"
+      print_warning "⚠️ 当前dnsmasq正常运行中，pid: ${OLD_PID}，准备重启！"
     else
-      echo "🔍 当前dnsmasq未运行，尝试重启！"
+      print_normal "🔍 当前dnsmasq未运行，尝试重启！"
     fi
 
-    echo "⏳ 执行dnsmasq重启服务..."
+    print_normal "⏳ 执行dnsmasq重启服务..."
     service restart_dnsmasq >/dev/null 2>&1
 
     local DPID
@@ -122,7 +157,7 @@ restart_dnsmasq(){
       i=$(($i - 1))
       DPID=$(pidof dnsmasq)
       if [ "$i" -lt 1 ]; then
-        echo "❌ dnsmasq重启失败，请检查你的dnsmasq配置！"
+        print_error "❌ dnsmasq重启失败，请检查你的dnsmasq配置！"
         return 1
       fi
       usleep 250000
@@ -144,19 +179,19 @@ start_singbox() {
 
     # 检查并清理可能残存的旧 sing-box 进程（防止重复启动套娃）
     if ps | grep -v grep | grep -q "$SINGBOX_BIN"; then
-        echo "🔄 侦测到已存在的 sing-box 实例，正在重启..."
+        print_normal "🔄 侦测到已存在的 sing-box 实例，正在重启..."
         killall -9 sing-box 2>/dev/null
         sleep 1
     fi
 
     # 检查核心文件是否存在
     if [ ! -f "$SINGBOX_BIN" ]; then
-        echo "❌ 错误：在当前目录未找到 sing-box 二进制执行文件！"
+        print_error "❌ 错误：在当前目录未找到 sing-box 二进制执行文件！"
         exit 1
     fi
 
     if [ ! -f "$SINGBOX_CONF" ]; then
-        echo "❌ 错误：在当前目录未找到 config.json 配置文件！"
+        print_error "❌ 错误：在当前目录未找到 config.json 配置文件！"
         exit 1
     fi
 
@@ -164,15 +199,15 @@ start_singbox() {
     mkdir -p "${CUR_DIR}/logs"
 
     # 启动 sing-box 并将日志重定向到当前目录，且在后台长效运行
-    echo "🚀 正在后台启动 sing-box 纯代理火箭..."
+    print_normal "🚀 正在后台启动 sing-box 纯代理火箭..."
     nohup "$SINGBOX_BIN" run -c "$SINGBOX_CONF" > "$SINGBOX_LOG" 2>&1 &
 
     sleep 2
 
     # 验证是否成功驻留后台
     if ps | grep -v grep | grep -q "$SINGBOX_BIN"; then
-        echo "🎉 sing-box 已经在后台稳稳垂钓！"
-        echo "📝 实时日志已挂载至：$SINGBOX_LOG"
+        print_success "🎉 sing-box 已经在后台稳稳垂钓！"
+        print_normal "📝 实时日志已挂载至：$SINGBOX_LOG"
 
         # setup lan tproxy
         setup_lan_tproxy
@@ -181,7 +216,7 @@ start_singbox() {
         setup_oneself_tproxy
 
     else
-        echo "❌ 启动失败！请检查 $SINGBOX_LOG 查看具体报错原因。"
+        print_error "❌ 启动失败！请检查 $SINGBOX_LOG 查看具体报错原因。"
     fi
 
     #print_line "singbox complete"
@@ -196,12 +231,12 @@ stop_singbox()
 
     # 检查是否有正在运行的 sing-box 进程
     if ps | grep -v grep | grep -q "sing-box"; then
-        echo "⚠️ 侦测到正在运行的 sing-box 实例，正在尝试停止..."
+        print_warning "⚠️ 侦测到正在运行的 sing-box 实例，正在尝试停止..."
         killall -9 sing-box 2>/dev/null
         sleep 1
-        echo "✅ sing-box 已成功停止。"
+        print_success "✅ sing-box 已成功停止。"
     else
-        echo "🔍 未发现运行中的 sing-box 实例，无需停止。"
+        print_normal "🔍 未发现运行中的 sing-box 实例，无需停止。"
     fi
 
     #print_line "singbox stop complete"
@@ -223,41 +258,41 @@ start_smartdns() {
 
     # 将 merlin-box 自带的 dnsmasq.postconf 复制到 /jffs/scripts/
     if [ -f "$dnsmasq_merlin_box_postconf" ]; then
-        echo "🔄 正在部署 $dnsmasq_merlin_box_postconf 到 /jffs/scripts/"
+        print_normal "🔄 正在部署 $dnsmasq_merlin_box_postconf 到 /jffs/scripts/"
         \cp -f "$dnsmasq_merlin_box_postconf" "/jffs/scripts/dnsmasq.postconf"
-        echo "✅ 部署完成"
+        print_success "✅ 部署完成"
     fi
 
     # 检查并清理可能残存的旧 smartdns 进程（防止端口占用）
     OLD_SMART_PID=$(ps | grep -v grep | grep "$SMARTDNS_BIN" | awk '{print $1}')
 
     if [ ! -z "$OLD_SMART_PID" ]; then
-        echo "🔄 侦测到已有 smartdns 实例在运行 (PID: $OLD_SMART_PID)，正在重启..."
+        print_normal "🔄 侦测到已有 smartdns 实例在运行 (PID: $OLD_SMART_PID)，正在重启..."
         kill -15 $OLD_SMART_PID 2>/dev/null
         sleep 1
         kill -9 $OLD_SMART_PID 2>/dev/null
         sleep 1
-        echo "✅ 旧 smartdns 进程已彻底清理。"
+        print_success "✅ 旧 smartdns 进程已彻底清理。"
     else
         # 额外兜底：有些固件可能直接运行全局的 smartdns 命令，也尝试清理一下
         if ps | grep -v grep | grep -q "smartdns"; then
-            echo "⚠️ 发现非当前目录启动的 smartdns 进程，尝试一并清理以防端口冲突..."
+            print_warning "⚠️ 发现非当前目录启动的 smartdns 进程，尝试一并清理以防端口冲突..."
             killall -9 smartdns 2>/dev/null
             sleep 1
         else
-            echo "🔍 未发现运行中的旧 smartdns 进程。尝试停掉dnsmasq。"
+            print_normal "🔍 未发现运行中的旧 smartdns 进程。尝试停掉dnsmasq。"
             service stop_dnsmasq >/dev/null 2>&1
         fi
     fi
 
     # 检查核心文件是否存在
     if [ ! -f "$SMARTDNS_BIN" ]; then
-        echo "❌ 错误：在当前目录未找到 smartdns 二进制执行文件！"
+        print_error "❌ 错误：在当前目录未找到 smartdns 二进制执行文件！"
         exit 1
     fi
 
     if [ ! -f "$SMARTDNS_CONF" ]; then
-        echo "❌ 错误：在当前目录未找到 smartdns.conf 配置文件！"
+        print_error "❌ 错误：在当前目录未找到 smartdns.conf 配置文件！"
         exit 1
     fi
 
@@ -273,22 +308,22 @@ start_smartdns() {
 
     # 启动新的 smartdns 进程
     # 使用 -f 参数在前台运行，因此配合 nohup 和 & 挂到后台，并将标准输出与错误重定向到日志
-    echo "🚀 正在后台启动 smartdns 实例..."
+    print_normal "🚀 正在后台启动 smartdns 实例..."
     nohup "$SMARTDNS_BIN" -c "$SMARTDNS_CONF" -f > "$SMARTDNS_LOG" 2>&1 &
 
     sleep 2
 
     # 验证是否成功驻留后台并接管 DNS
     if ps | grep -v grep | grep "$SMARTDNS_BIN" | grep -q -- "-f"; then
-        echo "🎉 smartdns 已成功在后台挂载运行！"
-        echo "📝 运行日志已重定向至：$SMARTDNS_LOG"
-        echo "💡 提示：你可以使用 'netstat -nlp | grep smartdns' 或查看日志来确认端口监听情况。"
+        print_success "🎉 smartdns 已成功在后台挂载运行！"
+        print_normal "📝 运行日志已重定向至：$SMARTDNS_LOG"
+        print_normal "💡 提示：你可以使用 'netstat -nlp | grep smartdns' 或查看日志来确认端口监听情况。"
 
         # 拦截局域网 DNS 53 端口流量送入 smartdns
         setup_dns_hijack
 
     else
-        echo "❌ 启动失败！请检查 $SMARTDNS_LOG 查看具体报错原因。"
+        print_error "❌ 启动失败！请检查 $SMARTDNS_LOG 查看具体报错原因。"
     fi
 
     #print_line "smartdns complete"
@@ -302,25 +337,25 @@ stop_smartdns() {
 
     # 检查是否有正在运行的 smartdns 进程
     if ps | grep -v grep | grep -q "smartdns"; then
-        echo "⚠️ 侦测到正在运行的 smartdns 实例，正在尝试停止..."
+        print_normal "⚠️ 侦测到正在运行的 smartdns 实例，正在尝试停止..."
         killall -15 smartdns 2>/dev/null
         sleep 1
         killall -9 smartdns 2>/dev/null
         sleep 1
-        echo "✅ smartdns 已成功停止。"
+        print_success "✅ smartdns 已成功停止。"
     else
-        echo "🔍 未发现运行中的 smartdns 实例，无需停止。"
+        print_normal "🔍 未发现运行中的 smartdns 实例，无需停止。"
     fi
 
     # 删除 dnsmasq.postconf 文件
     local dnsmasq_postconf="/jffs/scripts/dnsmasq.postconf"
 
     if [ -f "$dnsmasq_postconf" ]; then
-        echo "🔄 检测到 dnsmasq.postconf，正在删除..."
+        print_normal "🔄 检测到 dnsmasq.postconf，正在删除..."
         \rm -f "$dnsmasq_postconf"
-        echo "✅ 删除完成：$dnsmasq_postconf"
+        print_success "✅ 删除完成：$dnsmasq_postconf"
     else
-        echo "🔍 未检测到 dnsmasq.postconf，无需删除。"
+        print_normal "🔍 未检测到 dnsmasq.postconf，无需删除。"
     fi
 
     #print_line "smartdns stop complete"
@@ -496,25 +531,25 @@ reset_iptables()
     # ----------------------------------------------------------
     # B. 初始化 IPSET 大陆白名单集合 (此时可以安全 destroy)
     # ----------------------------------------------------------
-    echo "⏳ 正在加载 IPSET 大陆白名单分流集合..."
+    print_normal "⏳ 正在加载 IPSET 大陆白名单分流集合..."
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
     ipset create "$MB_IPSET_NAME" hash:net
 
     if [ -f "$MB_CHN_IP4_FILE" ]; then
         dos2unix "$MB_CHN_IP4_FILE" 2>/dev/null
         (echo "create $MB_IPSET_NAME hash:net -exist" ; awk '{print "add '"$MB_IPSET_NAME"'" , $0}' "$MB_CHN_IP4_FILE") | ipset restore 2>/dev/null
-        echo "✅ 成功将白名单 IP 网段加载至 ipset 集合。"
+        print_success "✅ 成功将白名单 IP 网段加载至 ipset 集合。"
     else
-        echo "⚠️ 未找到白名单文件: $MB_CHN_IP4_FILE，分流功能将不生效！"
+        print_warning "⚠️ 未找到白名单文件: $MB_CHN_IP4_FILE，分流功能将不生效！"
     fi
 
     #检测是否存在 MB_IP4_WHITELIST_FILE 这个文件, 如果存在, 也要加载到 ipset 中
     if [ -f "$MB_IP4_WHITELIST_FILE" ]; then
         dos2unix "$MB_IP4_WHITELIST_FILE" 2>/dev/null
         (echo "create $MB_IPSET_NAME hash:net -exist" ; awk '{print "add '"$MB_IPSET_NAME"'" , $0}' "$MB_IP4_WHITELIST_FILE") | ipset restore 2>/dev/null
-        echo "✅ 成功将自定义白名单 IP 网段加载至 ipset 集合。"
+        print_success "✅ 成功将自定义白名单 IP 网段加载至 ipset 集合。"
     else
-        echo "⚠️ 未找到自定义白名单文件: $MB_IP4_WHITELIST_FILE 。"
+        print_warning "⚠️ 未找到自定义白名单文件: $MB_IP4_WHITELIST_FILE 。"
     fi
 
     # ----------------------------------------------------------
@@ -545,7 +580,7 @@ reset_iptables_ipv6()
     ip6tables -t mangle -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
 
     # 2. 初始化 IPSET 大陆 v6 白名单集合
-    echo "⏳ 正在加载 IPSET 大陆 IPv6 白名单分流集合..."
+    print_normal "⏳ 正在加载 IPSET 大陆 IPv6 白名单分流集合..."
     ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
     # 注意：IPv6 的集合类型必须声明为 hash:net 为 family inet6
     ipset create "$MB_IPSET_NAME_V6" hash:net family inet6 -exist
@@ -553,18 +588,18 @@ reset_iptables_ipv6()
     if [ -f "$MB_CHN_IP6_FILE" ]; then
         dos2unix "$MB_CHN_IP6_FILE" 2>/dev/null
         (echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist" ; awk '{print "add '"$MB_IPSET_NAME_V6"'" , $0}' "$MB_CHN_IP6_FILE") | ipset restore 2>/dev/null
-        echo "✅ 成功将白名单 IPv6 网段加载至 ipset 集合。"
+        print_success "✅ 成功将白名单 IPv6 网段加载至 ipset 集合。"
     else
-        echo "⚠️ 未找到 IPv6 白名单文件: $MB_CHN_IP6_FILE，IPv6 分流功能将不生效！"
+        print_warning "⚠️ 未找到 IPv6 白名单文件: $MB_CHN_IP6_FILE，IPv6 分流功能将不生效！"
     fi
 
     # 检测是否存在 MB_IP6_WHITELIST_FILE 这个文件, 如果存在, 也要加载到 ipset 中
     if [ -f "$MB_IP6_WHITELIST_FILE" ]; then
         dos2unix "$MB_IP6_WHITELIST_FILE" 2>/dev/null
         (echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist" ; awk '{print "add '"$MB_IPSET_NAME_V6"'" , $0}' "$MB_IP6_WHITELIST_FILE") | ipset restore 2>/dev/null
-        echo "✅ 成功将自定义白名单 IPv6 网段加载至 ipset 集合。"
+        print_success "✅ 成功将自定义白名单 IPv6 网段加载至 ipset 集合。"
     else
-        echo "⚠️ 未找到自定义白名单文件: $MB_IP6_WHITELIST_FILE 。"
+        print_warning "⚠️ 未找到自定义白名单文件: $MB_IP6_WHITELIST_FILE 。"
     fi
 
     # 3. 策略路由重置 (使用 ip -6 命令)
@@ -821,23 +856,23 @@ compress_executable_with_upx() {
     local executable_path="$1"
 
     if [ ! -f "$executable_path" ]; then
-        echo "❌ 错误：指定的可执行文件不存在：$executable_path"
+        print_error "❌ 错误：指定的可执行文件不存在：$executable_path"
         return 1
     fi
 
     if ! command -v upx >/dev/null 2>&1; then
-        echo "⚠️ 警告：未检测到 upx 工具，无法进行压缩。请先安装 upx。https://github.com/upx/upx/releases "
+        print_warning "⚠️ 警告：未检测到 upx 工具，无法进行压缩。请先安装 upx。https://github.com/upx/upx/releases "
         return 1
     fi
 
-    echo "⏳ 正在使用 upx 压缩可执行文件：$executable_path"
+    print_normal "⏳ 正在使用 upx 压缩可执行文件：$executable_path"
     upx --lzma --ultra-brute "$executable_path" #--lzma启动时会稍微慢一些
     #upx --best "$executable_path"
 
     if [ $? -eq 0 ]; then
-        echo "✅ 压缩完成：$executable_path"
+        print_success "✅ 压缩完成：$executable_path"
     else
-        echo "❌ 压缩失败，请检查 upx 输出信息。"
+        print_error "❌ 压缩失败，请检查 upx 输出信息。"
         return 1
     fi
 }

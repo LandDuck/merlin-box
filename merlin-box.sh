@@ -128,12 +128,23 @@ restart() {
 #=========================================
 # 测试函数
 #=========================================
-test() {
+test_debug() {
 	#reset_iptables
 	#clear_iptables
 	#start_singbox
 	#start_smartdns
 	:
+}
+
+#=========================================
+# 测试彩色打印函数
+#=========================================
+test_print() {
+  print_normal "This is a normal message."
+  print_success "This is an info message."
+  print_warning "This is a warning message."
+  print_error "This is an error message."
+  :
 }
 
 #=========================================
@@ -237,8 +248,20 @@ main() {
 			uninstall
 			;;
 		test)
-			test
-			;;
+      case "$2" in
+        print)
+          test_print
+          ;;
+        debug)
+          test_debug
+          ;;
+        *)
+          echo "错误: 不支持的测试子命令 '$2'"
+          echo "可用子命令: print, debug"
+          exit 1
+          ;;
+      esac
+      ;;
 		start)
 			start
 			;;
