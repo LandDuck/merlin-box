@@ -387,6 +387,10 @@ setup_lan_tproxy()
 
     # 2. 匹配 IPSET 白名单集合的 TCP 流量直接 RETURN（直连放行）
     iptables -t mangle -A "$MB_PROXY_CHAIN" -p tcp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        iptables -t mangle -A "$MB_PROXY_CHAIN" -p udp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
+    fi
 
     # 3. 仅在开关开启时屏蔽局域网的 QUIC (UDP 443)
     if [ "$MB_DISABLE_QUIC_FROM_LAN" = "1" ]; then
@@ -395,16 +399,26 @@ setup_lan_tproxy()
 
     # 4. 剩余流量全部送入 TPROXY，使用全局变量端口和打标值
     iptables -t mangle -A "$MB_PROXY_CHAIN" -p tcp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
-    #iptables -t mangle -A "$MB_PROXY_CHAIN" -p udp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        iptables -t mangle -A "$MB_PROXY_CHAIN" -p udp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+    fi
 
     # 5. 主链去重清理与排除 DNS 53 - 保持不变
     iptables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
+    iptables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
     iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null
+    #--
     iptables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
+    #UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        iptables -t mangle -A PREROUTING -i br0 -p udp --dport 53 -j RETURN
+    fi
     iptables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN"
 
     #print_line "lan tproxy setup complete"
 
+    # 执行 IPv6 代理配置
     setup_lan_tproxy_ipv6
 }
 
@@ -417,12 +431,16 @@ setup_lan_tproxy_ipv6()
     print_line "setting up lan tproxy v6 and quic block"
 
     # 1. 局域网本地特殊 v6 网段直连放行（必须放行 fe80::/10 链路本地地址和私有本地地址）
-    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -d ::1/128 -j RETURN
-    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -d fe80::/10 -j RETURN
-    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -d fc00::/7 -j RETURN
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -d ::1/128 -j RETURN
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -d fe80::/10 -j RETURN
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -d fc00::/7 -j RETURN
 
     # 2. 匹配 IPSET 大陆 IPv6 白名单网段直接直连放行
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p udp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
+    fi
 
     # 3. 仅在开关开启时屏蔽局域网的 v6 QUIC (UDP 443)
     if [ "$MB_DISABLE_QUIC_FROM_LAN" = "1" ]; then
@@ -431,12 +449,21 @@ setup_lan_tproxy_ipv6()
 
     # 4. 剩余 TCP 流量全部送入 TPROXY 本地端口
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p udp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+    fi
 
     # 5. 主链去重清理与排除 TCP DNS 53
     ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
+    ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
     ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
-
+    #--
     ip6tables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        ip6tables -t mangle -A PREROUTING -i br0 -p udp --dport 53 -j RETURN
+    fi
     ip6tables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6"
 
     #print_line "lan tproxy v6 setup complete"
@@ -584,6 +611,7 @@ clear_iptables()
     iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null
 
     iptables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN" 2>/dev/null
+    iptables -t mangle -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN" 2>/dev/null
 
     # ==========================================================
     # 1. 清理 nat 表的 DNS 链
@@ -629,9 +657,11 @@ clear_iptables_ipv6()
     ip6tables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
 
     ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
+    ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
     ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
 
     ip6tables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
 
     # 2. 彻底销毁自定义链
     ip6tables -t nat -F "$MB_DNS_CHAIN_V6" 2>/dev/null
@@ -684,25 +714,42 @@ setup_oneself_tproxy()
 
     # 规则 C: 路由器本机发往白名单 IP 集合的 TCP 流量直接 RETURN（直连放行）
     iptables -t mangle -A "$MB_ONESELF_CHAIN" -p tcp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        iptables -t mangle -A "$MB_ONESELF_CHAIN" -p udp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
+    fi
 
     # 规则 D: 放行 SmartDNS 直连公网的上游 DNS 流量
     # 如果你的 SmartDNS 配置了直连非 53 端口的 DoT/DoH 上游，请在这里补充对应的端口（如 853）。
     # 这里我们放行本地发往外网所有 53, 853 端口的 TCP 流量，确保 SmartDNS 直连查询不被 sing-box 拦截
     iptables -t mangle -A "$MB_ONESELF_CHAIN" -p tcp --dport 53 -j RETURN
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        iptables -t mangle -A "$MB_ONESELF_CHAIN" -p udp --dport 53 -j RETURN
+    fi
     #iptables -t mangle -A "$MB_ONESELF_CHAIN" -p tcp --dport 853 -j RETURN
 
     # 规则 E: 终极捕获！将剩余的本机本地【仅 TCP】流量打上代理标记，送入策略路由
     # 注意：本机流量不能用 -j TPROXY（TPROXY只能用于PREROUTING），本机流量必须改用 -j MARK
     iptables -t mangle -A "$MB_ONESELF_CHAIN" -p tcp -j MARK --set-xmark "$MB_FWMARK"
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        iptables -t mangle -A "$MB_ONESELF_CHAIN" -p udp -j MARK --set-xmark "$MB_FWMARK"
+    fi
 
     # ----------------------------------------------------------
     # 3. 主链（OUTPUT）挂载与去重
     # ----------------------------------------------------------
     # 防御性清理老规则
     iptables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN" 2>/dev/null
+    iptables -t mangle -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN" 2>/dev/null
 
     # 正式引流：将路由器本机产生的所有 TCP 流量引入自定义链
     iptables -t mangle -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN"
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        iptables -t mangle -A OUTPUT -p udp -j "$MB_ONESELF_CHAIN"
+    fi
 
     #print_line "router oneself tcp proxy setup complete"
 
@@ -733,16 +780,35 @@ setup_oneself_tproxy_ipv6()
 
     # 规则 C: 路由器本机发往 IPv6 大陆白名单集合的流量直连放行
     ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p udp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
+    fi
 
     # 规则 D: 放行本机发往公网的 DNS TCP 流量
     ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp --dport 53 -j RETURN
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p udp --dport 53 -j RETURN
+    fi
+    # ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp --dport 853 -j RETURN
 
     # 规则 E: 终极捕获打标，逼迫本机剩余的 TCP 流量掉头撞向本地代理
     ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp -j MARK --set-xmark "$MB_FWMARK"
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p udp -j MARK --set-xmark "$MB_FWMARK"
+    fi
 
     # 主链挂载与去重
     ip6tables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    #--
     ip6tables -t mangle -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6"
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        ip6tables -t mangle -A OUTPUT -p udp -j "$MB_ONESELF_CHAIN_V6"
+    fi
 
     #print_line "router oneself tcp proxy v6 setup complete"
 }

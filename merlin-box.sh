@@ -34,6 +34,8 @@ readonly MB_IP6_WHITELIST_FILE="${CUR_DIR}/res/ip6-whitelist.txt" #这里面的�
 MB_ENABLE_IPV6=1
 # 屏蔽来自局域网的QUIC协议访问 (0 不屏蔽, 1 屏蔽)
 readonly MB_DISABLE_QUIC_FROM_LAN=1
+# 是否启用UDP (0 DISABLE, 1 ENABLE)
+readonly MB_ENABLE_UDP=0
 
 # 引入fun.sh脚本, ./sh/fun.sh
 if [ -f "$CUR_DIR/sh/fun.sh" ]; then
