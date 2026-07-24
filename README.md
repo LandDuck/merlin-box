@@ -177,16 +177,16 @@ merlin-box/
 - 脚本默认会在项目目录下读取 `bin/sing-box` 与 `bin/smartdns`，并写日志到 `logs/`。
 - 目前包含的二进制文件在下面的设备上测试通过（没有更多机型供测试）。
 
-| 型号   | SINGBOX          | SMARTDNS         |
-|--------|------------------|------------------|
-| BE-86U | linux-arm64-musl | smartdns-aarch64 |
-| AC-86U | linux-arm64-musl | smartdns-aarch64 |
+| 型号     | SINGBOX          | SMARTDNS         |
+|----------|------------------|------------------|
+| RT-BE86U | linux-arm64-musl | smartdns-aarch64 |
+| RT-AC86U | linux-arm64-musl | smartdns-aarch64 |
 
 ---
 
 # 🖥️ 适用环境与机型说明
 
-- ✅ 已测试成功机型：BE-86U、AC-86U。
+- ✅ 已测试成功机型：RT-BE86U、RT-AC86U。
 - ✅ 理论上更高配、更新的机型（arm64）可直接用。
 - ⏳ 更多其他机型因设备有限暂未覆盖，可下载对应架构的 sing-box 与 smartdns 替换并尝试。
 - 💾 完整版 sing-box 体积较大，若路由器 jffs 空间较小，建议挂载 U 盘。
@@ -199,7 +199,7 @@ merlin-box/
 ## 📦 准备文件
 
 1. 将本项目上传到路由器（jffs 或 U 盘挂载目录均可）
-2. 准备可执行文件并放入（项目自带的可在 BE-86U、AC-86U 上运行）：
+2. 准备可执行文件并放入（项目自带的可在 RT-BE86U、RT-AC86U 上运行）：
     - `bin/sing-box`
     - `bin/smartdns`
 3. 给予执行权限（示例）：
