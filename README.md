@@ -87,10 +87,10 @@
       </td>
     </tr>
     <tr>
-      <td>软件中心 UI</td>
+      <td>UI</td>
       <td>⏳ 暂不支持</td>
       <td>
-        长远有计划支持。
+        长远有计划支持。大概率用 GO 直接跑一个WEB服务写一套独立的WEB UI。
       </td>
     </tr>
   </tbody>
