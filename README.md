@@ -113,9 +113,10 @@
 - 命中域名 -> 使用中国 DNS 上游解析（`china` 组）
 - 其他域名 -> 走国际 DNS 上游（`foreign` 组，默认经 socks5 代理）
 
-对应配置位置：
+smartdns 配置：
 
-- `conf/smartdns.conf`
+- 配置文件 `conf/smartdns.conf`
+- 配置参考 https://pymumu.github.io/smartdns/en/configuration/
 
 ---
 
@@ -143,9 +144,9 @@
     - TPROXY：`65002`（供透明代理接收）
 - 出站：在 `conf/config.json` 自行配置
 
-对应配置位置：
+sing-box（conf/config.json）配置参考：
 
-- `conf/config.json`
+- https://sing-box.sagernet.org/configuration/
 
 ---
 
