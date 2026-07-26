@@ -253,14 +253,17 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh -v
 ```
 
-安装与卸载（开机启动）
+- ▶️`start`：清理旧规则 -> 启动 sing-box -> 启动 smartdns -> 重启 dnsmasq
+- ⏹️ `stop`：停止 sing-box/smartdns -> 清理 iptables/ip6tables/ip rule/ipset -> 重启 dnsmasq
+
+安装与卸载（开机启动）：
 
 ```bash
 ./merlin-box.sh install
 ./merlin-box.sh uninstall
 ```
 
-工具命令
+工具命令：
 
 ```bash
 ./merlin-box.sh tool compress_singbox       #压缩 sing-box 可执行文件 ¹
@@ -272,11 +275,6 @@ chmod +x scripts/dnsmasq.postconf
 1. 命令仅在本地系统（或WSL）中执行，不能在路由器上执行。压缩依赖 upx 工具。
 - 本仓库携带的二进制文件已经经过压缩。
 - ⚠️压缩虽然可以明显降低文件大小，但是启动时会比原始程序要慢。
-
-脚本行为摘要：
-
-- ▶️`start`：清理旧规则 -> 启动 sing-box -> 启动 smartdns -> 重启 dnsmasq
-- ⏹️ `stop`：停止 sing-box/smartdns -> 清理 iptables/ip6tables/ip rule/ipset -> 重启 dnsmasq
 
 ---
 
