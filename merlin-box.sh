@@ -178,10 +178,12 @@ install() {
 
   # 目标启动脚本的绝对路径
   local boot_script="${CUR_DIR}/start_merlin_box.sh"
-  # 梅林固件的标准服务启动脚本
+  # wan状态改变时触发的脚本路径
   local merlin_wan_event="/jffs/scripts/wan-event"
-  # 如果安装了将U盘替代JFFS的插件, 脚本会在  /cifs2/scripts/wan-event 中
   local merlin_wan_event_cifs="/cifs2/scripts/wan-event"
+  # u盘挂载完成后触发的脚本路径
+  local merlin_mount_event="/jffs/scripts/post-mount"
+  local merlin_mount_event_cifs="/cifs2/scripts/post-mount"
 
   echo "creating boot script"
 
@@ -199,26 +201,52 @@ log_msg() {
     logger -t "merlin-box-boot" "\$1"
 }
 
-INTERFACE="\${1:-0}"
-EVENT="\${2:-connected}"
+SCRIPT="\$1"
+P1="\${2:-0}"
+P2="\${3:-connected}"
 
-log_msg "收到触发事件: WAN Interface=\$INTERFACE, Event=\$EVENT"
+log_msg "收到触发事件: SCRIPT=\$SCRIPT, P1=\$P1, P2=\$P2"
 
-# 只有当事件为 connected 或手动运行/缺省时，才触发重启
-if [ "\${INTERFACE}" = "0" ] && [ "\${EVENT}" = "connected" ]; then
-    log_msg "事件匹配成功，准备重启 merlin-box..."
+# wan 连接事件触发
+if [ "\${SCRIPT}" = "wan" ] && [ "\${P1}" = "0" ] && [ "\${P2}" = "connected" ]; then
+    log_msg "WAN 事件匹配成功，准备重启 merlin-box..."
 
     if cd "${CUR_DIR}"; then
         log_msg "已进入目录: ${CUR_DIR}，开始执行 ./merlin-box.sh restart"
         sleep 10
         ./merlin-box.sh restart >> "\$LOGFILE" 2>&1
-        log_msg "merlin-box 重启命令执行完毕 (退出码: \$?)"
+        EXIT_CODE=\$?
+        log_msg "merlin-box 重启命令执行完毕 (退出码: \$EXIT_CODE)"
     else
         log_msg "错误: 无法进入目录 ${CUR_DIR}，启动中断！"
     fi
-else
-    log_msg "跳过执行: 事件 \$EVENT 非 connected 状态"
 fi
+
+# U盘被挂载事件触发, 一般情况下视为开机
+if [ "\${SCRIPT}" = "mount" ] && [ "\${P1}" = "/tmp/mnt/sda1" ] ; then
+    log_msg "U盘挂载事件匹配成功，准备重启 merlin-box..."
+
+    # 要判断当前下有没有mount.sh，如果有，后台执行它。
+    # 用于自定义的一些操作
+    if [ -f "${CUR_DIR}/mount.sh" ]; then
+        log_msg "检测到 mount.sh 脚本，准备后台执行它..."
+        nohup sh "${CUR_DIR}/mount.sh" "\${P1}" "\${P2}" >> "\$LOGFILE" 2>&1 &
+        log_msg "mount.sh 脚本已在后台执行 (PID: \$!)"
+    else
+        log_msg "未检测到 mount.sh 脚本，跳过执行。"
+    fi
+
+    if cd "${CUR_DIR}"; then
+        log_msg "已进入目录: ${CUR_DIR}，开始执行 ./merlin-box.sh restart"
+        sleep 10
+        ./merlin-box.sh restart >> "\$LOGFILE" 2>&1
+        EXIT_CODE=\$?
+        log_msg "merlin-box 重启命令执行完毕 (退出码: \$EXIT_CODE)"
+    else
+        log_msg "错误: 无法进入目录 ${CUR_DIR}，启动中断！"
+    fi
+fi
+
 EOF
 
   # 赋予生成的脚本执行权限
@@ -235,15 +263,30 @@ EOF
     echo "#!/bin/sh" > "${merlin_wan_event_cifs}"
     chmod +x "${merlin_wan_event_cifs}"
   fi
+  # 检查并开启梅林固件的 post-mount
+  if [ ! -f "${merlin_mount_event}" ]; then
+    echo "Creating merlin post-mount script"
+    echo "#!/bin/sh" > "${merlin_mount_event}"
+    chmod +x "${merlin_mount_event}"
+  fi
+  if [ ! -f "${merlin_mount_event_cifs}" ]; then
+    echo "Creating merlin post-mount script on cifs"
+    echo "#!/bin/sh" > "${merlin_mount_event_cifs}"
+    chmod +x "${merlin_mount_event_cifs}"
+  fi
 
   echo "Adding boot script to merlin wan-event"
 
-  # C. 将脚本放入 wan-event（先清理旧的历史写入）
+  # C. 将脚本放入 wan-event 和 post-mount（先清理旧的历史写入）
   sed -i "\|${boot_script}|d" "${merlin_wan_event}"
   sed -i "\|${boot_script}|d" "${merlin_wan_event_cifs}"
+  sed -i "\|${boot_script}|d" "${merlin_mount_event}"
+  sed -i "\|${boot_script}|d" "${merlin_mount_event_cifs}"
   # 将 $1 $2 作为参数传递给 boot_script，并在后台异步执行
-  echo "${boot_script} \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event}"
-  echo "${boot_script} \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event_cifs}"
+  echo "${boot_script} wan \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event}"
+  echo "${boot_script} wan \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event_cifs}"
+  echo "${boot_script} mount \"\$1\" >/dev/null 2>&1 &" >> "${merlin_mount_event}"
+  echo "${boot_script} mount \"\$1\" >/dev/null 2>&1 &" >> "${merlin_mount_event_cifs}"
 
   print_line "merlin-box installed"
 }
