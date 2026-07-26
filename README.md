@@ -246,11 +246,11 @@ chmod +x scripts/dnsmasq.postconf
 主入口命令：
 
 ```bash
-./merlin-box.sh start
-./merlin-box.sh stop
-./merlin-box.sh restart
-./merlin-box.sh -h
-./merlin-box.sh -v
+./merlin-box.sh start                      #启动服务
+./merlin-box.sh stop                       #停止服务
+./merlin-box.sh restart                    #重启服务
+./merlin-box.sh -h                         #显示帮助信息
+./merlin-box.sh -v                         #显示版本信息
 ```
 
 - ▶️`start`：清理旧规则 -> 启动 sing-box -> 启动 smartdns -> 重启 dnsmasq
@@ -259,8 +259,8 @@ chmod +x scripts/dnsmasq.postconf
 安装与卸载（开机启动）：
 
 ```bash
-./merlin-box.sh install
-./merlin-box.sh uninstall
+./merlin-box.sh install                     #安装服务使其开机启动（拨号成功后）
+./merlin-box.sh uninstall                   #卸载服务禁用开机启动
 ```
 
 工具命令：
