@@ -298,13 +298,16 @@ main() {
         compress_smartdns)
           compress_smartdns
           ;;
+        show_devices)
+          print_dhcp_devices
+          ;;
         -h|--help|"")
           echo "用法: $SCRIPT_NAME tool <subcommand>"
-          echo "可用子命令: compress_singbox, compress_smartdns"
+          echo "可用子命令: compress_singbox, compress_smartdns, show_devices"
           ;;
         *)
           echo "错误: 不支持的工具子命令 '$2'"
-          echo "可用子命令: compress_singbox, compress_smartdns"
+          echo "可用子命令: compress_singbox, compress_smartdns, show_devices"
           exit 1
           ;;
       esac
