@@ -330,7 +330,19 @@ start_smartdns() {
             sleep 1
         else
             print_normal "🔍 未发现运行中的旧 smartdns 进程。尝试停掉dnsmasq。"
+            #sleep 2
             service stop_dnsmasq >/dev/null 2>&1
+            #local DNSMASQ_PID=$(pidof dnsmasq)
+            #if [ ! -z "$DNSMASQ_PID" ]; then
+            #    print_normal "🔄 停止 dnsmasq 服务 (PID: $DNSMASQ_PID)..."
+            #    kill -15 $DNSMASQ_PID 2>/dev/null
+            #    sleep 1
+            #    kill -9 $DNSMASQ_PID 2>/dev/null
+            #    sleep 1
+            #    print_success "✅ dnsmasq 服务已停止。"
+            #else
+            #    print_normal "🔍 未发现运行中的 dnsmasq 服务，无需停止。"
+            #fi
         fi
     fi
 
@@ -363,10 +375,14 @@ start_smartdns() {
     sleep 2
 
     # 验证是否成功驻留后台并接管 DNS
-    if ps | grep -v grep | grep "$SMARTDNS_BIN" | grep -q -- "-f"; then
+    if ps | grep -v grep | grep "$SMARTDNS_BIN"; then
         print_success "🎉 smartdns 已成功在后台挂载运行！"
         print_normal "📝 运行日志已重定向至：$SMARTDNS_LOG"
         print_normal "💡 提示：你可以使用 'netstat -nlp | grep smartdns' 或查看日志来确认端口监听情况。"
+
+        #强制将/etc/resolv.conf改为127.0.0.1
+        print_normal "🔄 正在将 /etc/resolv.conf 指向本地 smartdns..."
+        echo "nameserver 127.0.0.1" > /etc/resolv.conf
 
         # 拦截局域网 DNS 53 端口流量送入 smartdns
         setup_dns_hijack
