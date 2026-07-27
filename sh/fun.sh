@@ -261,9 +261,6 @@ start_singbox() {
         # setup lan tproxy
         setup_lan_tproxy
 
-        # setup oneself tproxy
-        setup_oneself_tproxy
-
     else
         print_error "❌ 启动失败！请检查 $SINGBOX_LOG 查看具体报错原因。"
     fi
@@ -368,27 +365,42 @@ start_smartdns() {
     mkdir -p "${CUR_DIR}/logs"
 
     # 启动新的 smartdns 进程
-    # 使用 -f 参数在前台运行，因此配合 nohup 和 & 挂到后台，并将标准输出与错误重定向到日志
+
     print_normal "🚀 正在后台启动 smartdns 实例..."
-    nohup "$SMARTDNS_BIN" -c "$SMARTDNS_CONF" -f > "$SMARTDNS_LOG" 2>&1 &
 
-    sleep 2
+    # 提取纯二进制文件名（去除路径），方便 ps 检索
+    SMARTDNS_NAME=$(basename "$SMARTDNS_BIN")
 
-    # 验证是否成功驻留后台并接管 DNS
-    if ps | grep -v grep | grep "$SMARTDNS_BIN"; then
-        print_success "🎉 smartdns 已成功在后台挂载运行！"
+    max_retries=10
+    retry_count=0
+    success=0
+
+    while [ $retry_count -lt $max_retries ]; do
+        retry_count=$((retry_count + 1))
+
+        # 启动进程
+        nohup "$SMARTDNS_BIN" -c "$SMARTDNS_CONF" -f > "$SMARTDNS_LOG" 2>&1 &
+
+        sleep 4
+
+        # 检查进程是否存在
+        if ps | grep -v grep | grep -q "$SMARTDNS_NAME"; then
+            success=1
+            break
+        fi
+
+        print_error "⚠️ 第 $retry_count 次尝试启动失败，4 秒后重试..."
+    done
+
+    # 验证最终运行状态
+    if [ $success -eq 1 ]; then
+        print_success "🎉 smartdns 已成功在后台挂载运行！（尝试了 $retry_count 次）"
         print_normal "📝 运行日志已重定向至：$SMARTDNS_LOG"
-        print_normal "💡 提示：你可以使用 'netstat -nlp | grep smartdns' 或查看日志来确认端口监听情况。"
-
-        #强制将/etc/resolv.conf改为127.0.0.1
-        print_normal "🔄 正在将 /etc/resolv.conf 指向本地 smartdns..."
-        echo "nameserver 127.0.0.1" > /etc/resolv.conf
 
         # 拦截局域网 DNS 53 端口流量送入 smartdns
         setup_dns_hijack
-
     else
-        print_error "❌ 启动失败！请检查 $SMARTDNS_LOG 查看具体报错原因。"
+        print_error "❌ 连续尝试 $max_retries 次均启动失败！请检查 $SMARTDNS_LOG 查看具体报错原因。"
     fi
 
     #print_line "smartdns complete"
@@ -642,7 +654,6 @@ reset_iptables_ipv6()
 
     # 1. 重置 ip6tables 自定义链引用，防止 ipset 销毁失败
     ip6tables -t mangle -F "$MB_PROXY_CHAIN_V6" 2>/dev/null
-    ip6tables -t mangle -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
 
     # 2. 初始化 IPSET 大陆 v6 白名单集合
     print_normal "⏳ 正在加载 IPSET 大陆 IPv6 白名单分流集合..."
@@ -710,9 +721,6 @@ clear_iptables()
     iptables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
     iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null
 
-    iptables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN" 2>/dev/null
-    iptables -t mangle -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN" 2>/dev/null
-
     # ==========================================================
     # 1. 清理 nat 表的 DNS 链
     # ==========================================================
@@ -724,8 +732,6 @@ clear_iptables()
     # ==========================================================
     iptables -t mangle -F "$MB_PROXY_CHAIN" 2>/dev/null
     iptables -t mangle -X "$MB_PROXY_CHAIN" 2>/dev/null
-    iptables -t mangle -F "$MB_ONESELF_CHAIN" 2>/dev/null
-    iptables -t mangle -X "$MB_ONESELF_CHAIN" 2>/dev/null
 
     # ----------------------------------------------------------
     # 3. 释放策略路由与路由表（新增）
@@ -760,17 +766,12 @@ clear_iptables_ipv6()
     ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
     ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
 
-    ip6tables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
-    ip6tables -t mangle -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
-
     # 2. 彻底销毁自定义链
     ip6tables -t nat -F "$MB_DNS_CHAIN_V6" 2>/dev/null
     ip6tables -t nat -X "$MB_DNS_CHAIN_V6" 2>/dev/null
 
     ip6tables -t mangle -F "$MB_PROXY_CHAIN_V6" 2>/dev/null
     ip6tables -t mangle -X "$MB_PROXY_CHAIN_V6" 2>/dev/null
-    ip6tables -t mangle -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
-    ip6tables -t mangle -X "$MB_ONESELF_CHAIN_V6" 2>/dev/null
 
     # 3. 释放 v6 策略路由与清除 IPSET
     while ip -6 rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
@@ -781,136 +782,6 @@ clear_iptables_ipv6()
     ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
 
     #print_line "clear v6 complete"
-}
-
-#=========================================
-# 路由器本机流量透明代理封装（仅 TCP）
-#=========================================
-setup_oneself_tproxy()
-{
-    print_line "setting up router oneself tcp proxy"
-
-    # ----------------------------------------------------------
-    # 1. 初始化与重建 mangle 表的本机代理链
-    # ----------------------------------------------------------
-    iptables -t mangle -F "$MB_ONESELF_CHAIN" 2>/dev/null
-    iptables -t mangle -X "$MB_ONESELF_CHAIN" 2>/dev/null
-    if ! iptables -t mangle -L "$MB_ONESELF_CHAIN" >/dev/null 2>&1; then
-        iptables -t mangle -N "$MB_ONESELF_CHAIN"
-    fi
-
-    # ----------------------------------------------------------
-    # 2. 填充本机代理链规则（自上而下，严格白名单放行）
-    # ----------------------------------------------------------
-
-    # 规则 A: 放行发往本地回环和局域网的流量（包含 SmartDNS 走 127.0.0.1 的情况，以及本地 DNS 请求）
-    iptables -t mangle -A "$MB_ONESELF_CHAIN" -d 127.0.0.0/8 -j RETURN
-    iptables -t mangle -A "$MB_ONESELF_CHAIN" -d 192.168.0.0/16 -j RETURN
-    iptables -t mangle -A "$MB_ONESELF_CHAIN" -d 172.16.0.0/12 -j RETURN
-    iptables -t mangle -A "$MB_ONESELF_CHAIN" -d 10.0.0.0/8 -j RETURN
-
-    # 规则 B: 放行 Sing-box 自身发出的外网流量（通过识别出站 mark 255，绝对防止死循环）
-    iptables -t mangle -A "$MB_ONESELF_CHAIN" -m mark --mark "$MB_SINGBOX_OUT_MARK" -j RETURN
-
-    # 规则 C: 路由器本机发往白名单 IP 集合的 TCP 流量直接 RETURN（直连放行）
-    iptables -t mangle -A "$MB_ONESELF_CHAIN" -p tcp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
-    # UDP 支持
-    if [ "$MB_ENABLE_UDP" = "1" ]; then
-        iptables -t mangle -A "$MB_ONESELF_CHAIN" -p udp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
-    fi
-
-    # 规则 D: 放行 SmartDNS 直连公网的上游 DNS 流量
-    # 如果你的 SmartDNS 配置了直连非 53 端口的 DoT/DoH 上游，请在这里补充对应的端口（如 853）。
-    # 这里我们放行本地发往外网所有 53, 853 端口的 TCP 流量，确保 SmartDNS 直连查询不被 sing-box 拦截
-    iptables -t mangle -A "$MB_ONESELF_CHAIN" -p tcp --dport 53 -j RETURN
-    # UDP 支持
-    if [ "$MB_ENABLE_UDP" = "1" ]; then
-        iptables -t mangle -A "$MB_ONESELF_CHAIN" -p udp --dport 53 -j RETURN
-    fi
-    #iptables -t mangle -A "$MB_ONESELF_CHAIN" -p tcp --dport 853 -j RETURN
-
-    # 规则 E: 终极捕获！将剩余的本机本地【仅 TCP】流量打上代理标记，送入策略路由
-    # 注意：本机流量不能用 -j TPROXY（TPROXY只能用于PREROUTING），本机流量必须改用 -j MARK
-    iptables -t mangle -A "$MB_ONESELF_CHAIN" -p tcp -j MARK --set-xmark "$MB_FWMARK"
-    # UDP 支持
-    if [ "$MB_ENABLE_UDP" = "1" ]; then
-        iptables -t mangle -A "$MB_ONESELF_CHAIN" -p udp -j MARK --set-xmark "$MB_FWMARK"
-    fi
-
-    # ----------------------------------------------------------
-    # 3. 主链（OUTPUT）挂载与去重
-    # ----------------------------------------------------------
-    # 防御性清理老规则
-    iptables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN" 2>/dev/null
-    iptables -t mangle -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN" 2>/dev/null
-
-    # 正式引流：将路由器本机产生的所有 TCP 流量引入自定义链
-    iptables -t mangle -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN"
-    # UDP 支持
-    if [ "$MB_ENABLE_UDP" = "1" ]; then
-        iptables -t mangle -A OUTPUT -p udp -j "$MB_ONESELF_CHAIN"
-    fi
-
-    #print_line "router oneself tcp proxy setup complete"
-
-    setup_oneself_tproxy_ipv6
-}
-
-# ==========================================
-# 路由器本机流量透明代理封装 (IPv6 专属，仅 TCP)
-# ==========================================
-setup_oneself_tproxy_ipv6()
-{
-    [ "$MB_ENABLE_IPV6" != "1" ] && return 0
-    print_line "setting up router oneself tcp proxy v6"
-
-    ip6tables -t mangle -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
-    ip6tables -t mangle -X "$MB_ONESELF_CHAIN_V6" 2>/dev/null
-    if ! ip6tables -t mangle -L "$MB_ONESELF_CHAIN_V6" >/dev/null 2>&1; then
-        ip6tables -t mangle -N "$MB_ONESELF_CHAIN_V6"
-    fi
-
-    # 规则 A: 放行回环、链路本地和 ULA 私有本地地址
-    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -d ::1/128 -j RETURN
-    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -d fe80::/10 -j RETURN
-    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -d fc00::/7 -j RETURN
-
-    # 规则 B: 放行 Sing-box 自身发出的外网 v6 流量（绝对防止本地死循环）
-    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -m mark --mark "$MB_SINGBOX_OUT_MARK" -j RETURN
-
-    # 规则 C: 路由器本机发往 IPv6 大陆白名单集合的流量直连放行
-    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
-    # UDP 支持
-    if [ "$MB_ENABLE_UDP" = "1" ]; then
-        ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p udp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
-    fi
-
-    # 规则 D: 放行本机发往公网的 DNS TCP 流量
-    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp --dport 53 -j RETURN
-    # UDP 支持
-    if [ "$MB_ENABLE_UDP" = "1" ]; then
-        ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p udp --dport 53 -j RETURN
-    fi
-    # ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp --dport 853 -j RETURN
-
-    # 规则 E: 终极捕获打标，逼迫本机剩余的 TCP 流量掉头撞向本地代理
-    ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p tcp -j MARK --set-xmark "$MB_FWMARK"
-    # UDP 支持
-    if [ "$MB_ENABLE_UDP" = "1" ]; then
-        ip6tables -t mangle -A "$MB_ONESELF_CHAIN_V6" -p udp -j MARK --set-xmark "$MB_FWMARK"
-    fi
-
-    # 主链挂载与去重
-    ip6tables -t mangle -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
-    ip6tables -t mangle -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null
-    #--
-    ip6tables -t mangle -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6"
-    # UDP 支持
-    if [ "$MB_ENABLE_UDP" = "1" ]; then
-        ip6tables -t mangle -A OUTPUT -p udp -j "$MB_ONESELF_CHAIN_V6"
-    fi
-
-    #print_line "router oneself tcp proxy v6 setup complete"
 }
 
 # ==========================================

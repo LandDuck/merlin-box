@@ -87,6 +87,13 @@
       </td>
     </tr>
     <tr>
+      <td>路由自身</td>
+      <td>⏳ 暂不支持</td>
+      <td>
+        --
+      </td>
+    </tr>
+    <tr>
       <td>UI</td>
       <td>⏳ 暂不支持</td>
       <td>
@@ -155,6 +162,7 @@ sing-box（conf/config.json）配置参考：
 ```text
 merlin-box/
 ├─ merlin-box.sh            # 主入口脚本（start/stop）
+├─ start_merlin_box.sh      # 用于支持开机启动
 ├─ bin/
 │  ├─ sing-box              # sing-box 可执行文件
 │  └─ smartdns              # smartdns 可执行文件
@@ -207,6 +215,7 @@ merlin-box/
 
 ```bash
 chmod +x merlin-box.sh
+chmod +x start_merlin_box.sh
 chmod +x bin/sing-box
 chmod +x bin/smartdns
 chmod +x scripts/dnsmasq.postconf
