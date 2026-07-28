@@ -641,7 +641,11 @@ reset_iptables()
         dos2unix "$MB_CHN_IP4_FILE" 2>/dev/null
         (
             echo "create $MB_IPSET_NAME hash:net -exist"
-            awk '{print "add '"$MB_IPSET_NAME"' " $0}' "$MB_CHN_IP4_FILE"
+            awk '
+                /^[[:space:]]*$/ { next }          # 空行
+                /^[[:space:]]*#/ { next }          # 注释
+                {print "add '"$MB_IPSET_NAME"' " $1}
+            ' "$MB_CHN_IP4_FILE"
         ) | ipset restore 2>/dev/null
         print_success "✅ 已加载中国 IPv4 白名单。"
     else
@@ -653,7 +657,11 @@ reset_iptables()
         dos2unix "$MB_IP4_WHITELIST_FILE" 2>/dev/null
         (
             echo "create $MB_IPSET_NAME hash:net -exist"
-            awk '{print "add '"$MB_IPSET_NAME"' " $0}' "$MB_IP4_WHITELIST_FILE"
+            awk '
+                /^[[:space:]]*$/ { next }          # 空行
+                /^[[:space:]]*#/ { next }          # 注释
+                {print "add '"$MB_IPSET_NAME"' " $1}
+            ' "$MB_IP4_WHITELIST_FILE"
         ) | ipset restore 2>/dev/null
         print_success "✅ 已加载自定义 IPv4 白名单。"
     else
@@ -672,7 +680,11 @@ reset_iptables()
         dos2unix "$MB_MAC_BLACKLIST_FILE" 2>/dev/null
         (
             echo "create $MB_MAC_BLACKLIST_NAME hash:mac -exist"
-            awk '{print "add '"$MB_MAC_BLACKLIST_NAME"' " $0}' "$MB_MAC_BLACKLIST_FILE"
+            awk '
+                /^[[:space:]]*$/ { next }          # 空行
+                /^[[:space:]]*#/ { next }          # 注释
+                {print "add '"$MB_MAC_BLACKLIST_NAME"' " $1}
+            ' "$MB_MAC_BLACKLIST_FILE"
         ) | ipset restore 2>/dev/null
         print_success "✅ 已加载设备 MAC 黑名单。"
     else
@@ -746,7 +758,11 @@ reset_iptables_ipv6()
         dos2unix "$MB_CHN_IP6_FILE" 2>/dev/null
         (
             echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist"
-            awk '{print "add '"$MB_IPSET_NAME_V6"' " $0}' "$MB_CHN_IP6_FILE"
+            awk '
+                /^[[:space:]]*$/ { next }          # 空行
+                /^[[:space:]]*#/ { next }          # 注释
+                {print "add '"$MB_IPSET_NAME_V6"' " $1}
+            ' "$MB_CHN_IP6_FILE"
         ) | ipset restore 2>/dev/null
         print_success "✅ 已加载中国 IPv6 白名单。"
     else
@@ -758,7 +774,11 @@ reset_iptables_ipv6()
         dos2unix "$MB_IP6_WHITELIST_FILE" 2>/dev/null
         (
             echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist"
-            awk '{print "add '"$MB_IPSET_NAME_V6"' " $0}' "$MB_IP6_WHITELIST_FILE"
+            awk '
+                /^[[:space:]]*$/ { next }          # 空行
+                /^[[:space:]]*#/ { next }          # 注释
+                {print "add '"$MB_IPSET_NAME_V6"' " $1}
+            ' "$MB_IP6_WHITELIST_FILE"
         ) | ipset restore 2>/dev/null
         print_success "✅ 已加载自定义 IPv6 白名单。"
     else
