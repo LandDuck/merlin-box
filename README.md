@@ -193,6 +193,8 @@ merlin-box/
    ├─ chn-ip4.txt           # 中国 IPv4
    ├─ chn-ip6.txt           # 中国 IPv6
    ├─ chn-site.txt          # 中国域名列表
+   ├─ device_blacklist.txt  # 设备黑名单列表(设备不能走代理)
+   ├─ device_whitelist.txt  # 设备白名单列表(仅允许的设备可以走代理)
    ├─ site-blocklist.txt    # 屏蔽域名列表(进入黑洞)
    └─ site-blacklist.txt    # 黑名单域名列表(强制走代理)
 ```
@@ -263,6 +265,12 @@ chmod +x scripts/dnsmasq.postconf
 ### 5. 强制走代理域名 (黑名单)
 
 - `res/site-blacklist.txt` 本项目此文件中收集了 Apple 相关域名，能解决访问外区苹果服务的很多问题，访问国区的小伙伴自行修改此文件。
+
+### 6. 设备黑白名单 (可选)
+
+- `res/device_blacklist.txt`：怕邻居蹭网误入迷失深林🌳，在此文件中配置邻居设备的 MAC 地址即可。
+- `res/device_whitelist.txt`：使用白名单可以防止未授权的来宾用户误入迷失深林🌳，在此文件中配置常用设备 MAC 地址即可。
+- ⚠️如果不需要此功能，请删除对应的文件，否则有可能因为文件存在，但没有配设备，导致设备无法上网。
 
 ---
 
