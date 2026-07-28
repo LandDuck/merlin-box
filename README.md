@@ -80,17 +80,17 @@
       </td>
     </tr>
     <tr>
+      <td>路由自身</td>
+      <td>✅ 已支持</td>
+      <td>
+        仅 TCP 代理，默认关闭。需要将 merlin-box.sh 中的 MB_ENABLE_ONESELF_PROXY 变量值修改为 1。 
+      </td>
+    </tr>
+    <tr>
       <td>ping 代理</td>
       <td>⏳ 暂不支持</td>
       <td>
         不在当前代理范围内。
-      </td>
-    </tr>
-    <tr>
-      <td>路由自身</td>
-      <td>⏳ 暂不支持</td>
-      <td>
-        --
       </td>
     </tr>
     <tr>
@@ -106,9 +106,10 @@
 ### 💡 说明
 
 - UDP 代理需要上游节点支持，且 sing-box 需要配置支持 UDP 的出站。
+- 路由自身的代理功能需要在 sing-box 配置中添加一条 redirect 入站。
 - IPv6 需要本地网络和上游服务器均支持；MB_ENABLE_IPV6=1 时脚本会自动检测本地网络 IPv6 可用性，不可用时自动降级到 IPv4 流程。
 - ⚠️脚本无法检测上游服务器是否支持 IPv6，若上游不支持 IPv6，且 MB_ENABLE_IPV6=1，由于会走IPV6优先模式，可能导致无法上网。
-- QUIC 属于 UDP，无论是否开启 UDP 代理，项目均采取拦截方案（DROP UDP 443），因此会导致依赖 H3/QUIC 的网站在客户端侧无法以 QUIC 访问（通常会回退到 TCP/TLS；个别站点可能表现为打不开或异常）。如果你希望在 LAN 侧使用 QUIC 协议访问网站，请将 merlin-box.sh 中的 MB_DISABLE_QUIC_FROM_LAN 变量值修改为 0。
+- QUIC 属于 UDP，无论是否开启 UDP 代理，项目均采取拦截方案（DROP UDP 443），因此会导致依赖 H3/QUIC 的网站在客户端侧无法以 QUIC 访问（通常会回退到 TCP/TLS；个别站点可能表现为打不开或异常）。
 
 ---
 

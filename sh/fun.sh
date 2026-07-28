@@ -261,6 +261,14 @@ start_singbox() {
         # setup lan tproxy
         setup_lan_tproxy
 
+        # setup oneself redirect
+
+        if [ "$MB_ENABLE_ONESELF_PROXY" -eq 1 ]; then
+            setup_oneself_redirect
+        else
+            print_warning "🔍 未启用路由器自身代理，跳过自身流量重定向设置。"
+        fi
+
     else
         print_error "❌ 启动失败！请检查 $SINGBOX_LOG 查看具体报错原因。"
     fi
@@ -438,7 +446,6 @@ stop_smartdns() {
     #print_line "smartdns stop complete"
 }
 
-
 #=========================================
 # 局域网 DNS 53 端口劫持
 #=========================================
@@ -581,207 +588,381 @@ setup_lan_tproxy_ipv6()
     #print_line "lan tproxy v6 setup complete"
 }
 
-#=========================================
-# 初始化与重置防火墙及策略路由
-#=========================================
+# ==========================================
+# 初始化与重置 IPv4 防火墙及策略路由
+# ==========================================
 reset_iptables()
 {
-    print_line "resetting iptables and routing rules"
+    print_line "resetting IPv4 iptables and routing rules"
 
     # ----------------------------------------------------------
-    # A. 自定义链重置 (优先执行，彻底洗空内容，解除对 ipset 的引用)
+    # 1. 重置自定义链
+    #    先清空链内容，解除对 ipset 的引用；
+    #    再删除并重新创建链，确保链处于干净状态。
     # ----------------------------------------------------------
-    # 重置 nat 表的 DNS 链
+
+    # DNS 重定向链（nat）
     iptables -t nat -F "$MB_DNS_CHAIN" 2>/dev/null
     iptables -t nat -X "$MB_DNS_CHAIN" 2>/dev/null
     if ! iptables -t nat -L "$MB_DNS_CHAIN" >/dev/null 2>&1; then
-        iptables -t nat -N "$MB_DNS_CHAIN"
+        iptables -t nat -N "$MB_DNS_CHAIN" 2>/dev/null
     fi
 
-    # 重置 mangle 表的代理链（这一步执行完，对 ipset 的引用就断了）
+    # 局域网代理链（mangle）
     iptables -t mangle -F "$MB_PROXY_CHAIN" 2>/dev/null
     iptables -t mangle -X "$MB_PROXY_CHAIN" 2>/dev/null
     if ! iptables -t mangle -L "$MB_PROXY_CHAIN" >/dev/null 2>&1; then
-        iptables -t mangle -N "$MB_PROXY_CHAIN"
+        iptables -t mangle -N "$MB_PROXY_CHAIN" 2>/dev/null
+    fi
+
+    # 路由器自身代理链
+    iptables -t nat -F "$MB_ONESELF_CHAIN" 2>/dev/null
+    iptables -t nat -X "$MB_ONESELF_CHAIN" 2>/dev/null
+    if ! iptables -t nat -L "$MB_ONESELF_CHAIN" >/dev/null 2>&1; then
+        iptables -t nat -N "$MB_ONESELF_CHAIN"
     fi
 
     # ----------------------------------------------------------
-    # B. 初始化 IPSET 大陆白名单集合 (此时可以安全 destroy)
+    # 2. 重建 IPSET 白名单
     # ----------------------------------------------------------
-    print_normal "⏳ 正在加载 IPSET 大陆白名单分流集合..."
+    print_normal "⏳ 正在加载 IPv4 白名单 IPSET..."
+
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
     ipset create "$MB_IPSET_NAME" hash:net
 
+    # 中国 IP 段
     if [ -f "$MB_CHN_IP4_FILE" ]; then
         dos2unix "$MB_CHN_IP4_FILE" 2>/dev/null
-        (echo "create $MB_IPSET_NAME hash:net -exist" ; awk '{print "add '"$MB_IPSET_NAME"'" , $0}' "$MB_CHN_IP4_FILE") | ipset restore 2>/dev/null
-        print_success "✅ 成功将白名单 IP 网段加载至 ipset 集合。"
+        (
+            echo "create $MB_IPSET_NAME hash:net -exist"
+            awk '{print "add '"$MB_IPSET_NAME"' " $0}' "$MB_CHN_IP4_FILE"
+        ) | ipset restore 2>/dev/null
+        print_success "✅ 已加载中国 IPv4 白名单。"
     else
-        print_warning "⚠️ 未找到白名单文件: $MB_CHN_IP4_FILE，分流功能将不生效！"
+        print_warning "⚠️ 未找到中国 IPv4 白名单文件：$MB_CHN_IP4_FILE"
     fi
 
-    #检测是否存在 MB_IP4_WHITELIST_FILE 这个文件, 如果存在, 也要加载到 ipset 中
+    # 用户自定义白名单
     if [ -f "$MB_IP4_WHITELIST_FILE" ]; then
         dos2unix "$MB_IP4_WHITELIST_FILE" 2>/dev/null
-        (echo "create $MB_IPSET_NAME hash:net -exist" ; awk '{print "add '"$MB_IPSET_NAME"'" , $0}' "$MB_IP4_WHITELIST_FILE") | ipset restore 2>/dev/null
-        print_success "✅ 成功将自定义白名单 IP 网段加载至 ipset 集合。"
+        (
+            echo "create $MB_IPSET_NAME hash:net -exist"
+            awk '{print "add '"$MB_IPSET_NAME"' " $0}' "$MB_IP4_WHITELIST_FILE"
+        ) | ipset restore 2>/dev/null
+        print_success "✅ 已加载自定义 IPv4 白名单。"
     else
-        print_warning "⚠️ 未找到自定义白名单文件: $MB_IP4_WHITELIST_FILE 。"
+        print_warning "⚠️ 未找到自定义 IPv4 白名单文件：$MB_IP4_WHITELIST_FILE"
     fi
 
     # ----------------------------------------------------------
-    # C. 策略路由重置 (ip rule / ip route)
+    # 3. 重置策略路由
     # ----------------------------------------------------------
     while ip rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
         :
     done
+
     ip route flush table "$MB_ROUTE_TABLE" 2>/dev/null
+
     ip rule add fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE"
     ip route add local default dev lo table "$MB_ROUTE_TABLE"
 
-    #print_line "reset complete"
-
+    # ----------------------------------------------------------
+    # 4. 初始化 IPv6
+    # ----------------------------------------------------------
     reset_iptables_ipv6
 }
 
 # ==========================================
-# 初始化与重置防火墙及策略路由 (IPv6 专属)
+# 初始化与重置 IPv6 防火墙及策略路由
 # ==========================================
 reset_iptables_ipv6()
 {
     [ "$MB_ENABLE_IPV6" != "1" ] && return 0
-    print_line "resetting iptables v6 and routing rules"
 
-    # 1. 重置 ip6tables 自定义链引用，防止 ipset 销毁失败
-    ip6tables -t mangle -F "$MB_PROXY_CHAIN_V6" 2>/dev/null
+    print_line "resetting IPv6 iptables and routing rules"
 
-    # 2. 初始化 IPSET 大陆 v6 白名单集合
-    print_normal "⏳ 正在加载 IPSET 大陆 IPv6 白名单分流集合..."
-    ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
-    # 注意：IPv6 的集合类型必须声明为 hash:net 为 family inet6
-    ipset create "$MB_IPSET_NAME_V6" hash:net family inet6 -exist
+    # ----------------------------------------------------------
+    # 1. 重置自定义链
+    #    先清空链内容，解除对 ipset 的引用；
+    #    再删除并重新创建链，确保链处于干净状态。
+    # ----------------------------------------------------------
 
-    if [ -f "$MB_CHN_IP6_FILE" ]; then
-        dos2unix "$MB_CHN_IP6_FILE" 2>/dev/null
-        (echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist" ; awk '{print "add '"$MB_IPSET_NAME_V6"'" , $0}' "$MB_CHN_IP6_FILE") | ipset restore 2>/dev/null
-        print_success "✅ 成功将白名单 IPv6 网段加载至 ipset 集合。"
-    else
-        print_warning "⚠️ 未找到 IPv6 白名单文件: $MB_CHN_IP6_FILE，IPv6 分流功能将不生效！"
-    fi
-
-    # 检测是否存在 MB_IP6_WHITELIST_FILE 这个文件, 如果存在, 也要加载到 ipset 中
-    if [ -f "$MB_IP6_WHITELIST_FILE" ]; then
-        dos2unix "$MB_IP6_WHITELIST_FILE" 2>/dev/null
-        (echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist" ; awk '{print "add '"$MB_IPSET_NAME_V6"'" , $0}' "$MB_IP6_WHITELIST_FILE") | ipset restore 2>/dev/null
-        print_success "✅ 成功将自定义白名单 IPv6 网段加载至 ipset 集合。"
-    else
-        print_warning "⚠️ 未找到自定义白名单文件: $MB_IP6_WHITELIST_FILE 。"
-    fi
-
-    # 3. 策略路由重置 (使用 ip -6 命令)
-    while ip -6 rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
-        :
-    done
-    ip -6 route flush table "$MB_ROUTE_TABLE" 2>/dev/null
-    ip -6 rule add fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE"
-    # 将 v6 流量掉头撞向本地回环
-    ip -6 route add local default dev lo table "$MB_ROUTE_TABLE"
-
-    # 4. 自定义链重建 (ip6tables nat 表)
+    # DNS 重定向链（nat）
     ip6tables -t nat -F "$MB_DNS_CHAIN_V6" 2>/dev/null
     ip6tables -t nat -X "$MB_DNS_CHAIN_V6" 2>/dev/null
     if ! ip6tables -t nat -L "$MB_DNS_CHAIN_V6" >/dev/null 2>&1; then
-        ip6tables -t nat -N "$MB_DNS_CHAIN_V6"
+        ip6tables -t nat -N "$MB_DNS_CHAIN_V6" 2>/dev/null
     fi
 
-    # 5. 自定义链重建 (ip6tables mangle 表)
+    # 局域网代理链（mangle）
     ip6tables -t mangle -F "$MB_PROXY_CHAIN_V6" 2>/dev/null
     ip6tables -t mangle -X "$MB_PROXY_CHAIN_V6" 2>/dev/null
     if ! ip6tables -t mangle -L "$MB_PROXY_CHAIN_V6" >/dev/null 2>&1; then
-        ip6tables -t mangle -N "$MB_PROXY_CHAIN_V6"
+        ip6tables -t mangle -N "$MB_PROXY_CHAIN_V6" 2>/dev/null
     fi
 
-    #print_line "reset v6 complete"
+    # 路由器自身代理链
+    ip6tables -t nat -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    ip6tables -t nat -X "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    if ! ip6tables -t nat -L "$MB_ONESELF_CHAIN_V6" >/dev/null 2>&1; then
+        ip6tables -t nat -N "$MB_ONESELF_CHAIN_V6"
+    fi
+
+    # ----------------------------------------------------------
+    # 2. 重建 IPv6 IPSET 白名单
+    # ----------------------------------------------------------
+    print_normal "⏳ 正在加载 IPv6 白名单 IPSET..."
+
+    ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
+    ipset create "$MB_IPSET_NAME_V6" hash:net family inet6
+
+    # 中国 IPv6 段
+    if [ -f "$MB_CHN_IP6_FILE" ]; then
+        dos2unix "$MB_CHN_IP6_FILE" 2>/dev/null
+        (
+            echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist"
+            awk '{print "add '"$MB_IPSET_NAME_V6"' " $0}' "$MB_CHN_IP6_FILE"
+        ) | ipset restore 2>/dev/null
+        print_success "✅ 已加载中国 IPv6 白名单。"
+    else
+        print_warning "⚠️ 未找到中国 IPv6 白名单文件：$MB_CHN_IP6_FILE"
+    fi
+
+    # 用户自定义 IPv6 白名单
+    if [ -f "$MB_IP6_WHITELIST_FILE" ]; then
+        dos2unix "$MB_IP6_WHITELIST_FILE" 2>/dev/null
+        (
+            echo "create $MB_IPSET_NAME_V6 hash:net family inet6 -exist"
+            awk '{print "add '"$MB_IPSET_NAME_V6"' " $0}' "$MB_IP6_WHITELIST_FILE"
+        ) | ipset restore 2>/dev/null
+        print_success "✅ 已加载自定义 IPv6 白名单。"
+    else
+        print_warning "⚠️ 未找到自定义 IPv6 白名单文件：$MB_IP6_WHITELIST_FILE"
+    fi
+
+    # ----------------------------------------------------------
+    # 3. 重置 IPv6 策略路由
+    # ----------------------------------------------------------
+    while ip -6 rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
+        :
+    done
+
+    ip -6 route flush table "$MB_ROUTE_TABLE" 2>/dev/null
+
+    ip -6 rule add fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE"
+    ip -6 route add local default dev lo table "$MB_ROUTE_TABLE"
 }
 
-#=========================================
-# 清理 iptables 规则与策略路由
-#=========================================
+# ==========================================
+# 清理 IPv4 防火墙规则及策略路由
+# ==========================================
 clear_iptables()
 {
-    print_line "clear iptables and routing rules"
+    print_line "clear IPv4 iptables and routing rules"
 
     # ----------------------------------------------------------
-    # 1. 拔除主链（PREROUTING）中的引流规则
+    # 1. 删除主链中的跳转规则（Jump）
+    #    防止自定义链仍被引用，导致无法删除。
     # ----------------------------------------------------------
-    iptables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null
-    iptables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null
 
-    iptables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
-    iptables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
-    iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null
+    # DNS 重定向入口（nat）
+    while iptables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null; do :; done
+    while iptables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null; do :; done
 
-    # ==========================================================
-    # 1. 清理 nat 表的 DNS 链
-    # ==========================================================
+    # 局域网代理入口（mangle）
+    while iptables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null; do :; done
+    while iptables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null; do :; done
+    while iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null; do :; done
+
+    # 路由器自身代理入口（OUTPUT）
+    while iptables -t nat -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN" 2>/dev/null; do :; done
+    #while iptables -t nat -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN" 2>/dev/null; do :; done
+
+    # ----------------------------------------------------------
+    # 2. 销毁自定义链
+    # ----------------------------------------------------------
+
+    # DNS 重定向链（nat）
     iptables -t nat -F "$MB_DNS_CHAIN" 2>/dev/null
     iptables -t nat -X "$MB_DNS_CHAIN" 2>/dev/null
 
-    # ==========================================================
-    # 2. 清理 mangle 表的代理链
-    # ==========================================================
+    # 局域网代理链（mangle）
     iptables -t mangle -F "$MB_PROXY_CHAIN" 2>/dev/null
     iptables -t mangle -X "$MB_PROXY_CHAIN" 2>/dev/null
 
+    # 路由器自身代理链（mangle）
+    iptables -t nat -F "$MB_ONESELF_CHAIN" 2>/dev/null
+    iptables -t nat -X "$MB_ONESELF_CHAIN" 2>/dev/null
+
     # ----------------------------------------------------------
-    # 3. 释放策略路由与路由表（新增）
+    # 3. 清理策略路由
     # ----------------------------------------------------------
-    # 删除策略路由条目
+
     while ip rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
         :
     done
 
-    # 彻底清空并擦除自定义路由表 100
     ip route flush table "$MB_ROUTE_TABLE" 2>/dev/null
-    # 销毁 ipset 白名单集合
+
+    # ----------------------------------------------------------
+    # 4. 销毁 IPSET 白名单
+    # ----------------------------------------------------------
+
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
 
-    #print_line "clear complete"
+    # ----------------------------------------------------------
+    # 5. 清理 IPv6
+    # ----------------------------------------------------------
 
     clear_iptables_ipv6
 }
 
 # ==========================================
-# 清理 iptables 规则与策略路由 (IPv6 专属)
+# 清理 IPv6 防火墙规则及策略路由
 # ==========================================
 clear_iptables_ipv6()
 {
-    print_line "clear iptables v6 and routing rules"
+    [ "$MB_ENABLE_IPV6" != "1" ] && return 0
 
-    # 1. 拔除主链（PREROUTING / OUTPUT）中的引流路标
-    ip6tables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
-    ip6tables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
+    print_line "clear IPv6 iptables and routing rules"
 
-    ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
-    ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
-    ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
+    # ----------------------------------------------------------
+    # 1. 删除主链中的跳转规则（Jump）
+    #    防止自定义链仍被引用，导致无法删除。
+    # ----------------------------------------------------------
 
-    # 2. 彻底销毁自定义链
+    # DNS 重定向入口（nat）
+    while ip6tables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null; do :; done
+    while ip6tables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null; do :; done
+
+    # 局域网代理入口（mangle）
+    while ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null; do :; done
+    while ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null; do :; done
+    while ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null; do :; done
+
+    # 路由器自身代理入口（OUTPUT）
+    while ip6tables -t nat -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null; do :; done
+    #while ip6tables -t nat -D OUTPUT -p udp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null; do :; done
+
+    # ----------------------------------------------------------
+    # 2. 销毁自定义链
+    # ----------------------------------------------------------
+
+    # DNS 重定向链（nat）
     ip6tables -t nat -F "$MB_DNS_CHAIN_V6" 2>/dev/null
     ip6tables -t nat -X "$MB_DNS_CHAIN_V6" 2>/dev/null
 
+    # 局域网代理链（mangle）
     ip6tables -t mangle -F "$MB_PROXY_CHAIN_V6" 2>/dev/null
     ip6tables -t mangle -X "$MB_PROXY_CHAIN_V6" 2>/dev/null
 
-    # 3. 释放 v6 策略路由与清除 IPSET
+    # 路由器自身代理链（mangle）
+    ip6tables -t nat -F "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+    ip6tables -t nat -X "$MB_ONESELF_CHAIN_V6" 2>/dev/null
+
+    # ----------------------------------------------------------
+    # 3. 清理 IPv6 策略路由
+    # ----------------------------------------------------------
+
     while ip -6 rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
         :
     done
+
     ip -6 route flush table "$MB_ROUTE_TABLE" 2>/dev/null
 
-    ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
+    # ----------------------------------------------------------
+    # 4. 销毁 IPv6 IPSET 白名单
+    # ----------------------------------------------------------
 
-    #print_line "clear v6 complete"
+    ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
+}
+
+#=========================================
+# 路由器本机流量透明代理（IPv4 TCP REDIRECT）
+#=========================================
+setup_oneself_redirect()
+{
+    print_line "setting up router oneself tcp redirect proxy"
+
+    # ----------------------------------------------------------
+    # 1. 本机流量白名单放行
+    # ----------------------------------------------------------
+
+    # 放行本地回环地址
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -d 127.0.0.0/8 -j RETURN
+
+    # 放行 sing-box 自身流量，防止代理循环
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -m mark --mark "$MB_SINGBOX_OUT_MARK" -j RETURN
+
+    # 放行局域网地址
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -d 192.168.0.0/16 -j RETURN
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -d 172.16.0.0/12 -j RETURN
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -d 10.0.0.0/8 -j RETURN
+
+    # 放行大陆 IP 直连流量
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -p tcp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
+
+    # 放行本机 DNS 查询
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -p tcp --dport 53 -j RETURN
+
+    # ----------------------------------------------------------
+    # 2. 剩余 TCP 流量 REDIRECT 到 sing-box
+    # ----------------------------------------------------------
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -p tcp -j REDIRECT --to-ports "$MB_REDIRECT_PORT"
+
+    # ----------------------------------------------------------
+    # 3. OUTPUT 主链挂载
+    # ----------------------------------------------------------
+    while iptables -t nat -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN" 2>/dev/null; do :; done
+
+    iptables -t nat -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN"
+
+    # 初始化 IPv6
+    setup_oneself_redirect_ipv6
+}
+
+#=========================================
+# 路由器本机流量透明代理（IPv6 TCP REDIRECT）
+#=========================================
+setup_oneself_redirect_ipv6()
+{
+    [ "$MB_ENABLE_IPV6" != "1" ] && return 0
+
+    print_line "setting up router oneself tcp redirect proxy v6"
+
+    # ----------------------------------------------------------
+    # 1. IPv6 本机流量白名单放行
+    # ----------------------------------------------------------
+
+    # 放行 IPv6 回环地址
+    ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -d ::1/128 -j RETURN
+
+    # 放行 sing-box 自身流量，防止代理循环
+    ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -m mark --mark "$MB_SINGBOX_OUT_MARK" -j RETURN
+
+    # 放行链路本地地址
+    ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -d fe80::/10 -j RETURN
+
+    # 放行 IPv6 私有地址
+    ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -d fc00::/7 -j RETURN
+
+    # 放行大陆 IPv6 IP 直连流量
+    ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
+
+    # 放行本机 DNS 查询
+    ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -p tcp --dport 53 -j RETURN
+
+    # ----------------------------------------------------------
+    # 2. 剩余 TCP 流量 REDIRECT 到 sing-box
+    # ----------------------------------------------------------
+    ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -p tcp -j REDIRECT --to-ports "$MB_REDIRECT_PORT"
+
+    # ----------------------------------------------------------
+    # 3. OUTPUT 主链挂载
+    # ----------------------------------------------------------
+    while ip6tables -t nat -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null; do :; done
+
+    ip6tables -t nat -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6"
 }
 
 # ==========================================

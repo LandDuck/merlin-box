@@ -28,6 +28,12 @@
             "tag": "tproxy-in",
             "listen": "::",
             "listen_port": 65002
+        },
+        {
+            "type": "redirect",
+            "tag": "redirect-in",
+            "listen": "::",
+            "listen_port": 65003
         }
     ],
     "outbounds": [

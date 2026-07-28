@@ -32,11 +32,15 @@ SCRIPT_VERSION="0.0.1"
 # 全局防火墙链名定义
 readonly MB_DNS_CHAIN="MERLINKBOX_DNS"
 readonly MB_PROXY_CHAIN="MERLINKBOX_PROXY"
+readonly MB_ONESELF_CHAIN="MERLINKBOX_ONESELF"
 readonly MB_DNS_CHAIN_V6="MERLINKBOX_DNS_V6"
 readonly MB_PROXY_CHAIN_V6="MERLINKBOX_PROXY_V6"
+readonly MB_ONESELF_CHAIN_V6="MERLINKBOX_ONESELF_V6"
 
 # sing-box 监听的 TPROXY 端口
 readonly MB_TPROXY_PORT=65002
+# sing-box 监听的 REDIRECT 端口
+readonly MB_REDIRECT_PORT=65003
 # iptables 打标值与 ip rule 匹配值（一个32位无符号整数, 建议1到255）
 readonly MB_FWMARK=168
 # 自定义本地路由表编号 (1到32767)
@@ -56,6 +60,8 @@ MB_ENABLE_IPV6=1
 readonly MB_DISABLE_QUIC_FROM_LAN=1
 # 是否启用UDP (0 DISABLE, 1 ENABLE)
 readonly MB_ENABLE_UDP=0
+# 是否启用路由自身代理 (0 DISABLE, 1 ENABLE)。需要 singbox 的 inbound 配置中有 redirect
+readonly MB_ENABLE_ONESELF_PROXY=0
 
 # 引入fun.sh脚本, ./sh/fun.sh
 if [ -f "$CUR_DIR/sh/fun.sh" ]; then
@@ -100,20 +106,20 @@ start() {
   # 如果已经启用IPV6支持，使用 check_ipv6_support 函数检测当前路由是否支持IPv6，如果不支持则禁用IPv6支持
   if [ "$MB_ENABLE_IPV6" -eq 1 ]; then
     if ! check_ipv6_support; then
-      echo "[WARN] 当前路由器不支持或已弃用 IPv6，自动禁用 IPv6 支持。"
+      print_warning "当前路由器不支持或已弃用 IPv6，自动禁用 IPv6 支持。"
       MB_ENABLE_IPV6=0
     fi
   fi
 
   # 如果未能成功加载 TPROXY 模块，停止执行
   if ! check_and_load_tproxy; then
-      echo "脚本终止执行。"
+      print_error "脚本终止执行：因不支持 tproxy。"
       exit 1
   fi
 
 	# 清理iptables规则
 	reset_iptables
-  # 启动singbox socks:65001  tproxy:65002
+  # 启动singbox socks:65001  tproxy:65002 redirect:65003
   start_singbox
   # 启动smartdns服务
 	start_smartdns
@@ -282,7 +288,7 @@ compress_smartdns() {
 #=========================================
 main() {
 	if [ "$#" -lt 1 ]; then
-		echo "错误: 必须传入参数。"
+		print_error "错误: 必须传入参数。"
 		show_help
 		exit 1
 	fi
@@ -304,8 +310,8 @@ main() {
           test_debug
           ;;
         *)
-          echo "错误: 不支持的测试子命令 '$2'"
-          echo "可用子命令: print, debug"
+          print_error "错误: 不支持的测试子命令 '$2'"
+          print_normal "可用子命令: print, debug"
           exit 1
           ;;
       esac
@@ -328,12 +334,12 @@ main() {
           print_dhcp_devices
           ;;
         -h|--help|"")
-          echo "用法: $SCRIPT_NAME tool <subcommand>"
-          echo "可用子命令: compress_singbox, compress_smartdns, show_devices"
+          print_normal "用法: $SCRIPT_NAME tool <subcommand>"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices"
           ;;
         *)
-          echo "错误: 不支持的工具子命令 '$2'"
-          echo "可用子命令: compress_singbox, compress_smartdns, show_devices"
+          print_error "错误: 不支持的工具子命令 '$2'"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices"
           exit 1
           ;;
       esac
@@ -348,7 +354,7 @@ main() {
 			show_version
 			;;
 		*)
-			echo "错误: 不支持的参数 '$1'"
+			print_error "错误: 不支持的参数 '$1'"
 			show_help
 			exit 1
 			;;
