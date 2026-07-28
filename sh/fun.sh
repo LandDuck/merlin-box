@@ -501,6 +501,10 @@ setup_lan_tproxy()
 
     # 0 匹配 MAC 黑名单集合的流量直接 RETURN（不被代理）
     iptables -t mangle -A "$MB_PROXY_CHAIN" -m set --match-set "$MB_MAC_BLACKLIST_NAME" src -j RETURN
+    # 0 匹配 MAC 白名单集合的流量，不在白名单中的设备流量直接 RETURN（不被代理）
+    if [ -f "$MB_MAC_WHITELIST_FILE" ]; then
+      iptables -t mangle -A "$MB_PROXY_CHAIN" -m set ! --match-set "$MB_MAC_WHITELIST_NAME" src -j RETURN
+    fi
 
     # 1. 局域网互访放行
     iptables -t mangle -A "$MB_PROXY_CHAIN" -d 192.168.0.0/16 -j RETURN
@@ -554,6 +558,10 @@ setup_lan_tproxy_ipv6()
 
     # 0 匹配 MAC 黑名单集合的流量直接 RETURN（不被代理）
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -m set --match-set "$MB_MAC_BLACKLIST_NAME" src -j RETURN
+    # 0 匹配 MAC 白名单集合的流量，不在白名单中的设备流量直接 RETURN（不被代理）
+    if [ -f "$MB_MAC_WHITELIST_FILE" ]; then
+      ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -m set ! --match-set "$MB_MAC_WHITELIST_NAME" src -j RETURN
+    fi
 
     # 1. 局域网本地特殊 v6 网段直连放行（必须放行 fe80::/10 链路本地地址和私有本地地址）
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -d ::1/128 -j RETURN
@@ -686,13 +694,35 @@ reset_iptables()
                 {print "add '"$MB_MAC_BLACKLIST_NAME"' " $1}
             ' "$MB_MAC_BLACKLIST_FILE"
         ) | ipset restore 2>/dev/null
-        print_success "✅ 已加载设备 MAC 黑名单。"
+        print_success "✅ 已加载设备 MAC 黑名单。黑名单中的设备不会被代理。"
     else
         print_warning "⚠️ 未找到设备 MAC 黑名单文件：$MB_MAC_BLACKLIST_FILE"
     fi
 
     # ----------------------------------------------------------
-    # 4. 重置策略路由
+    # 4. 设备白名单（MAC 地址），只有这些设备会被代理。
+    # ----------------------------------------------------------
+    if [ -f "$MB_MAC_WHITELIST_FILE" ]; then
+        print_normal "⏳ 正在加载设备 MAC 白名单..."
+        ipset destroy "$MB_MAC_WHITELIST_NAME" 2>/dev/null
+        ipset create "$MB_MAC_WHITELIST_NAME" hash:mac 2>/dev/null
+
+        dos2unix "$MB_MAC_WHITELIST_FILE" 2>/dev/null
+        (
+            echo "create $MB_MAC_WHITELIST_NAME hash:mac -exist"
+            awk '
+                /^[[:space:]]*$/ { next }          # 空行
+                /^[[:space:]]*#/ { next }          # 注释
+                {print "add '"$MB_MAC_WHITELIST_NAME"' " $1}
+            ' "$MB_MAC_WHITELIST_FILE"
+        ) | ipset restore 2>/dev/null
+        print_success "✅ 已加载设备 MAC 白名单。仅白名单设备会被代理。"
+    else
+        print_warning "⚠️ 未找到设备 MAC 白名单文件：$MB_MAC_WHITELIST_FILE"
+    fi
+
+    # ----------------------------------------------------------
+    # 5. 重置策略路由
     # ----------------------------------------------------------
     while ip rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
         :
@@ -855,6 +885,7 @@ clear_iptables()
 
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
     ipset destroy "$MB_MAC_BLACKLIST_NAME" 2>/dev/null
+    ipset destroy "$MB_MAC_WHITELIST_NAME" 2>/dev/null
 
     # ----------------------------------------------------------
     # 5. 清理 IPv6

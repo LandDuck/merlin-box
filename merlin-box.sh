@@ -27,7 +27,7 @@ CUR_DIR=$(cd "$(dirname "$0")"; pwd)
 # 脚本名称
 SCRIPT_NAME="$(basename "$0")"
 # 脚本版本
-SCRIPT_VERSION="0.0.1"
+SCRIPT_VERSION="1.0.0"
 
 # 全局防火墙链名定义
 readonly MB_DNS_CHAIN="MERLINKBOX_DNS"
@@ -52,11 +52,14 @@ readonly MB_IPSET_NAME="merlinkbox_chn"
 readonly MB_IPSET_NAME_V6="merlinkbox_chn_v6"
 # 设备黑名单MAC地址SET NAME
 readonly MB_MAC_BLACKLIST_NAME="merlinkbox_mac_blacklist"
+# 设备白名单MAC地址SET NAME
+readonly MB_MAC_WHITELIST_NAME="merlinkbox_mac_whitelist"
 readonly MB_CHN_IP4_FILE="${CUR_DIR}/res/chn-ip4.txt"
 readonly MB_IP4_WHITELIST_FILE="${CUR_DIR}/res/ip4-whitelist.txt" #这里面的东西不会被代理
 readonly MB_CHN_IP6_FILE="${CUR_DIR}/res/chn-ip6.txt"
 readonly MB_IP6_WHITELIST_FILE="${CUR_DIR}/res/ip6-whitelist.txt" #这里面的东西不会被代理
 readonly MB_MAC_BLACKLIST_FILE="${CUR_DIR}/res/device_blacklist.txt" #这里面的设备不会被代理
+readonly MB_MAC_WHITELIST_FILE="${CUR_DIR}/res/device_whitelist.txt" #这里面的设备会被代理
 # 是否启用 IPv6 支持 (0 DISABLE, 1 ENABLE)。注意系统会检测到 IPv6 是否可用，如果不可用则会自动禁用 IPv6 支持
 MB_ENABLE_IPV6=1
 # 屏蔽来自局域网的QUIC协议访问 (0 不屏蔽, 1 屏蔽)
