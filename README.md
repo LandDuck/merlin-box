@@ -90,7 +90,7 @@
       <td>设备黑名单</td>
       <td>✅ 已支持</td>
       <td>
-        防止邻居蹭网误入迷失深林。 在 device_blocklist.txt 中配置设备 MAC 地址即可。
+        防止邻居蹭网误入迷失深林。 在 device_blacklist.txt 中配置设备 MAC 地址即可。
       </td>
     </tr>
     <tr>
