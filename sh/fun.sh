@@ -499,6 +499,9 @@ setup_lan_tproxy()
 {
     print_line "setting up lan tproxy and quic block"
 
+    # 0 匹配 MAC 黑名单集合的流量直接 RETURN（不被代理）
+    iptables -t mangle -A "$MB_PROXY_CHAIN" -m set --match-set "$MB_MAC_BLACKLIST_NAME" src -j RETURN
+
     # 1. 局域网互访放行
     iptables -t mangle -A "$MB_PROXY_CHAIN" -d 192.168.0.0/16 -j RETURN
     iptables -t mangle -A "$MB_PROXY_CHAIN" -d 172.16.0.0/12 -j RETURN
@@ -548,6 +551,9 @@ setup_lan_tproxy_ipv6()
 {
     [ "$MB_ENABLE_IPV6" != "1" ] && return 0
     print_line "setting up lan tproxy v6 and quic block"
+
+    # 0 匹配 MAC 黑名单集合的流量直接 RETURN（不被代理）
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -m set --match-set "$MB_MAC_BLACKLIST_NAME" src -j RETURN
 
     # 1. 局域网本地特殊 v6 网段直连放行（必须放行 fe80::/10 链路本地地址和私有本地地址）
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -d ::1/128 -j RETURN
@@ -655,7 +661,26 @@ reset_iptables()
     fi
 
     # ----------------------------------------------------------
-    # 3. 重置策略路由
+    # 3. 设备黑名单（MAC 地址），这些设备不会被代理。
+    # ----------------------------------------------------------
+
+    if [ -f "$MB_MAC_BLACKLIST_FILE" ]; then
+        print_normal "⏳ 正在加载设备 MAC 黑名单..."
+        ipset destroy "$MB_MAC_BLACKLIST_NAME" 2>/dev/null
+        ipset create "$MB_MAC_BLACKLIST_NAME" hash:mac 2>/dev/null
+
+        dos2unix "$MB_MAC_BLACKLIST_FILE" 2>/dev/null
+        (
+            echo "create $MB_MAC_BLACKLIST_NAME hash:mac -exist"
+            awk '{print "add '"$MB_MAC_BLACKLIST_NAME"' " $0}' "$MB_MAC_BLACKLIST_FILE"
+        ) | ipset restore 2>/dev/null
+        print_success "✅ 已加载设备 MAC 黑名单。"
+    else
+        print_warning "⚠️ 未找到设备 MAC 黑名单文件：$MB_MAC_BLACKLIST_FILE"
+    fi
+
+    # ----------------------------------------------------------
+    # 4. 重置策略路由
     # ----------------------------------------------------------
     while ip rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
         :
@@ -667,7 +692,7 @@ reset_iptables()
     ip route add local default dev lo table "$MB_ROUTE_TABLE"
 
     # ----------------------------------------------------------
-    # 4. 初始化 IPv6
+    # 5. 初始化 IPv6
     # ----------------------------------------------------------
     reset_iptables_ipv6
 }
@@ -805,10 +830,11 @@ clear_iptables()
     ip route flush table "$MB_ROUTE_TABLE" 2>/dev/null
 
     # ----------------------------------------------------------
-    # 4. 销毁 IPSET 白名单
+    # 4. 销毁 IPSET 白名单，MAC 黑名单
     # ----------------------------------------------------------
 
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
+    ipset destroy "$MB_MAC_BLACKLIST_NAME" 2>/dev/null
 
     # ----------------------------------------------------------
     # 5. 清理 IPv6
@@ -875,6 +901,7 @@ clear_iptables_ipv6()
     # ----------------------------------------------------------
 
     ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
+
 }
 
 #=========================================
