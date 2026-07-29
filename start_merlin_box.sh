@@ -28,6 +28,8 @@
 readonly LOGFILE="/tmp/merlin-box-boot.log"
 # merlin-box 根目录，脚本会自动修改
 readonly MD_ROOT_DIR="/jffs/xxxxxxx"
+# 安装时获取的系统年份
+readonly INSTALL_YEAR=2026
 # 并发锁
 readonly LOCK_DIR="/tmp/merlin-box-boot.lock"
 # 调用来自哪个脚本
@@ -90,6 +92,30 @@ wait_network()
     return 1
 }
 
+########################################
+# 等待时间同步正确
+########################################
+wait_time_sync()
+{
+    i=1
+
+    while [ $i -le 50 ]; do
+
+        if [ "$(date +%Y)" -ge "$INSTALL_YEAR" ]; then
+            log_msg "时间已同步"
+            return 0
+        fi
+
+        log_msg "等待时间同步 ($i/50)"
+        sleep 2
+
+        i=$((i + 1))
+    done
+
+    log_msg "等待时间同步超时"
+    return 1
+}
+
 log_msg "收到触发事件: FROM=$FROM, P1=$P1, P2=$P2"
 
 # wan 连接事件触发，重新拨号后merlin-box重启
@@ -99,6 +125,8 @@ if { [ "$FROM" = "wan_event" ] && [ "$P1" = "0" ] && [ "$P2" = "connected" ]; } 
     lock
 
     wait_network
+
+    wait_time_sync
 
     sleep 2
 

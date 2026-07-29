@@ -200,6 +200,11 @@ install() {
   # 修改脚本中的 MD_ROOT_DIR 为当前目录
   sed -i "s|^readonly MD_ROOT_DIR=.*|readonly MD_ROOT_DIR=\"${CUR_DIR}\"|" "${boot_script}"
 
+  print_normal "修改脚本中的 INSTALL_YEAR 为当前年份"
+
+  # 修改脚本中的 INSTALL_YEAR 为当前年份
+  sed -i "s|^readonly INSTALL_YEAR=.*|readonly INSTALL_YEAR=$(date +%Y)|" "${boot_script}"
+
   # 检查并开启梅林固件的 wan-event
   if [ ! -f "${merlin_wan_event}" ]; then
     print_normal "创建 merlin wan-event 脚本"
