@@ -500,7 +500,9 @@ setup_lan_tproxy()
     print_line "setting up lan tproxy and quic block"
 
     # 0 匹配 MAC 黑名单集合的流量直接 RETURN（不被代理）
-    iptables -t mangle -A "$MB_PROXY_CHAIN" -m set --match-set "$MB_MAC_BLACKLIST_NAME" src -j RETURN
+    if [ -f "$MB_MAC_BLACKLIST_FILE" ]; then
+      iptables -t mangle -A "$MB_PROXY_CHAIN" -m set --match-set "$MB_MAC_BLACKLIST_NAME" src -j RETURN
+    fi
     # 0 匹配 MAC 白名单集合的流量，不在白名单中的设备流量直接 RETURN（不被代理）
     if [ -f "$MB_MAC_WHITELIST_FILE" ]; then
       iptables -t mangle -A "$MB_PROXY_CHAIN" -m set ! --match-set "$MB_MAC_WHITELIST_NAME" src -j RETURN
@@ -557,7 +559,9 @@ setup_lan_tproxy_ipv6()
     print_line "setting up lan tproxy v6 and quic block"
 
     # 0 匹配 MAC 黑名单集合的流量直接 RETURN（不被代理）
-    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -m set --match-set "$MB_MAC_BLACKLIST_NAME" src -j RETURN
+    if [ -f "$MB_MAC_BLACKLIST_FILE" ]; then
+      ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -m set --match-set "$MB_MAC_BLACKLIST_NAME" src -j RETURN
+    fi
     # 0 匹配 MAC 白名单集合的流量，不在白名单中的设备流量直接 RETURN（不被代理）
     if [ -f "$MB_MAC_WHITELIST_FILE" ]; then
       ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -m set ! --match-set "$MB_MAC_WHITELIST_NAME" src -j RETURN
