@@ -22,7 +22,7 @@ This project aims to clearly separate responsibilities:
   <thead>
     <tr>
       <th width="180">Item</th>
-      <th width="120">Status</th>
+      <th width="160">Status</th>
       <th>Description</th>
     </tr>
   </thead>
