@@ -1,5 +1,10 @@
 # 🚀 merlin-box
 
+#### 🌐 Languages
+
+- 简体中文
+- [English](README.md)
+
 基于 **ASUSWRT-Merlin** 路由器环境的 **sing-box + smartdns** 分流代理脚本方案。
 
 本项目目标是把职责拆分清晰：

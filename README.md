@@ -1,5 +1,11 @@
 # 🚀 merlin-box
 
+#### 🌐 Languages
+
+- English
+- [简体中文](README.zh-CN.md)
+
+
 A **sing-box + smartdns** routing and proxy script solution based on the **ASUSWRT-Merlin** router environment.
 
 This project aims to clearly separate responsibilities:
