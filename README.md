@@ -308,12 +308,17 @@ Tool commands:
 ./merlin-box.sh tool compress_singbox       #Compress sing-box executable ¹
 ./merlin-box.sh tool compress_smartdns      #Compress smartdns executable ¹
 ./merlin-box.sh tool show_devices           #Show current DHCP lease device list  
+./merlin-box.sh tool update_rules           #Update rule files ²
 ./merlin-box.sh tool -h
 ```
 
 1. Commands are only executed on the local system (or WSL), not on the router. Compression depends on the upx tool.
 - The binary files included in this repository have been compressed.
 - ⚠️ While compression can significantly reduce file size, startup will be slower than the original program.
+
+2. Rule updates have two behaviors:
+- In development mode, a Python script is called to download the latest rule files from three sources and overwrite the local files.
+- In production mode (on the router), wget is used to download the latest rule files from the raw files of this repository and overwrite the local files.
 
 ---
 

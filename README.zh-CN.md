@@ -306,13 +306,17 @@ chmod +x scripts/dnsmasq.postconf
 ```bash
 ./merlin-box.sh tool compress_singbox       #压缩 sing-box 可执行文件 ¹
 ./merlin-box.sh tool compress_smartdns      #压缩 smartdns 可执行文件 ¹
-./merlin-box.sh tool show_devices           #显示当前 DHCP 租约的设备列表  
+./merlin-box.sh tool show_devices           #显示当前 DHCP 租约的设备列表 
+./merlin-box.sh tool update_rules           #更新规则文件 ²
 ./merlin-box.sh tool -h
 ```
 
 1. 命令仅在本地系统（或WSL）中执行，不能在路由器上执行。压缩依赖 upx 工具。
 - 本仓库携带的二进制文件已经经过压缩。
 - ⚠️压缩虽然可以明显降低文件大小，但是启动时会比原始程序要慢。
+2. 规则更新有两种行为：
+- 在开发模式下，会调用python脚本从三个源下载最新规则文件并覆盖本地文件。
+- 在生产模式下（路由器中），使用wget从本仓库的 raw 文件下载最新规则文件并覆盖本地文件。
 
 ---
 
