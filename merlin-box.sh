@@ -302,6 +302,17 @@ update_rules() {
   # 检测 nvram 是否可用, 如果可用证明在路由器中, 直接下载本项目的规则文件到 res 目录
   if command -v nvram >/dev/null 2>&1; then
     print_normal "检测到在路由器中运行，直接下载规则文件到 res 目录"
+    # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt
+    # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt
+    # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-site.txt
+
+    # wget 这些文件到 res 目录
+    wget -O "${CUR_DIR}/res/chn-ip4.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt"
+    wget -O "${CUR_DIR}/res/chn-ip6.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt"
+    wget -O "${CUR_DIR}/res/chn-site.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-site.txt"
+
+    print_success "规则文件更新完成"
+
   else
     print_warning "未在路由器中运行，使用 python3 ./tools/update-rules/main.py 更新规则文件"
     if command -v python3 >/dev/null 2>&1; then
@@ -373,7 +384,7 @@ main() {
           ;;
         *)
           print_error "错误: 不支持的工具子命令 '$2'"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules"
           exit 1
           ;;
       esac
