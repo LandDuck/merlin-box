@@ -28,6 +28,8 @@ CUR_DIR=$(cd "$(dirname "$0")"; pwd)
 SCRIPT_NAME="$(basename "$0")"
 # 脚本版本
 SCRIPT_VERSION="1.0.0"
+# PID
+PID_FILE="/tmp/merlin-box.pid"
 
 # 全局防火墙链名定义
 readonly MB_DNS_CHAIN="MERLINKBOX_DNS"
@@ -123,6 +125,13 @@ start() {
       exit 1
   fi
 
+  # 如果存在 merlin-box 的 PID 文件，说明 merlin-box 已经在运行，先停止它
+  if [ -f "$PID_FILE" ]; then
+    print_warning "检测到 merlin-box 已经在运行，先停止它"
+    stop
+    sleep 2
+  fi
+
 	# 清理iptables规则
 	reset_iptables
   # 启动singbox socks:65001  tproxy:65002 redirect:65003
@@ -131,6 +140,10 @@ start() {
 	start_smartdns
   # 重启dnsmasq服务
   restart_dnsmasq
+
+  # 保存 sing-box 的 PID
+  pidof sing-box > "$PID_FILE"
+
   # 完成
 	print_line "merlin-box complete"
 }
@@ -140,10 +153,17 @@ start() {
 #=========================================
 stop() {
 	print_line "stop merlin-box"
+
 	stop_singbox
 	stop_smartdns
 	clear_iptables
 	restart_dnsmasq
+
+	# 删除 PID 文件
+	if [ -f "$PID_FILE" ]; then
+    rm -f "$PID_FILE"
+  fi
+
 	print_line "merlin-box stopped"
 }
 
@@ -154,6 +174,10 @@ restart() {
   stop_singbox
   stop_smartdns
   clear_iptables
+  # 删除 PID 文件
+  if [ -f "$PID_FILE" ]; then
+    rm -f "$PID_FILE"
+  fi
   sleep 2
   start
 }
