@@ -350,6 +350,137 @@ update_rules() {
 }
 
 #=========================================
+# 构建 sing-box 可执行文件
+#=========================================
+build_singbox() {
+
+  print_line "构建 sing-box 可执行文件"
+
+  # 询问用户要构建的 sing-box 版本
+  read -p "请输入要构建的 sing-box 版本 (例如 v1.13.16 或 1.13.16): " raw_version
+  # 询问架构 arm64 或 arm
+  read -p "请输入要构建的架构 (arm64 或 arm): " arch
+  if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
+    print_error "错误: 不支持的架构 '$arch'，请使用 arm64 或 arm"
+    exit 1
+  fi
+
+  # 规范化版本号：确保 singbox_version 不带 v，tag_name 带有 v
+  VERSION_NO_V="${raw_version#v}"
+  TAG_NAME="v${VERSION_NO_V}"
+
+  # 检查工具集
+  for cmd in git go tar; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+      print_error "未检测到 $cmd，请先安装 $cmd"
+      exit 1
+    fi
+  done
+
+  # 开发阶段调试用的
+  ### WORK_DIR=$CUR_DIR/tmp
+  # 如果不存在， 创建工作目录
+  ### mkdir -p "$WORK_DIR"
+  # 开发阶段调试用的结束
+
+  # 创建独立的工作临时目录，并在脚本退出/中断时自动清理
+  WORK_DIR=$(mktemp -d -t singbox-build-XXXXXX)
+  trap 'rm -rf "$WORK_DIR"' EXIT
+
+  echo "工作目录: $WORK_DIR"
+  cd "$WORK_DIR" || exit 1
+
+  # 1. 下载 sing-box 源码
+  print_line "正在克隆 sing-box (${TAG_NAME})..."
+  if ! git clone --branch "$TAG_NAME" --depth 1 "https://github.com/SagerNet/sing-box.git" sing-box; then
+   print_error "找不到标签为 ${TAG_NAME} 的 sing-box 源码，请检查版本号！"
+   exit 1
+  fi
+
+  # 2. 读取 sing-box 要求的精确 cronet-go 版本号
+  CD_SINGBOX="$WORK_DIR/sing-box"
+  CRONET_GO_VERSION=$(cat "$CD_SINGBOX/.github/CRONET_GO_VERSION")
+
+  if [ -z "$CRONET_GO_VERSION" ]; then
+    print_error "未能在 .github/CRONET_GO_VERSION 中找到 cronet-go 版本配置"
+    exit 1
+  fi
+
+  # 3. 按指定的 Commit/Tag 克隆 cronet-go 并拉取子模块
+  print_line "正在克隆匹配的 cronet-go (${CRONET_GO_VERSION})..."
+  mkdir -p cronet-go
+  cd cronet-go || exit 1
+  git init
+  git remote add origin https://github.com/sagernet/cronet-go.git
+  git fetch --depth=1 origin "$CRONET_GO_VERSION"
+  git checkout FETCH_HEAD
+  git submodule update --init --recursive --depth=1
+
+  # 4. 初始化 keyring 并准备工具链环境
+  print_line "准备 Chromium/musl 工具链..."
+  rm -f ./naiveproxy/src/build/linux/sysroot_scripts/keyring.gpg
+  GPG_TTY=/dev/null ./naiveproxy/src/build/linux/sysroot_scripts/generate_keyring.sh || true
+  go run ./cmd/build-naive --target=linux/"${arch}" --libc=musl download-toolchain
+
+  # 执行 build-naive env 并捕获原始输出
+  ENV_OUTPUT=$(go run ./cmd/build-naive --target=linux/"${arch}" --libc=musl env)
+  # echo "环境变量输出:"
+  # echo "$ENV_OUTPUT"
+
+  # 1. 提取 raw 变量
+  RAW_CC=$(echo "$ENV_OUTPUT" | grep '^CC=' | cut -d'=' -f2-)
+  RAW_CXX=$(echo "$ENV_OUTPUT" | grep '^CXX=' | cut -d'=' -f2-)
+  RAW_LDFLAGS=$(echo "$ENV_OUTPUT" | grep '^CGO_LDFLAGS=' | cut -d'=' -f2-)
+  RAW_QEMU=$(echo "$ENV_OUTPUT" | grep '^QEMU_LD_PREFIX=' | cut -d'=' -f2-)
+
+  # 2. 剥离纯路径与标志（关键：在 grep 参数后加上 -- ）
+  PURE_CC=$(echo "$RAW_CC" | awk '{print $1}')
+  PURE_CXX=$(echo "$RAW_CXX" | awk '{print $1}')
+
+  # 加上 -- 阻止 grep 解析开头的杠杠
+  TARGET_FLAG=$(echo "$RAW_CC" | grep -o -E -- '--target=[^ ]*')
+  SYSROOT_FLAG=$(echo "$RAW_CC" | grep -o -E -- '--sysroot=[^ ]*')
+
+  # 3. 导出标准 CGO 环境变量
+  export CC="${PURE_CC}"
+  export CXX="${PURE_CXX}"
+  export CGO_CFLAGS="${TARGET_FLAG} ${SYSROOT_FLAG}"
+  export CGO_CXXFLAGS="${TARGET_FLAG} ${SYSROOT_FLAG}"
+  export CGO_LDFLAGS="${RAW_LDFLAGS} ${TARGET_FLAG} ${SYSROOT_FLAG}"
+  export QEMU_LD_PREFIX="${RAW_QEMU}"
+
+  export CGO_ENABLED=1
+  export GOOS=linux
+  export GOARCH="${arch}"
+  #如果是arm架构, 需要设置 GOARM=7
+  if [ "$arch" = "arm" ]; then
+    export GOARM=7
+  fi
+
+  # 5. 读取默认 Build Tags (如有) 或使用推荐 Tags
+  cd "$CD_SINGBOX" || exit 1
+
+  # merlin-box 使用这些就够了
+  BUILD_TAGS="with_musl,with_quic,with_utls,with_naive_outbound"
+
+  # 6. 开始编译 sing-box
+  print_line "开始编译 sing-box..."
+  mkdir -p "${CUR_DIR}/bin"
+
+  go build -v -trimpath \
+    -tags "${BUILD_TAGS}" \
+    -ldflags "-X github.com/sagernet/sing-box/constant.Version=${VERSION_NO_V} -s -w -buildid=" \
+    -o "${CUR_DIR}/bin/sing-box" \
+    ./cmd/sing-box
+
+  # 调用压缩函数
+  compress_singbox
+
+  print_success "sing-box 可执行文件构建完成: ${CUR_DIR}/bin/sing-box"
+}
+
+
+#=========================================
 # 主函数
 #=========================================
 main() {
@@ -402,13 +533,16 @@ main() {
         update_rules)
           update_rules
           ;;
+        build_singbox)
+          build_singbox
+          ;;
         -h|--help|"")
           print_normal "用法: $SCRIPT_NAME tool <subcommand>"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox"
           ;;
         *)
           print_error "错误: 不支持的工具子命令 '$2'"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox"
           exit 1
           ;;
       esac

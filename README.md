@@ -309,6 +309,7 @@ Tool commands:
 ./merlin-box.sh tool compress_smartdns      #Compress smartdns executable ¹
 ./merlin-box.sh tool show_devices           #Show current DHCP lease device list  
 ./merlin-box.sh tool update_rules           #Update rule files ²
+./merlin-box.sh tool build_singbox          #Build sing-box executable ¹
 ./merlin-box.sh tool -h
 ```
 
