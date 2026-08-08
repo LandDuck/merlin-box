@@ -13,6 +13,12 @@
 - 🌐 smartdns 负责域名解析与域名分流
 - 📦 ipset + iptables/ip6tables 负责 IP 分流与透明代理引流
 
+#### 🎥 快速入门教程
+
+> 💡 **点击下方缩略图观看视频演示：**
+
+[![视频教程](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE)
+
 ---
 
 # 📋 当前功能与限制
