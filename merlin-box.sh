@@ -82,18 +82,30 @@ fi
 show_help() {
 	cat <<EOF
 用法:
-  $SCRIPT_NAME <command>
+  $SCRIPT_NAME <command> [subcommand]
 
 命令:
   start        启动服务
   stop         停止服务
+  restart      重启服务
+  install      设置 merlin-box 开机自启
+  uninstall    卸载 merlin-box 开机自启
   tool         工具命令
+  test         测试命令
 
-工具子命令:
-  compress_singbox  压缩 sing-box 可执行文件
+tool 子命令:
+  compress_singbox   压缩 sing-box 可执行文件
+  compress_smartdns  压缩 smartdns 可执行文件
+  show_devices       显示局域网 DHCP 设备列表
+  update_rules       更新规则文件 (chn-ip4/ip6/site)
+  build_singbox      编译构建 sing-box 可执行文件
+
+test 子命令:
+  print        测试彩色打印输出
+  debug        测试调试函数
 
 选项:
-  -h, --help   显示帮助信息
+  -h, --help    显示帮助信息
   -v, --version 显示脚本版本
 EOF
 }
