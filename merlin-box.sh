@@ -99,6 +99,7 @@ tool 子命令:
   show_devices       显示局域网 DHCP 设备列表
   update_rules       更新规则文件 (chn-ip4/ip6/site)
   build_singbox      编译构建 sing-box 可执行文件
+  download_smartdns   下载最新的 smartdns 可执行文件
 
 test 子命令:
   print        测试彩色打印输出
@@ -362,6 +363,49 @@ update_rules() {
 }
 
 #=========================================
+# 下载最新的 smartdns 可执行文件
+# arm64 https://github.com/pymumu/smartdns/releases/download/Release48.4/smartdns-aarch64
+# arm  https://github.com/pymumu/smartdns/releases/download/Release48.4/smartdns-arm
+# 下载到 bin 目录下 smartdns
+#=========================================
+download_smartdns() {
+
+  print_line "下载最新的 smartdns 可执行文件"
+
+  #询问用户要下载的 smartdns 版本
+  read -p "请输入要下载的 smartdns 版本 (例如 48.4): " smartdns_version
+  # 询问架构 arm64 或 arm
+  read -p "请输入要下载的架构 (arm64 或 arm): " arch
+  if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
+    print_error "错误: 不支持的架构 '$arch'，请使用 arm64 或 arm"
+    exit 1
+  fi
+
+  # 构建下载 URL
+  if [ "$arch" = "arm64" ]; then
+    smartdns_url="https://github.com/pymumu/smartdns/releases/download/Release${smartdns_version}/smartdns-aarch64"
+  else
+    smartdns_url="https://github.com/pymumu/smartdns/releases/download/Release${smartdns_version}/smartdns-arm"
+  fi
+
+  # 下载到 bin 目录下 smartdns
+  mkdir -p "${CUR_DIR}/bin"
+  wget -O "${CUR_DIR}/bin/smartdns" "$smartdns_url"
+
+  # 检查下载是否成功
+  if [ $? -ne 0 ]; then
+    print_error "下载 smartdns 失败，请检查版本号和网络连接"
+    exit 1
+  fi
+
+  # 压缩 smartdns 可执行文件
+  compress_smartdns
+
+  print_success "smartdns 可执行文件下载完成: ${CUR_DIR}/bin/smartdns"
+
+}
+
+#=========================================
 # 构建 sing-box 可执行文件
 #=========================================
 build_singbox() {
@@ -548,13 +592,16 @@ main() {
         build_singbox)
           build_singbox
           ;;
+        download_smartdns)
+          download_smartdns
+          ;;
         -h|--help|"")
           print_normal "用法: $SCRIPT_NAME tool <subcommand>"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns"
           ;;
         *)
           print_error "错误: 不支持的工具子命令 '$2'"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns"
           exit 1
           ;;
       esac
