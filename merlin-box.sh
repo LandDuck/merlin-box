@@ -99,7 +99,7 @@ tool 子命令:
   show_devices       显示局域网 DHCP 设备列表
   update_rules       更新规则文件 (chn-ip4/ip6/site)
   build_singbox      编译构建 sing-box 可执行文件
-  download_smartdns   下载最新的 smartdns 可执行文件
+  download_smartdns   下载 smartdns 可执行文件
 
 test 子命令:
   print        测试彩色打印输出
@@ -363,14 +363,14 @@ update_rules() {
 }
 
 #=========================================
-# 下载最新的 smartdns 可执行文件
+# 下载 smartdns 可执行文件
 # arm64 https://github.com/pymumu/smartdns/releases/download/Release48.4/smartdns-aarch64
 # arm  https://github.com/pymumu/smartdns/releases/download/Release48.4/smartdns-arm
 # 下载到 bin 目录下 smartdns
 #=========================================
 download_smartdns() {
 
-  print_line "下载最新的 smartdns 可执行文件"
+  print_line "下载 smartdns 可执行文件"
 
   #询问用户要下载的 smartdns 版本
   read -p "请输入要下载的 smartdns 版本 (例如 48.4): " smartdns_version

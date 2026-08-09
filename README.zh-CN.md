@@ -315,6 +315,7 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh tool show_devices           #显示当前 DHCP 租约的设备列表 
 ./merlin-box.sh tool update_rules           #更新规则文件 ²
 ./merlin-box.sh tool build_singbox          #构建 sing-box 可执行文件 ¹
+./merlin-box.sh tool download_smartdns      #下载 smartdns 可执行文件 ¹
 ./merlin-box.sh tool -h
 ```
 
