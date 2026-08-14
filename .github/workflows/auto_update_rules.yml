@@ -23,25 +23,32 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. 环境搭建：设置 Python 环境
+      # 2. 【核心新增】安装并注册 QEMU 用户态模拟器 (binfmt_misc)
+      # 这步做的事情就相当于你在 WSL 里安装 qemu-user-static
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all  # 注册包括 arm, arm64 在内的所有跨架构支持
+
+      # 3. 环境搭建：设置 Python 环境
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-python-version: '3.x'
+          python-version: '3.x'
 
-      # 3. 如果 update-rules/main.py 依赖第三方库，在此处安装（如果没有直接跳过或删掉）
+      # 4. 如果 update-rules/main.py 依赖第三方库，在此处安装（如果没有直接跳过或删掉）
       - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f ./tools/update-rules/requirements.txt ]; then pip install -r ./tools/update-rules/requirements.txt; fi
 
-      # 4. 执行你的脚本命令
+      # 5. 执行你的脚本命令
       - name: Run Update Rules
         run: |
           chmod +x ./merlin-box.sh   # 请修改为你的脚本文件名
           ./merlin-box.sh tool update_rules
 
-      # 5. 检查是否有文件更新，如果有则提交并推送
+      # 6. 检查是否有文件更新，如果有则提交并推送
       - name: Commit and Push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
