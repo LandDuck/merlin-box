@@ -337,16 +337,16 @@ compress_smartdns() {
 update_rules() {
   print_line "更新规则文件"
   # 检测 nvram 是否可用, 如果可用证明在路由器中, 直接下载本项目的规则文件到 res 目录
-  if command -v nvram >/dev/null 2>&1; then
+  if type nvram >/dev/null 2>&1; then
     print_normal "检测到在路由器中运行，直接下载规则文件到 res 目录"
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-site.txt
 
     # wget 这些文件到 res 目录
-    wget -O "${CUR_DIR}/res/chn-ip4.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt"
-    wget -O "${CUR_DIR}/res/chn-ip6.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt"
-    wget -O "${CUR_DIR}/res/chn-site.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-site.txt"
+    wget --no-hsts -O "${CUR_DIR}/res/chn-ip4.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt"
+    wget --no-hsts -O "${CUR_DIR}/res/chn-ip6.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt"
+    wget --no-hsts -O "${CUR_DIR}/res/chn-site.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-site.txt"
 
     print_success "规则文件更新完成"
 

@@ -1,0 +1,58 @@
+name: Auto Update Rules
+
+# 触发条件：定时触发 + 手动触发
+on:
+  schedule:
+    # 每天 UTC 时间 20:00 运行（对应北京时间 UTC+8 的凌晨 04:00）
+    # 语法依次为：分 时 日 月 星期
+    - cron: '0 20 * * *'
+
+  # 支持在 GitHub 网页页面上手动点击运行（便于测试）
+  workflow_dispatch:
+
+jobs:
+  update-rules:
+    runs-on: ubuntu-latest
+
+    # 赋予工作流对仓库的读写权限，以便 Commit 和 Push
+    permissions:
+      contents: write
+
+    steps:
+      # 1. 拉取仓库代码
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. 环境搭建：设置 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-python-version: '3.x'
+
+      # 3. 如果 update-rules/main.py 依赖第三方库，在此处安装（如果没有直接跳过或删掉）
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f ./tools/update-rules/requirements.txt ]; then pip install -r ./tools/update-rules/requirements.txt; fi
+
+      # 4. 执行你的脚本命令
+      - name: Run Update Rules
+        run: |
+          chmod +x ./merlin-box.sh   # 请修改为你的脚本文件名
+          ./merlin-box.sh tool update_rules
+
+      # 5. 检查是否有文件更新，如果有则提交并推送
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # 检查是否有文件改动
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "检测到规则文件已更新，开始提交..."
+            git add .
+            git commit -m "chore(auto): 自动更新规则文件 [skip ci]"
+            git push
+          else
+            echo "规则文件无变化，无需提交。"
+          fi
