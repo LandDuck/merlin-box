@@ -45,8 +45,9 @@ jobs:
       # 5. 执行你的脚本命令
       - name: Run Update Rules
         run: |
-          chmod +x ./merlin-box.sh   # 请修改为你的脚本文件名
-          ./merlin-box.sh tool update_rules
+          chmod +x ./merlin-box.sh   # 主文件权限
+          chmod +x ./bin/sing-box   # sing-box 权限
+          ./merlin-box.sh tool update_rules # 执行更新规则脚本
 
       # 6. 检查是否有文件更新，如果有则提交并推送
       - name: Commit and Push changes
@@ -58,7 +59,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             echo "检测到规则文件已更新，开始提交..."
             git add .
-            git commit -m "chore(auto): 自动更新规则文件 [skip ci]"
+            git commit -m "chore(auto): 自动更新规则文件"
             git push
           else
             echo "规则文件无变化，无需提交。"
