@@ -3,9 +3,9 @@ name: Auto Update Rules
 # 触发条件：定时触发 + 手动触发
 on:
   schedule:
-    # 每天 UTC 时间 20:00 运行（对应北京时间 UTC+8 的凌晨 04:00）
+    # 每周一 UTC 时间 20:00 运行（对应北京时间 UTC+8 的周二凌晨 04:00）
     # 语法依次为：分 时 日 月 星期
-    - cron: '0 20 * * *'
+    - cron: '0 20 * * 1'
 
   # 支持在 GitHub 网页页面上手动点击运行（便于测试）
   workflow_dispatch:
