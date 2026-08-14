@@ -3,3 +3,4 @@ logs
 .idea
 check-ipv6.sh
 check-lan.sh
+/tools/update-rules/res
