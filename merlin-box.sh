@@ -343,10 +343,52 @@ update_rules() {
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-site.txt
 
-    # wget 这些文件到 res 目录
-    wget --no-hsts -O "${CUR_DIR}/res/chn-ip4.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt"
-    wget --no-hsts -O "${CUR_DIR}/res/chn-ip6.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt"
-    wget --no-hsts -O "${CUR_DIR}/res/chn-site.txt" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-site.txt"
+    local tmp_dir="${CUR_DIR}/.tmp-update-rules"
+    rm -rf "${tmp_dir}"
+    mkdir -p "${tmp_dir}"
+    if [ $? -ne 0 ]; then
+      print_error "创建临时目录失败: ${tmp_dir}"
+      exit 1
+    fi
+
+    if type curl >/dev/null 2>&1; then
+      print_normal "检测到 curl，使用 SOCKS5 代理(127.0.0.1:65001)下载规则文件"
+      for rule in chn-ip4 chn-ip6 chn-site; do
+        local target_file="${CUR_DIR}/res/${rule}.txt"
+        local tmp_file="${tmp_dir}/${rule}.txt"
+        curl --fail --silent --show-error --location --proxy "socks5h://127.0.0.1:65001" -o "${tmp_file}" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/${rule}.txt"
+        if [ $? -ne 0 ]; then
+          rm -rf "${tmp_dir}"
+          print_error "下载 ${rule}.txt 失败"
+          exit 1
+        fi
+        cp "${tmp_file}" "${target_file}"
+        if [ $? -ne 0 ]; then
+          rm -rf "${tmp_dir}"
+          print_error "写入 ${target_file} 失败"
+          exit 1
+        fi
+      done
+    else
+      print_normal "未检测到 curl，使用 wget 直连下载规则文件"
+      for rule in chn-ip4 chn-ip6 chn-site; do
+        local target_file="${CUR_DIR}/res/${rule}.txt"
+        local tmp_file="${tmp_dir}/${rule}.txt"
+        wget --no-hsts -O "${tmp_file}" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/${rule}.txt"
+        if [ $? -ne 0 ]; then
+          rm -rf "${tmp_dir}"
+          print_error "下载 ${rule}.txt 失败"
+          exit 1
+        fi
+        cp "${tmp_file}" "${target_file}"
+        if [ $? -ne 0 ]; then
+          rm -rf "${tmp_dir}"
+          print_error "写入 ${target_file} 失败"
+          exit 1
+        fi
+      done
+    fi
+    rm -rf "${tmp_dir}"
 
     print_success "规则文件更新完成"
 
