@@ -95,7 +95,8 @@ tool 子命令:
   show_devices       显示局域网 DHCP 设备列表
   update_rules       更新规则文件 (chn-ip4/ip6/site)
   build_singbox      编译构建 sing-box 可执行文件
-  download_smartdns   下载 smartdns 可执行文件
+  download_smartdns  下载 smartdns 可执行文件
+  sub2box            将订阅链接转换为 sing-box 配置文件
 
 test 子命令:
   print        测试彩色打印输出
@@ -363,6 +364,13 @@ uninstall() {
 #调用 compress_executable_with_upx 压缩sing-box 可执行文件
 #=========================================
 compress_singbox() {
+
+  # 验证一下是否在路由器中， 如果在， 不执行，给出警告
+  if is_running_on_router; then
+    print_warning "在路由器中运行，跳过压缩 sing-box 可执行文件，请在 PC 或服务器上运行此脚本以构建 sing-box"
+    return
+  fi
+
   local singbox_path="${CUR_DIR}/bin/sing-box"
   compress_executable_with_upx "$singbox_path"
 }
@@ -371,6 +379,13 @@ compress_singbox() {
 #调用 compress_executable_with_upx 压缩smartdns 可执行文件
 #=========================================
 compress_smartdns() {
+
+  # 验证一下是否在路由器中， 如果在， 不执行，给出警告
+  if is_running_on_router; then
+    print_warning "在路由器中运行，跳过压缩 smartdns 可执行文件，请在 PC 或服务器上运行此脚本以构建 smartdns"
+    return
+  fi
+
   local smartdns_path="${CUR_DIR}/bin/smartdns"
   compress_executable_with_upx "$smartdns_path"
 }
@@ -380,8 +395,8 @@ compress_smartdns() {
 #=========================================
 update_rules() {
   print_line "更新规则文件"
-  # 检测 nvram 是否可用, 如果可用证明在路由器中, 直接下载本项目的规则文件到 res 目录
-  if type nvram >/dev/null 2>&1; then
+  # 检测是否在路由器中, 在的话直接下载本项目的规则文件到 res 目录
+  if is_running_on_router; then
     print_normal "检测到在路由器中运行，直接下载规则文件到 res 目录"
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt
@@ -456,6 +471,12 @@ update_rules() {
 #=========================================
 download_smartdns() {
 
+  # 验证一下是否在路由器中， 如果在， 不执行，给出警告
+  if is_running_on_router; then
+    print_warning "在路由器中运行，跳过下载 smartdns 可执行文件，请在 PC 或服务器上运行此脚本以下载 smartdns"
+    return
+  fi
+
   print_line "下载 smartdns 可执行文件"
 
   #询问用户要下载的 smartdns 版本
@@ -492,9 +513,43 @@ download_smartdns() {
 }
 
 #=========================================
+# 将订阅链接转换为 sing-box 配置文件
+#=========================================
+subscription_to_singbox_config() {
+
+  local subscription_url="$1"
+  if [ -z "$subscription_url" ]; then
+    print_error "错误: 订阅链接不能为空"
+    exit 1
+  fi
+
+  print_normal "将订阅链接转换为 sing-box 配置文件，Url=$subscription_url"
+
+  # 验证是否在路由器中运行，如果在，先空着， 否则 ， 调用 python3 ./tools/sub2box/main.py
+  if is_running_on_router; then
+    print_warning "在路由器中运行，跳过订阅链接转换为 sing-box 配置文件，请在 PC 或服务器上运行此脚本以转换订阅链接"
+  else
+    if command -v python3 >/dev/null 2>&1; then
+      python3 ./tools/sub2box/main.py "$subscription_url"
+    else
+      print_error "未检测到 python，请先安装 python"
+      exit 1
+    fi
+  fi
+
+}
+
+#=========================================
 # 构建 sing-box 可执行文件
 #=========================================
 build_singbox() {
+
+
+  # 验证一下是否在路由器中， 如果在， 不执行，给出警告
+  if is_running_on_router; then
+    print_warning "在路由器中运行，跳过构建 sing-box 可执行文件，请在 PC 或服务器上运行此脚本以构建 sing-box"
+    return
+  fi
 
   print_line "构建 sing-box 可执行文件"
 
@@ -686,13 +741,16 @@ main() {
         download_smartdns)
           download_smartdns
           ;;
+        sub2box)
+          subscription_to_singbox_config "$3"
+          ;;
         -h|--help|"")
           print_normal "用法: $SCRIPT_NAME tool <subcommand>"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box"
           ;;
         *)
           print_error "错误: 不支持的工具子命令 '$2'"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box"
           exit 1
           ;;
       esac

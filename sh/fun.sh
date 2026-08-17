@@ -1071,3 +1071,15 @@ compress_executable_with_upx() {
         return 1
     fi
 }
+
+# =========================================
+# 检测是否在路由器中运行
+# 如果在路由器中运行，返回 0；否则返回 1
+# =========================================
+is_running_on_router() {
+    if type nvram >/dev/null 2>&1; then
+        return 0  # 是路由器环境
+    else
+        return 1  # 不是路由器环境
+    fi
+}
