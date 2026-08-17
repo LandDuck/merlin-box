@@ -65,11 +65,11 @@ readonly MB_MAC_WHITELIST_FILE="${CUR_DIR}/res/device_whitelist.txt" #这里面�
 # 是否启用 IPv6 支持 (0 DISABLE, 1 ENABLE)。注意系统会检测到 IPv6 是否可用，如果不可用则会自动禁用 IPv6 支持
 MB_ENABLE_IPV6=1
 # 屏蔽来自局域网的QUIC协议访问 (0 不屏蔽, 1 屏蔽)
-readonly MB_DISABLE_QUIC_FROM_LAN=1
+MB_DISABLE_QUIC_FROM_LAN=1
 # 是否启用UDP (0 DISABLE, 1 ENABLE)
-readonly MB_ENABLE_UDP=0
+MB_ENABLE_UDP=0
 # 是否启用路由自身代理 (0 DISABLE, 1 ENABLE)。需要 singbox 的 inbound 配置中有 redirect
-readonly MB_ENABLE_ONESELF_PROXY=0
+MB_ENABLE_ONESELF_PROXY=0
 
 # 引入fun.sh脚本, ./sh/fun.sh
 if [ -f "$CUR_DIR/sh/fun.sh" ]; then
@@ -82,10 +82,10 @@ fi
 show_help() {
 	cat <<EOF
 用法:
-  $SCRIPT_NAME <command> [subcommand]
+  $SCRIPT_NAME <command> [args]
 
 命令:
-  start        启动服务
+  start        启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]
   stop         停止服务
   restart      重启服务
   install      设置 merlin-box 开机自启
@@ -105,6 +105,12 @@ test 子命令:
   print        测试彩色打印输出
   debug        测试调试函数
 
+start 参数说明 (默认值: 1 1 0 0):
+  enable_ipv6            是否启用 IPv6 (0/1)
+  disable_quic_from_lan  是否屏蔽 LAN 侧 QUIC (0/1)
+  enable_udp             是否启用 UDP 代理 (0/1)
+  enable_oneself_proxy   是否启用路由自身代理 (0/1)
+
 选项:
   -h, --help    显示帮助信息
   -v, --version 显示脚本版本
@@ -122,6 +128,45 @@ show_version() {
 # 启动服务
 #=========================================
 start() {
+  local start_enable_ipv6="${1:-$MB_ENABLE_IPV6}"
+  local start_disable_quic_from_lan="${2:-$MB_DISABLE_QUIC_FROM_LAN}"
+  local start_enable_udp="${3:-$MB_ENABLE_UDP}"
+  local start_enable_oneself_proxy="${4:-$MB_ENABLE_ONESELF_PROXY}"
+
+  case "$start_enable_ipv6" in
+    0|1) ;;
+    *)
+      print_error "错误: start 参数 enable_ipv6 只能是 0 或 1，当前值: '$start_enable_ipv6'"
+      exit 1
+      ;;
+  esac
+  case "$start_disable_quic_from_lan" in
+    0|1) ;;
+    *)
+      print_error "错误: start 参数 disable_quic_from_lan 只能是 0 或 1，当前值: '$start_disable_quic_from_lan'"
+      exit 1
+      ;;
+  esac
+  case "$start_enable_udp" in
+    0|1) ;;
+    *)
+      print_error "错误: start 参数 enable_udp 只能是 0 或 1，当前值: '$start_enable_udp'"
+      exit 1
+      ;;
+  esac
+  case "$start_enable_oneself_proxy" in
+    0|1) ;;
+    *)
+      print_error "错误: start 参数 enable_oneself_proxy 只能是 0 或 1，当前值: '$start_enable_oneself_proxy'"
+      exit 1
+      ;;
+  esac
+
+  MB_ENABLE_IPV6="$start_enable_ipv6"
+  MB_DISABLE_QUIC_FROM_LAN="$start_disable_quic_from_lan"
+  MB_ENABLE_UDP="$start_enable_udp"
+  MB_ENABLE_ONESELF_PROXY="$start_enable_oneself_proxy"
+
 	print_line "start merlin-box"
 
   # 如果已经启用IPV6支持，使用 check_ipv6_support 函数检测当前路由是否支持IPv6，如果不支持则禁用IPv6支持
@@ -612,7 +657,12 @@ main() {
       esac
       ;;
 		start)
-			start
+      if [ "$#" -gt 5 ]; then
+        print_error "错误: start 最多支持 4 个可选参数，当前传入: $(($# - 1))"
+        print_normal "用法: $SCRIPT_NAME start [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]"
+        exit 1
+      fi
+			start "$2" "$3" "$4" "$5"
 			;;
 		stop)
 			stop

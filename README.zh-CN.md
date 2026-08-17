@@ -290,7 +290,8 @@ chmod +x scripts/dnsmasq.postconf
 主入口命令：
 
 ```bash
-./merlin-box.sh start                      #启动服务
+./merlin-box.sh start                      #启动服务（默认参数: 1 1 0 0）
+./merlin-box.sh start 1 1 0 0              #显式参数启动：IPv6 QUIC拦截 UDP 自身代理
 ./merlin-box.sh stop                       #停止服务
 ./merlin-box.sh restart                    #重启服务
 ./merlin-box.sh -h                         #显示帮助信息
@@ -298,6 +299,8 @@ chmod +x scripts/dnsmasq.postconf
 ```
 
 - ▶️`start`：清理旧规则 -> 启动 sing-box -> 启动 smartdns -> 重启 dnsmasq
+- `start` 参数（均可选，每个参数值为 `0` 或 `1`，默认值 `1 1 0 0`）：
+  - `enable_ipv6` `disable_quic_from_lan` `enable_udp` `enable_oneself_proxy`
 - ⏹️ `stop`：停止 sing-box/smartdns -> 清理 iptables/ip6tables/ip rule/ipset -> 重启 dnsmasq
 
 安装与卸载（开机启动）：

@@ -291,7 +291,8 @@ chmod +x scripts/dnsmasq.postconf
 Main entry command:
 
 ```bash
-./merlin-box.sh start                      #Start service
+./merlin-box.sh start                      #Start service (defaults: 1 1 0 0)
+./merlin-box.sh start 1 1 0 0              #Start with explicit params: IPv6 QUIC-block UDP oneself-proxy
 ./merlin-box.sh stop                       #Stop service
 ./merlin-box.sh restart                    #Restart service
 ./merlin-box.sh -h                         #Show help information
@@ -299,6 +300,8 @@ Main entry command:
 ```
 
 - ▶️ `start`: Clean old rules -> Start sing-box -> Start smartdns -> Restart dnsmasq
+- `start` parameters (all optional, each value is `0` or `1`, default is `1 1 0 0`):
+  - `enable_ipv6` `disable_quic_from_lan` `enable_udp` `enable_oneself_proxy`
 - ⏹️ `stop`: Stop sing-box/smartdns -> Clean iptables/ip6tables/ip rule/ipset -> Restart dnsmasq
 
 Installation and uninstallation (boot startup):
