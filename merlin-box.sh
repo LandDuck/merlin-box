@@ -27,7 +27,7 @@ CUR_DIR=$(cd "$(dirname "$0")"; pwd)
 # 脚本名称
 SCRIPT_NAME="$(basename "$0")"
 # 脚本版本
-SCRIPT_VERSION="1.0.0"
+SCRIPT_VERSION="1.0.1"
 # PID
 PID_FILE="/tmp/merlin-box.pid"
 
