@@ -56,6 +56,13 @@ print_normal() {
 #=========================================
 print_dhcp_devices()
 {
+
+    #如果未在路由器中执行, 直接return并给出警告
+    if ! is_running_on_router; then
+        print_warning "⚠️ 当前环境非路由器，无法获取 DHCP 租约设备列表。"
+        return 1
+    fi
+
     local lease_file="/var/lib/misc/dnsmasq.leases"
 
     if [ ! -f "$lease_file" ]; then
