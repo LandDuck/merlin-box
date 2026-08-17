@@ -354,4 +354,6 @@ In theory, any protocol supported by sing-box can be integrated into this soluti
 
 # 📜 LICENSE
 
-MIT License
+This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
+
+Copyright (C) 2026 [LandDuck](https://github.com/LandDuck/).

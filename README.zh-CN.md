@@ -352,4 +352,8 @@ chmod +x scripts/dnsmasq.postconf
 
 # 📜 LICENSE
 
-MIT License
+本项目基于 **GNU General Public License v3.0 (GPL-3.0)** 协议开源 - 详情请参阅 [LICENSE](LICENSE) 文件。
+
+Copyright (C) 2026 [LandDuck](https://github.com/LandDuck/).
+
+
