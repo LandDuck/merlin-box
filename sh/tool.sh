@@ -184,12 +184,23 @@ subscription_to_singbox_config() {
 
   print_normal "将订阅链接转换为 sing-box 配置文件，Url=$subscription_url"
 
-  # 验证是否在路由器中运行，如果在，先空着， 否则 ， 调用 python3 ./tools/sub2box/main.py
+  # sub2box 可执行文件路径
+  local sub2box_bin="${CUR_DIR}/bin/sub2box"
+  # sub2box Python 脚本路径
+  local sub2box_py="${CUR_DIR}/tools/sub2box/main.py"
+
+  # 验证是否在路由器中运行，如果在，使用 sub2box 可执行文件执行转换，否则使用 Python 脚本执行转换
   if is_running_on_router; then
-    print_warning "在路由器中运行，跳过订阅链接转换为 sing-box 配置文件，请在 PC 或服务器上运行此脚本以转换订阅链接"
+    print_warning "在路由器中运行，使用 sub2box 执行转换"
+    if [ ! -f "$sub2box_bin" ]; then
+      print_error "sub2box 可执行文件不存在，请先在 PC 上构建 sub2box"
+      exit 1
+    fi
+    "$sub2box_bin" "$subscription_url"
   else
     if command -v python3 >/dev/null 2>&1; then
-      python3 ./tools/sub2box/main.py "$subscription_url"
+      print_warning "在 PC 上运行，使用 Python 脚本执行转换"
+      python3 "$sub2box_py" "$subscription_url"
     else
       print_error "未检测到 python，请先安装 python"
       exit 1
