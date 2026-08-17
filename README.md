@@ -193,7 +193,7 @@ merlin-box/
 ├─ start_merlin_box.sh      # For boot startup support
 ├─ bin/
 │  ├─ sing-box              # sing-box executable
-│  └─ smartdns              # smartdns executable
+│  ├─ smartdns              # smartdns executable
 │  └─ sub2box               # sub2box executable (for converting subscriptions to sing-box configuration)
 ├─ conf/
 │  ├─ config.json           # sing-box configuration
@@ -201,10 +201,10 @@ merlin-box/
 ├─ scripts/
 │  └─ dnsmasq.postconf      # dnsmasq post-processing script (used when taking over port 53)
 ├─ sh/
-│  └─ fun.sh                # Core logic
+│  ├─ fun.sh                # Core logic
 │  └─ tool.sh               # Implementation of tool subcommands
 ├─ tools/
-│  └─ sub2box/              # Tool for converting subscriptions to sing-box configuration
+│  ├─ sub2box/              # Tool for converting subscriptions to sing-box configuration
 │  └─ update-rules/         # Rule update scripts
 └─ res/
    ├─ chn-ip4.txt           # China IPv4

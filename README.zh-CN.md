@@ -192,7 +192,7 @@ merlin-box/
 ├─ start_merlin_box.sh      # 用于支持开机启动
 ├─ bin/
 │  ├─ sing-box              # sing-box 可执行文件
-│  └─ smartdns              # smartdns 可执行文件
+│  ├─ smartdns              # smartdns 可执行文件
 │  └─ sub2box               # sub2box 可执行文件（用于将订阅转换为 sing-box 配置）
 ├─ conf/
 │  ├─ config.json           # sing-box 配置
@@ -200,10 +200,10 @@ merlin-box/
 ├─ scripts/
 │  └─ dnsmasq.postconf      # dnsmasq 后处理脚本（接管 53 端口时使用）
 ├─ sh/
-│  └─ fun.sh                # 核心逻辑
+│  ├─ fun.sh                # 核心逻辑
 │  └─ tool.sh               # tool 子命令的实现
 ├─ tools/
-│  └─ sub2box/              # 用于将订阅转换为 sing-box 配置的工具
+│  ├─sub2box/              # 用于将订阅转换为 sing-box 配置的工具
 │  └─ update-rules/         # 规则更新脚本
 └─ res/
    ├─ chn-ip4.txt           # 中国 IPv4
