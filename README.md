@@ -201,6 +201,10 @@ merlin-box/
 │  └─ dnsmasq.postconf      # dnsmasq post-processing script (used when taking over port 53)
 ├─ sh/
 │  └─ fun.sh                # Core logic
+│  └─ tool.sh               # Implementation of tool subcommands
+├─ tools/
+│  └─ sub2box/              # Tool for converting subscriptions to sing-box configuration
+│  └─ update-rules/         # Rule update scripts
 └─ res/
    ├─ chn-ip4.txt           # China IPv4
    ├─ chn-ip6.txt           # China IPv6

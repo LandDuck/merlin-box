@@ -200,6 +200,10 @@ merlin-box/
 │  └─ dnsmasq.postconf      # dnsmasq 后处理脚本（接管 53 端口时使用）
 ├─ sh/
 │  └─ fun.sh                # 核心逻辑
+│  └─ tool.sh               # tool 子命令的实现
+├─ tools/
+│  └─ sub2box/              # 用于将订阅转换为 sing-box 配置的工具
+│  └─ update-rules/         # 规则更新脚本
 └─ res/
    ├─ chn-ip4.txt           # 中国 IPv4
    ├─ chn-ip6.txt           # 中国 IPv6
