@@ -18,7 +18,7 @@ This project aims to clearly separate responsibilities:
 
 > 💡 **Click the thumbnail below to watch the video demonstration:**
 
-[![Video Tutorial](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE)
+[![Video Tutorial](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE&list=PLDyvs8NWsF2w)
 
 ---
 

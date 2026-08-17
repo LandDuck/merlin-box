@@ -17,7 +17,7 @@
 
 > 💡 **点击下方缩略图观看视频演示：**
 
-[![视频教程](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE)
+[![视频教程](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE&list=PLDyvs8NWsF2w)
 
 ---
 
