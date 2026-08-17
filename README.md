@@ -321,6 +321,7 @@ Tool commands:
 ./merlin-box.sh tool build_singbox          #Build sing-box executable ¹
 ./merlin-box.sh tool download_smartdns      #Download smartdns executable ¹
 ./merlin-box.sh tool sub2box                #Convert subscription to sing-box configuration ³
+./merlin-box.sh tool build_sub2box          #Build sub2box executable ¹
 ./merlin-box.sh tool -h
 ```
 

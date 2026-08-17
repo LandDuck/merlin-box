@@ -319,8 +319,9 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh tool update_rules           #更新规则文件 ²
 ./merlin-box.sh tool build_singbox          #构建 sing-box 可执行文件 ¹
 ./merlin-box.sh tool download_smartdns      #下载 smartdns 可执行文件 ¹
-./merlin-box.sh tool download_singbox        #下载 sing-box 可执行文件 ¹
+./merlin-box.sh tool download_singbox       #下载 sing-box 可执行文件 ¹
 ./merlin-box.sh tool sub2box                #将订阅转换为 sing-box 配置 ³
+./merlin-box.sh tool build_sub2box          #构建 sub2box 可执行文件 ¹
 ./merlin-box.sh tool -h
 ```
 

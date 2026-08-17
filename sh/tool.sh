@@ -334,3 +334,57 @@ build_singbox() {
 
   print_success "sing-box 可执行文件构建完成: ${CUR_DIR}/bin/sing-box"
 }
+
+#=========================================
+# 构建 sub2box 可执行文件
+#=========================================
+build_sub2box() {
+
+  # 验证一下是否在路由器中， 如果在， 不执行，给出警告
+  if is_running_on_router; then
+    print_warning "在路由器中运行，跳过构建 sub2box 可执行文件，请在 PC 或服务器上运行此脚本以构建 sub2box"
+    return
+  fi
+
+  print_line "构建 sub2box 可执行文件"
+
+  # 检查是否存在 go 命令
+  if ! command -v go >/dev/null 2>&1; then
+    print_error "未检测到 go，请先安装 go"
+    exit 1
+  fi
+
+  # 源码目录
+  local sub2box_src_dir="${CUR_DIR}/tools/sub2box" #main.go
+  # 输出目录
+  local sub2box_output_bin="${CUR_DIR}/bin/sub2box"
+
+  # 询问构建arm64还是arm
+  read -p "请输入要构建的架构 (arm64 或 arm): " arch
+  if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
+    print_error "错误: 不支持的架构 '$arch'，请使用 arm64 或 arm"
+    exit 1
+  fi
+
+  # 用 GO 构建, 不使用 CGO, 平台为 linux/arm64 或 linux/arm
+  # 进入 sub2box 源码目录构建，确保使用 tools/sub2box/go.mod 解析依赖
+  (
+    cd "$sub2box_src_dir" || exit 1
+    GOOS=linux GOARCH="$arch" CGO_ENABLED=0 go build -o "$sub2box_output_bin" .
+  )
+  if [ $? -ne 0 ]; then
+    print_error "构建 sub2box 失败"
+    exit 1
+  fi
+
+  # 验证一下,如果存在, 则压缩 sub2box 可执行文件
+  if [ -f "$sub2box_output_bin" ]; then
+    compress_executable_with_upx "$sub2box_output_bin"
+  else
+    print_error "构建 sub2box 可执行文件失败: ${sub2box_output_bin} 不存在"
+    exit 1
+  fi
+
+  print_success "sub2box 可执行文件构建完成: ${sub2box_output_bin}"
+
+}
