@@ -20,6 +20,7 @@
 
 # 此文件主要用于在路由器启动时自动启动 merlin-box，或者在 WAN 连接事件触发时重新启动 merlin-box。
 
+
 # 日志
 readonly LOGFILE="/tmp/merlin-box-boot.log"
 # merlin-box 根目录，脚本会自动修改

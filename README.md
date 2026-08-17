@@ -320,6 +320,7 @@ Tool commands:
 ./merlin-box.sh tool update_rules           #Update rule files ²
 ./merlin-box.sh tool build_singbox          #Build sing-box executable ¹
 ./merlin-box.sh tool download_smartdns      #Download smartdns executable ¹
+./merlin-box.sh tool sub2box                #Convert subscription to sing-box configuration ³
 ./merlin-box.sh tool -h
 ```
 
@@ -330,6 +331,10 @@ Tool commands:
 2. Rule updates have two behaviors:
 - In development mode, a Python script is called to download the latest rule files from three sources and overwrite the local files.
 - In production mode (on the router), wget is used to download the latest rule files from the raw files of this repository and overwrite the local files.
+
+3. Subscription conversion has two behaviors:
+- In development mode, a Python script is called to convert the subscription to sing-box configuration.
+- In production mode (on the router), the sub2box (under development) binary file is called for conversion.
 
 ---
 

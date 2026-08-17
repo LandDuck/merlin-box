@@ -319,6 +319,8 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh tool update_rules           #更新规则文件 ²
 ./merlin-box.sh tool build_singbox          #构建 sing-box 可执行文件 ¹
 ./merlin-box.sh tool download_smartdns      #下载 smartdns 可执行文件 ¹
+./merlin-box.sh tool download_singbox        #下载 sing-box 可执行文件 ¹
+./merlin-box.sh tool sub2box                #将订阅转换为 sing-box 配置 ³
 ./merlin-box.sh tool -h
 ```
 
@@ -328,6 +330,9 @@ chmod +x scripts/dnsmasq.postconf
 2. 规则更新有两种行为：
 - 在开发模式下，会调用python脚本从三个源下载最新规则文件并覆盖本地文件。
 - 在生产模式下（路由器中），使用wget从本仓库的 raw 文件下载最新规则文件并覆盖本地文件。
+3. 订阅转换有两种行为：
+- 在开发模式下，会调用python脚本将订阅转换为 sing-box 配置。
+- 在生产模式下（路由器中），调用 sub2box（开发中） 二进制文件进行转换。
 
 ---
 
