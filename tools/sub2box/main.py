@@ -353,7 +353,7 @@ def parse_uri(uri: str) -> Dict[str, Any] | None:
         return parse_vless(uri)
 
     protocol = uri.split("://", 1)[0].upper() if "://" in uri else uri
-    print_warning(f"跳过不支持的协议: {protocol}")
+    print_warning(f"跳过未实现的转换协议: {protocol}")
     return None
 
 
