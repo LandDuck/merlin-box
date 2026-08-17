@@ -194,6 +194,7 @@ merlin-box/
 ├─ bin/
 │  ├─ sing-box              # sing-box executable
 │  └─ smartdns              # smartdns executable
+│  └─ sub2box               # sub2box executable (for converting subscriptions to sing-box configuration)
 ├─ conf/
 │  ├─ config.json           # sing-box configuration
 │  └─ smartdns.conf         # smartdns configuration

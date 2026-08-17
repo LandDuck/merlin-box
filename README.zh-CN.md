@@ -193,6 +193,7 @@ merlin-box/
 ├─ bin/
 │  ├─ sing-box              # sing-box 可执行文件
 │  └─ smartdns              # smartdns 可执行文件
+│  └─ sub2box               # sub2box 可执行文件（用于将订阅转换为 sing-box 配置）
 ├─ conf/
 │  ├─ config.json           # sing-box 配置
 │  └─ smartdns.conf         # smartdns 配置
