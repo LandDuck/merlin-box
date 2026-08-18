@@ -1050,35 +1050,6 @@ setup_oneself_redirect_ipv6()
     ip6tables -t nat -A OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6"
 }
 
-# ==========================================
-# 使用upx压缩 一个可执行文件
-# 接收一个参数：要压缩的可执行文件路径
-# ==========================================
-compress_executable_with_upx() {
-    local executable_path="$1"
-
-    if [ ! -f "$executable_path" ]; then
-        print_error "❌ 错误：指定的可执行文件不存在：$executable_path"
-        return 1
-    fi
-
-    if ! command -v upx >/dev/null 2>&1; then
-        print_warning "⚠️ 警告：未检测到 upx 工具，无法进行压缩。请先安装 upx。https://github.com/upx/upx/releases "
-        return 1
-    fi
-
-    print_normal "⏳ 正在使用 upx 压缩可执行文件：$executable_path"
-    upx --lzma --ultra-brute "$executable_path" #--lzma启动时会稍微慢一些
-    #upx --best "$executable_path"
-
-    if [ $? -eq 0 ]; then
-        print_success "✅ 压缩完成：$executable_path"
-    else
-        print_error "❌ 压缩失败，请检查 upx 输出信息。"
-        return 1
-    fi
-}
-
 # =========================================
 # 检测是否在路由器中运行
 # 如果在路由器中运行，返回 0；否则返回 1
@@ -1088,39 +1059,5 @@ is_running_on_router() {
         return 0  # 是路由器环境
     else
         return 1  # 不是路由器环境
-    fi
-}
-
-# =========================================
-# 获取 GitHub 仓库的最新 Release 版本号
-# 参数: 仓库路径 (例如: owner/repo)
-# =========================================
-get_github_latest_release() {
-    local repo="$1"
-
-    # 参数检查
-    if [ -z "$repo" ]; then
-        echo "错误: 请提供仓库路径 (例如: owner/repo)" >&2
-        return 1
-    fi
-
-    # 1. 发送请求提取 tag_name
-    local tag
-    tag=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" \
-        | grep -o '"tag_name": *"[^"]*"' \
-        | head -n 1 \
-        | sed 's/"tag_name": *"\([^"]*\)"/\1/')
-
-    # 2. 纯数字版本号清洗 (去除 Release、v 等字母前缀/后缀，仅保留数字和 .)
-    local version
-    version=$(echo "$tag" | sed 's/[^0-9.]*//g')
-
-    # 验证提取结果
-    if [ -n "$version" ]; then
-        echo "$version"
-        return 0
-    else
-        echo "错误: 无法获取 [${repo}] 的 Release 版本（可能是无效仓库或超出了 API 速率限制）" >&2
-        return 1
     fi
 }
