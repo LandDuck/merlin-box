@@ -132,13 +132,13 @@ download_smartdns() {
   local smartdns_version="${1:-}"
   local arch="${2:-}"
 
+  print_normal "准备 smartdns 可执行文件，版本(传入参数): ${smartdns_version}, 架构(传入参数): ${arch}"
+
   # 验证一下是否在路由器中， 如果在， 不执行，给出警告
   if is_running_on_router; then
     print_warning "在路由器中运行，跳过下载 smartdns 可执行文件，请在 PC 或服务器上运行此脚本以下载 smartdns"
     return
   fi
-
-  print_line "下载 smartdns 可执行文件"
 
   if [ -z "$smartdns_version" ]; then
     read -p "请输入要下载的 smartdns 版本 (例如 48.4): " smartdns_version
@@ -182,11 +182,15 @@ download_smartdns() {
           ;;
   esac
 
+  print_warning "当前 smartdns 版本: ${raw_version} (${raw_arch})，目标版本: ${smartdns_version} (${arch})"
+
   # 如果版本号和架构相同，则跳过下载
   if [ "$raw_version" = "$smartdns_version" ] && [ "$raw_arch" = "$arch" ]; then
     print_success "smartdns 已是最新版本: ${raw_version} (${raw_arch})，无需下载"
     return
   fi
+
+  print_line "下载 smartdns 可执行文件"
 
   # 构建下载 URL
   if [ "$arch" = "arm64" ]; then

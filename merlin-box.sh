@@ -432,7 +432,16 @@ main() {
           #VERSION=$(get_github_latest_release "sagernet/sing-box")
           #print_warning "远程仓库最新版本: $VERSION"
           #download_smartdns "$VERSION" "arm64" #版本纯数字 架构arm64/arm
-          download_smartdns
+          # 判断是否传入了 $3(平台)
+          if [ -z "$3" ]; then
+            #手动执行
+            download_smartdns
+          else
+            #由github action 自动执行
+            VERSION=$(get_github_latest_release "pymumu/smartdns")
+            print_warning "远程仓库最新版本: $VERSION"
+            download_smartdns "$VERSION" "$3"
+          fi
           ;;
         sub2box)
           subscription_to_singbox_config "$3"
