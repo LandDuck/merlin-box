@@ -132,7 +132,7 @@ download_smartdns() {
   local smartdns_version="${1:-}"
   local arch="${2:-}"
 
-  print_normal "准备 smartdns 可执行文件，版本(传入参数): ${smartdns_version}, 架构(传入参数): ${arch}"
+  print_normal "准备下载 smartdns 可执行文件，版本(传入参数): ${smartdns_version}, 架构(传入参数): ${arch}"
 
   # 验证一下是否在路由器中， 如果在， 不执行，给出警告
   if is_running_on_router; then
@@ -259,6 +259,10 @@ subscription_to_singbox_config() {
 #=========================================
 build_singbox() {
 
+  local singbox_version="${1:-}"
+  local arch="${2:-}"
+
+  print_normal "准备编译 sing-box 可执行文件，版本(传入参数): ${singbox_version}, 架构(传入参数): ${arch}"
 
   # 验证一下是否在路由器中， 如果在， 不执行，给出警告
   if is_running_on_router; then
@@ -266,20 +270,62 @@ build_singbox() {
     return
   fi
 
-  print_line "构建 sing-box 可执行文件"
+  if [ -z "$singbox_version" ]; then
+      read -p "请输入要构建的 sing-box 版本 (例如 1.13.16): " singbox_version
+  fi
 
-  # 询问用户要构建的 sing-box 版本
-  read -p "请输入要构建的 sing-box 版本 (例如 v1.13.16 或 1.13.16): " raw_version
-  # 询问架构 arm64 或 arm
-  read -p "请输入要构建的架构 (arm64 或 arm): " arch
+  if [ -z "$arch" ]; then
+      read -p "请输入要构建的架构 (arm64 或 arm): " arch
+  fi
+
   if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
     print_error "错误: 不支持的架构 '$arch'，请使用 arm64 或 arm"
     exit 1
   fi
 
   # 规范化版本号：确保 singbox_version 不带 v，tag_name 带有 v
-  VERSION_NO_V="${raw_version#v}"
+  VERSION_NO_V="${singbox_version#v}"
   TAG_NAME="v${VERSION_NO_V}"
+
+  # 0 sing-box 可执行文件路径
+  local file_path="${CUR_DIR}/bin/sing-box"
+
+  # 1. 获取版本原始信息 (尝试使用 version，如果不成功再尝试 -v)
+  local raw_version_info
+  raw_version_info=$("$file_path" version 2>&1)
+  if [ $? -ne 0 ] || [ -z "$raw_version_info" ]; then
+      raw_version_info=$("$file_path" -v 2>&1)
+  fi
+  local raw_version
+  raw_version=$(echo "$raw_version_info" | grep -oP '(version|Release)\s*\K[0-9.]+' | head -n 1)
+
+  # 2. 提取架构 (通过 file 命令解析 ELF 信息)
+  local file_info
+  file_info=$(file -b "$file_path")
+  local raw_arch="unknown"
+
+  case "$file_info" in
+      *aarch64*|*ARM\ aarch64*)
+          raw_arch="arm64"
+          ;;
+      *ARM*)
+          raw_arch="arm"
+          ;;
+      *x86-64*)
+          raw_arch="x86_64"
+          ;;
+      *80386*)
+          raw_arch="x86"
+          ;;
+  esac
+
+  print_warning "当前 sing-box 版本: ${raw_version} (${raw_arch})，目标版本: ${singbox_version} (${arch})"
+
+  # 如果版本号和架构相同，则跳过下载
+  if [ "$raw_version" = "$singbox_version" ] && [ "$raw_arch" = "$arch" ]; then
+    print_success "sing-box 已是最新版本: ${raw_version} (${raw_arch})，无需下载"
+    return
+  fi
 
   # 检查工具集
   for cmd in git go tar; do
@@ -294,6 +340,8 @@ build_singbox() {
   # 如果不存在， 创建工作目录
   ### mkdir -p "$WORK_DIR"
   # 开发阶段调试用的结束
+
+  print_line "构建 sing-box 可执行文件"
 
   # 创建独立的工作临时目录，并在脚本退出/中断时自动清理
   WORK_DIR=$(mktemp -d -t singbox-build-XXXXXX)
@@ -377,18 +425,18 @@ build_singbox() {
 
   # 6. 开始编译 sing-box
   print_line "开始编译 sing-box..."
-  mkdir -p "${CUR_DIR}/bin"
+  #mkdir -p "${CUR_DIR}/bin"
 
   go build -v -trimpath \
     -tags "${BUILD_TAGS}" \
     -ldflags "-X github.com/sagernet/sing-box/constant.Version=${VERSION_NO_V} -s -w -buildid=" \
-    -o "${CUR_DIR}/bin/sing-box" \
+    -o "${file_path}" \
     ./cmd/sing-box
 
   # 调用压缩函数
   compress_singbox
 
-  print_success "sing-box 可执行文件构建完成: ${CUR_DIR}/bin/sing-box"
+  print_success "sing-box 可执行文件构建完成: ${file_path}"
 }
 
 #=========================================

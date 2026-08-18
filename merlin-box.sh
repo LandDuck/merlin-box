@@ -425,7 +425,16 @@ main() {
           update_rules
           ;;
         build_singbox)
-          build_singbox
+          # 判断是否传入了 $3(平台)
+          if [ -z "$3" ]; then
+            #手动执行
+            build_singbox
+          else
+            #由github action 自动执行
+            VERSION=$(get_github_latest_release "sagernet/sing-box")
+            print_warning "远程仓库最新版本: $VERSION"
+            build_singbox "$VERSION" "$3"
+          fi
           ;;
         download_smartdns)
           #VERSION=$(get_github_latest_release "pymumu/smartdns")

@@ -1,0 +1,57 @@
+name: Auto Build sing-box
+
+on:
+  schedule:
+    # 每天 UTC 17:00 运行（对应北京时间 UTC+8 次日 01:00）
+    - cron: '0 17 * * *'
+  workflow_dispatch:
+
+jobs:
+  build-singbox:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          check-latest: true
+
+      - name: Install UPX 5.2.0
+        run: |
+          set -e
+          curl -L -o /tmp/upx-5.2.0-amd64_linux.tar.xz https://github.com/upx/upx/releases/download/v5.2.0/upx-5.2.0-amd64_linux.tar.xz
+          tar -C /tmp -xf /tmp/upx-5.2.0-amd64_linux.tar.xz
+          sudo install -m 0755 /tmp/upx-5.2.0-amd64_linux/upx /usr/local/bin/upx
+          upx --version | head -n 1 | grep '5.2.0'
+
+      - name: Run sing-box Build
+        run: |
+          chmod +x ./merlin-box.sh
+          chmod +x ./bin/sing-box
+          ./merlin-box.sh tool build_singbox arm64
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "检测到 sing-box 文件已更新，开始提交..."
+            git add .
+            git commit -m "chore(auto): 自动构建 sing-box"
+            git push
+          else
+            echo "sing-box 文件无变化，无需提交。"
+          fi
