@@ -1090,3 +1090,37 @@ is_running_on_router() {
         return 1  # 不是路由器环境
     fi
 }
+
+# =========================================
+# 获取 GitHub 仓库的最新 Release 版本号
+# 参数: 仓库路径 (例如: owner/repo)
+# =========================================
+get_github_latest_release() {
+    local repo="$1"
+
+    # 参数检查
+    if [ -z "$repo" ]; then
+        echo "错误: 请提供仓库路径 (例如: owner/repo)" >&2
+        return 1
+    fi
+
+    # 1. 发送请求提取 tag_name
+    local tag
+    tag=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" \
+        | grep -o '"tag_name": *"[^"]*"' \
+        | head -n 1 \
+        | sed 's/"tag_name": *"\([^"]*\)"/\1/')
+
+    # 2. 纯数字版本号清洗 (去除 Release、v 等字母前缀/后缀，仅保留数字和 .)
+    local version
+    version=$(echo "$tag" | sed 's/[^0-9.]*//g')
+
+    # 验证提取结果
+    if [ -n "$version" ]; then
+        echo "$version"
+        return 0
+    else
+        echo "错误: 无法获取 [${repo}] 的 Release 版本（可能是无效仓库或超出了 API 速率限制）" >&2
+        return 1
+    fi
+}

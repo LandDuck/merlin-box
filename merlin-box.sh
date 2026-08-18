@@ -428,6 +428,10 @@ main() {
           build_singbox
           ;;
         download_smartdns)
+          #VERSION=$(get_github_latest_release "pymumu/smartdns")
+          #VERSION=$(get_github_latest_release "sagernet/sing-box")
+          #print_warning "远程仓库最新版本: $VERSION"
+          #download_smartdns "$VERSION" "arm64" #版本纯数字 架构arm64/arm
           download_smartdns
           ;;
         sub2box)

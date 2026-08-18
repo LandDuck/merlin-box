@@ -129,6 +129,8 @@ update_rules() {
 # 下载到 bin 目录下 smartdns
 #=========================================
 download_smartdns() {
+  local smartdns_version="${1:-}"
+  local arch="${2:-}"
 
   # 验证一下是否在路由器中， 如果在， 不执行，给出警告
   if is_running_on_router; then
@@ -138,13 +140,52 @@ download_smartdns() {
 
   print_line "下载 smartdns 可执行文件"
 
-  #询问用户要下载的 smartdns 版本
-  read -p "请输入要下载的 smartdns 版本 (例如 48.4): " smartdns_version
-  # 询问架构 arm64 或 arm
-  read -p "请输入要下载的架构 (arm64 或 arm): " arch
+  if [ -z "$smartdns_version" ]; then
+    read -p "请输入要下载的 smartdns 版本 (例如 48.4): " smartdns_version
+  fi
+
+  if [ -z "$arch" ]; then
+    read -p "请输入要下载的架构 (arm64 或 arm): " arch
+  fi
+
   if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
     print_error "错误: 不支持的架构 '$arch'，请使用 arm64 或 arm"
     exit 1
+  fi
+
+  # 0 smartdns 可执行文件路径
+  local file_path="${CUR_DIR}/bin/smartdns"
+
+  # 1. 提取版本号 (通过执行 -v 输出提取 Release 后的数字)
+  local raw_version_info
+  raw_version_info=$("$file_path" -v 2>&1)
+  local raw_version
+  raw_version=$(echo "$raw_version_info" | grep -oP 'Release\K[0-9.]+' || echo "$raw_version_info" | sed -n 's/.*Release\([0-9.]*\).*/\1/p')
+
+  # 2. 提取架构 (通过 file 命令解析 ELF 信息)
+  local file_info
+  file_info=$(file -b "$file_path")
+  local raw_arch="unknown"
+
+  case "$file_info" in
+      *aarch64*|*ARM\ aarch64*)
+          raw_arch="arm64"
+          ;;
+      *ARM*)
+          raw_arch="arm"
+          ;;
+      *x86-64*)
+          raw_arch="x86_64"
+          ;;
+      *80386*)
+          raw_arch="x86"
+          ;;
+  esac
+
+  # 如果版本号和架构相同，则跳过下载
+  if [ "$raw_version" = "$smartdns_version" ] && [ "$raw_arch" = "$arch" ]; then
+    print_success "smartdns 已是最新版本: ${raw_version} (${raw_arch})，无需下载"
+    return
   fi
 
   # 构建下载 URL
@@ -155,8 +196,8 @@ download_smartdns() {
   fi
 
   # 下载到 bin 目录下 smartdns
-  mkdir -p "${CUR_DIR}/bin"
-  wget -O "${CUR_DIR}/bin/smartdns" "$smartdns_url"
+  # mkdir -p "${CUR_DIR}/bin"
+  wget -O "${file_path}" "$smartdns_url"
 
   # 检查下载是否成功
   if [ $? -ne 0 ]; then
@@ -167,7 +208,7 @@ download_smartdns() {
   # 压缩 smartdns 可执行文件
   compress_smartdns
 
-  print_success "smartdns 可执行文件下载完成: ${CUR_DIR}/bin/smartdns"
+  print_success "smartdns 可执行文件下载完成: ${file_path}"
 
 }
 
