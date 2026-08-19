@@ -130,7 +130,7 @@ This project aims to clearly separate responsibilities:
       <td>UI</td>
       <td>⏳ Not Supported</td>
       <td>
-        Planned for the future. Likely to run a WEB service directly in Go with an independent WEB UI.
+        TODO.
       </td>
     </tr>
   </tbody>
@@ -198,9 +198,14 @@ sing-box (conf/config.json) configuration reference:
 merlin-box/
 ├─ merlin-box.sh            # Main entry script (start/stop)
 ├─ start_merlin_box.sh      # For boot startup support
+├─ ui/                      # WEB UI Development Directory (TODO)
+│  ├─ server                # WEB UI server (TODO)
+│  └─ front                 # WEB UI front-end (TODO)
+├─ wwwroot/                 # WEB UI static files (TODO)
 ├─ bin/
 │  ├─ sing-box              # sing-box executable
 │  ├─ smartdns              # smartdns executable
+│  ├─ ui-server             # WEB UI server executable (TODO)
 │  └─ sub2box               # sub2box executable (for converting subscriptions to sing-box configuration)
 ├─ conf/
 │  ├─ config.json           # sing-box configuration

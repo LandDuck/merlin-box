@@ -129,7 +129,7 @@
       <td>UI</td>
       <td>⏳ 暂不支持</td>
       <td>
-        长远有计划支持。大概率用 GO 直接跑一个WEB服务写一套独立的WEB UI。
+        待实现。
       </td>
     </tr>
   </tbody>
@@ -197,9 +197,14 @@ sing-box（conf/config.json）配置参考：
 merlin-box/
 ├─ merlin-box.sh            # 主入口脚本（start/stop）
 ├─ start_merlin_box.sh      # 用于支持开机启动
+├─ ui/                      # WEB UI 开发目录（待实现）
+│  ├─ server                # WEB UI 后端（待实现）
+│  └─ front                 # WEB UI 前端（待实现）
+├─ wwwroot/                 # WEB UI 静态资源（待实现）
 ├─ bin/
 │  ├─ sing-box              # sing-box 可执行文件
 │  ├─ smartdns              # smartdns 可执行文件
+│  ├─ ui-server             # WEB UI server 可执行文件（待实现）
 │  └─ sub2box               # sub2box 可执行文件（用于将订阅转换为 sing-box 配置）
 ├─ conf/
 │  ├─ config.json           # sing-box 配置
