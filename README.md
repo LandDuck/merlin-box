@@ -85,6 +85,13 @@ This project aims to clearly separate responsibilities:
       </td>
     </tr>
     <tr>
+      <td>IP Blacklist</td>
+      <td>✅ Supported</td>
+      <td>
+        Implemented through configuring ip4-blacklist.txt and ip6-blacklist.txt files to force specified IPs through the proxy.
+      </td>
+    </tr>
+    <tr>
       <td>UDP</td>
       <td>✅ Supported</td>
       <td>

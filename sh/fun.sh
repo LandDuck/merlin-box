@@ -516,6 +516,13 @@ setup_lan_tproxy()
     iptables -t mangle -A "$MB_PROXY_CHAIN" -d 172.16.0.0/12 -j RETURN
     iptables -t mangle -A "$MB_PROXY_CHAIN" -d 10.0.0.0/8 -j RETURN
 
+    # 2. 匹配 IPSET 黑名单集合的流量强制走代理（优先级高于白名单）
+    iptables -t mangle -A "$MB_PROXY_CHAIN" -p tcp -m set --match-set "$MB_IPSET_BLACKLIST_NAME" dst -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        iptables -t mangle -A "$MB_PROXY_CHAIN" -p udp -m set --match-set "$MB_IPSET_BLACKLIST_NAME" dst -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+    fi
+
     # 2. 匹配 IPSET 白名单集合的 TCP 流量直接 RETURN（直连放行）
     iptables -t mangle -A "$MB_PROXY_CHAIN" -p tcp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
     # UDP 支持
@@ -574,6 +581,13 @@ setup_lan_tproxy_ipv6()
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -d ::1/128 -j RETURN
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -d fe80::/10 -j RETURN
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -d fc00::/7 -j RETURN
+
+    # 2. 匹配 IPSET IPv6 黑名单集合的流量强制走代理（优先级高于白名单）
+    ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_BLACKLIST_NAME_V6" dst -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+    # UDP 支持
+    if [ "$MB_ENABLE_UDP" = "1" ]; then
+        ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p udp -m set --match-set "$MB_IPSET_BLACKLIST_NAME_V6" dst -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
+    fi
 
     # 2. 匹配 IPSET 大陆 IPv6 白名单网段直接直连放行
     ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN
@@ -681,6 +695,30 @@ reset_iptables()
         print_success "✅ 已加载自定义 IPv4 白名单。"
     else
         print_warning "⚠️ 未找到自定义 IPv4 白名单文件：$MB_IP4_WHITELIST_FILE"
+    fi
+
+    # ----------------------------------------------------------
+    # 2.5 重建 IPSET 黑名单
+    # ----------------------------------------------------------
+    print_normal "⏳ 正在加载 IPv4 黑名单 IPSET..."
+
+    ipset destroy "$MB_IPSET_BLACKLIST_NAME" 2>/dev/null
+    ipset create "$MB_IPSET_BLACKLIST_NAME" hash:net
+
+    # 用户自定义黑名单
+    if [ -f "$MB_IP4_BLACKLIST_FILE" ]; then
+        dos2unix "$MB_IP4_BLACKLIST_FILE" 2>/dev/null
+        (
+            echo "create $MB_IPSET_BLACKLIST_NAME hash:net -exist"
+            awk '
+                /^[[:space:]]*$/ { next }          # 空行
+                /^[[:space:]]*#/ { next }          # 注释
+                {print "add '"$MB_IPSET_BLACKLIST_NAME"' " $1}
+            ' "$MB_IP4_BLACKLIST_FILE"
+        ) | ipset restore 2>/dev/null
+        print_success "✅ 已加载自定义 IPv4 黑名单。"
+    else
+        print_warning "⚠️ 未找到自定义 IPv4 黑名单文件：$MB_IP4_BLACKLIST_FILE"
     fi
 
     # ----------------------------------------------------------
@@ -823,6 +861,30 @@ reset_iptables_ipv6()
     fi
 
     # ----------------------------------------------------------
+    # 2.5. 重建 IPv6 IPSET 黑名单
+    # ----------------------------------------------------------
+    print_normal "⏳ 正在加载 IPv6 黑名单 IPSET..."
+
+    ipset destroy "$MB_IPSET_BLACKLIST_NAME_V6" 2>/dev/null
+    ipset create "$MB_IPSET_BLACKLIST_NAME_V6" hash:net family inet6
+
+    # 用户自定义 IPv6 黑名单
+    if [ -f "$MB_IP6_BLACKLIST_FILE" ]; then
+        dos2unix "$MB_IP6_BLACKLIST_FILE" 2>/dev/null
+        (
+            echo "create $MB_IPSET_BLACKLIST_NAME_V6 hash:net family inet6 -exist"
+            awk '
+                /^[[:space:]]*$/ { next }          # 空行
+                /^[[:space:]]*#/ { next }          # 注释
+                {print "add '"$MB_IPSET_BLACKLIST_NAME_V6"' " $1}
+            ' "$MB_IP6_BLACKLIST_FILE"
+        ) | ipset restore 2>/dev/null
+        print_success "✅ 已加载自定义 IPv6 黑名单。"
+    else
+        print_warning "⚠️ 未找到自定义 IPv6 黑名单文件：$MB_IP6_BLACKLIST_FILE"
+    fi
+
+    # ----------------------------------------------------------
     # 3. 重置 IPv6 策略路由
     # ----------------------------------------------------------
     while ip -6 rule del fwmark "$MB_FWMARK" table "$MB_ROUTE_TABLE" 2>/dev/null; do
@@ -887,12 +949,13 @@ clear_iptables()
     ip route flush table "$MB_ROUTE_TABLE" 2>/dev/null
 
     # ----------------------------------------------------------
-    # 4. 销毁 IPSET 白名单，MAC 黑名单
+    # 4. 销毁 IPSET 白名单，MAC 黑名单, MAC 白名单, IPSET 黑名单
     # ----------------------------------------------------------
 
     ipset destroy "$MB_IPSET_NAME" 2>/dev/null
     ipset destroy "$MB_MAC_BLACKLIST_NAME" 2>/dev/null
     ipset destroy "$MB_MAC_WHITELIST_NAME" 2>/dev/null
+    ipset destroy "$MB_IPSET_BLACKLIST_NAME_V6" 2>/dev/null
 
     # ----------------------------------------------------------
     # 5. 清理 IPv6
@@ -955,10 +1018,11 @@ clear_iptables_ipv6()
     ip -6 route flush table "$MB_ROUTE_TABLE" 2>/dev/null
 
     # ----------------------------------------------------------
-    # 4. 销毁 IPv6 IPSET 白名单
+    # 4. 销毁 IPv6 IPSET 白名单, IPV6 IPSET 黑名单
     # ----------------------------------------------------------
 
     ipset destroy "$MB_IPSET_NAME_V6" 2>/dev/null
+    ipset destroy "$MB_IPSET_BLACKLIST_NAME_V6" 2>/dev/null
 
 }
 
@@ -983,6 +1047,9 @@ setup_oneself_redirect()
     iptables -t nat -A "$MB_ONESELF_CHAIN" -d 192.168.0.0/16 -j RETURN
     iptables -t nat -A "$MB_ONESELF_CHAIN" -d 172.16.0.0/12 -j RETURN
     iptables -t nat -A "$MB_ONESELF_CHAIN" -d 10.0.0.0/8 -j RETURN
+
+    # 黑名单 IP 强制走代理（优先级高于大陆白名单）
+    iptables -t nat -A "$MB_ONESELF_CHAIN" -p tcp -m set --match-set "$MB_IPSET_BLACKLIST_NAME" dst -j REDIRECT --to-ports "$MB_REDIRECT_PORT"
 
     # 放行大陆 IP 直连流量
     iptables -t nat -A "$MB_ONESELF_CHAIN" -p tcp -m set --match-set "$MB_IPSET_NAME" dst -j RETURN
@@ -1030,6 +1097,9 @@ setup_oneself_redirect_ipv6()
 
     # 放行 IPv6 私有地址
     ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -d fc00::/7 -j RETURN
+
+    # 黑名单 IPv6 IP 强制走代理（优先级高于大陆白名单）
+    ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_BLACKLIST_NAME_V6" dst -j REDIRECT --to-ports "$MB_REDIRECT_PORT"
 
     # 放行大陆 IPv6 IP 直连流量
     ip6tables -t nat -A "$MB_ONESELF_CHAIN_V6" -p tcp -m set --match-set "$MB_IPSET_NAME_V6" dst -j RETURN

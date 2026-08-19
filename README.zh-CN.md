@@ -84,6 +84,13 @@
       </td>
     </tr>
     <tr>
+      <td>IP黑名单</td>
+      <td>✅ 已支持</td>
+      <td>
+        通过配置 ip4-blacklist.txt 和 ip6-blacklist.txt 文件实现，使指定 IP 强制走代理。
+      </td>
+    </tr>
+    <tr>
       <td>UDP</td>
       <td>✅ 已支持</td>
       <td>

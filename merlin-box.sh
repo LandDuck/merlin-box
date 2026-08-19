@@ -23,7 +23,7 @@ CUR_DIR=$(cd "$(dirname "$0")"; pwd)
 # 脚本名称
 SCRIPT_NAME="$(basename "$0")"
 # 脚本版本
-SCRIPT_VERSION="1.0.1"
+SCRIPT_VERSION="1.0.3"
 # PID
 PID_FILE="/tmp/merlin-box.pid"
 
@@ -45,17 +45,22 @@ readonly MB_FWMARK=168
 readonly MB_ROUTE_TABLE=111
 # 必须在 sing-box 的 outbound 中配置 （一个32位无符号整数, 建议1到255）
 readonly MB_SINGBOX_OUT_MARK=169
-# IP分流/白名单相关变量
+# IP分流/白名单相关变量(直连)
 readonly MB_IPSET_NAME="merlinkbox_chn"
 readonly MB_IPSET_NAME_V6="merlinkbox_chn_v6"
+# IP分流/黑名单相关变量(强制代理)
+readonly MB_IPSET_BLACKLIST_NAME="merlinkbox_blacklist"
+readonly MB_IPSET_BLACKLIST_NAME_V6="merlinkbox_blacklist_v6"
 # 设备黑名单MAC地址SET NAME
 readonly MB_MAC_BLACKLIST_NAME="merlinkbox_mac_blacklist"
 # 设备白名单MAC地址SET NAME
 readonly MB_MAC_WHITELIST_NAME="merlinkbox_mac_whitelist"
 readonly MB_CHN_IP4_FILE="${CUR_DIR}/res/chn-ip4.txt"
 readonly MB_IP4_WHITELIST_FILE="${CUR_DIR}/res/ip4-whitelist.txt" #这里面的东西不会被代理
+readonly MB_IP4_BLACKLIST_FILE="${CUR_DIR}/res/ip4-blacklist.txt" #这里面的东西会被强制代理
 readonly MB_CHN_IP6_FILE="${CUR_DIR}/res/chn-ip6.txt"
 readonly MB_IP6_WHITELIST_FILE="${CUR_DIR}/res/ip6-whitelist.txt" #这里面的东西不会被代理
+readonly MB_IP6_BLACKLIST_FILE="${CUR_DIR}/res/ip6-blacklist.txt" #这里面的东西会被强制代理
 readonly MB_MAC_BLACKLIST_FILE="${CUR_DIR}/res/device_blacklist.txt" #这里面的设备不会被代理
 readonly MB_MAC_WHITELIST_FILE="${CUR_DIR}/res/device_whitelist.txt" #这里面的设备会被代理
 # 是否启用 IPv6 支持 (0 DISABLE, 1 ENABLE)。注意系统会检测到 IPv6 是否可用，如果不可用则会自动禁用 IPv6 支持
