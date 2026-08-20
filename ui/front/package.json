@@ -1,0 +1,30 @@
+{
+  "name": "merlin-box-ui",
+  "version": "0.0.1",
+  "description": "",
+  "license": "MIT",
+  "author": "LandDurk",
+  "devDependencies": {
+    "chokidar": "^5.0.0",
+    "del": "^8.0.1",
+    "esbuild": "^0.28.1",
+    "fast-glob": "^3.3.3",
+    "gulp": "^5.0.1",
+    "gulp-esbuild": "^0.15.0",
+    "gulp-newer": "^1.4.0",
+    "less": "^4.8.1"
+  },
+  "dependencies": {
+    "antd": "^6.6.1",
+    "axios": "^1.19.0",
+    "copy-text-to-clipboard": "^3.2.2",
+    "jquery": "^4.0.0",
+    "js-cookie": "^3.0.8",
+    "md5": "^2.3.0",
+    "moment": "^2.30.1",
+    "query-string": "^9.4.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "url-parse": "^1.5.10"
+  }
+}

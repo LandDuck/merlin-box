@@ -1,0 +1,207 @@
+/*
+ * # merlin-box - A sing-box + smartdns routing and proxy script solution for ASUSWRT-Merlin routers.
+ * # Copyright (C) 2026 LandDuck <https://github.com/LandDuck/>
+ * #
+ * # This program is free software: you can redistribute it and/or modify
+ * # it under the terms of the GNU General Public License as published by
+ * # the Free Software Foundation, either version 3 of the License, or
+ * # (at your option) any later version.
+ * #
+ * # This program is distributed in the hope that it will be useful,
+ * # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * # GNU General Public License for more details.
+ * #
+ * # You should have received a copy of the GNU General Public License
+ * # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+@import (reference) "../bootstrap/bootstrap.less";
+
+html {
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  height: 100%;
+  background-color: #0C1322;
+  padding: 0px;
+  margin: 0px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Source Han Sans CN", sans-serif !important;
+  color: #DCE2F7 !important;
+  line-height: 1.5 !important;
+  font-size: 16px !important;
+  -webkit-text-size-adjust: none;
+  font-weight: 400;
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+input, textarea {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Source Han Sans CN", sans-serif !important;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: none;
+  outline: none;
+  resize: none;
+}
+
+body.no-scroll {
+  overflow: hidden;
+}
+
+p {
+  margin: 0px 0px 0px 0px;
+}
+
+.ns-out-content {
+  width: 100%;
+}
+
+.ns-content {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+a {
+  //.transition-duration(0.2s) !important;
+  //.transition(all 0.2s) !important;
+  color: #DCE2F7;
+  text-decoration: none;
+}
+
+a:active {
+  //color: #3a4a5e;
+  opacity: 1 !important;
+}
+
+a:hover {
+  //color: #3a4a5e;
+}
+
+img {
+  vertical-align: top;
+}
+
+a:hover {
+  /*text-decoration: none;*/
+}
+
+.hover-btn {
+  display: block;
+  .transform-origin(center center);
+  .scale(1) ;
+  .transition-duration(0.1s);
+  .transition-property(transform);
+
+  &.hover {
+    .scale(0.95);
+  }
+}
+
+.ml-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.height1 {
+  .size(100%, 1px);
+  overflow: hidden;
+}
+
+.height5 {
+  .size(100%, 5px);
+  overflow: hidden;
+}
+
+.height10 {
+  .size(100%, 10px);
+  overflow: hidden;
+}
+
+.height15 {
+  .size(100%, 15px);
+  overflow: hidden;
+}
+
+.height20 {
+  .size(100%, 20px);
+  overflow: hidden;
+}
+
+.height25 {
+  .size(100%, 25px);
+  overflow: hidden;
+}
+
+.height30 {
+  .size(100%, 30px);
+  overflow: hidden;
+}
+
+.height35 {
+  .size(100%, 35px);
+  overflow: hidden;
+}
+
+.height40 {
+  .size(100%, 40px);
+  overflow: hidden;
+}
+
+.height45 {
+  .size(100%, 45px);
+  overflow: hidden;
+}
+
+.height50 {
+  .size(100%, 50px);
+  overflow: hidden;
+}
+
+.auto-size-img {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+a.dis {
+  cursor: default;
+  box-shadow: none !important;
+  background-color: #b2b2b2 !important;
+}
+
+a.dis:hover {
+  box-shadow: none !important;
+}
+
+a[title='站长统计'] {
+  display: none;
+}
+
+.nodata {
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+.no-data {
+  font-weight: 500;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  text-align: center;
+  font-size: 16px;
+  color: #DCE2F7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@import "./home/index";
+@import "./main/index";
+@import "./layer/index";

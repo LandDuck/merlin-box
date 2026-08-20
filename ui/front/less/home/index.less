@@ -1,0 +1,202 @@
+/*
+ * # merlin-box - A sing-box + smartdns routing and proxy script solution for ASUSWRT-Merlin routers.
+ * # Copyright (C) 2026 LandDuck <https://github.com/LandDuck/>
+ * #
+ * # This program is free software: you can redistribute it and/or modify
+ * # it under the terms of the GNU General Public License as published by
+ * # the Free Software Foundation, either version 3 of the License, or
+ * # (at your option) any later version.
+ * #
+ * # This program is distributed in the hope that it will be useful,
+ * # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * # GNU General Public License for more details.
+ * #
+ * # You should have received a copy of the GNU General Public License
+ * # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+.home-index {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  .rt-gradient {
+    width: 600px;
+    height: 600px;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    background: radial-gradient(ellipse 70.71% 70.71% at 50.00% 50.00%, rgba(14, 165, 255, 0.10) 0%, rgba(14, 165, 255, 0) 70%);
+    border-radius: 9999px;
+  }
+
+  .lt-gradient {
+    width: 600px;
+    height: 600px;
+    right: 0px;
+    bottom: 0px;
+    position: absolute;
+    background: radial-gradient(ellipse 70.71% 70.71% at 50.00% 50.00%, rgba(14, 165, 255, 0.10) 0%, rgba(14, 165, 255, 0) 70%);
+    border-radius: 9999px;
+  }
+
+  .login-card {
+    width: 448px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    outline: 1px solid rgba(255, 255, 255, .1);
+    outline-offset: -1px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .4);
+    backdrop-filter: blur(20px);
+  }
+
+  .login-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .login-title {
+    color: #DCE2F7;
+    font-family: Inter, sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 40px;
+  }
+
+  .login-subtitle {
+    margin-top: 8px;
+    color: #BEC7D4;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+  }
+
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .login-input {
+    height: 49px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 12px 0 40px;
+    background: rgba(255, 255, 255, .05);
+    border-radius: 8px;
+    outline: 1px solid rgba(255, 255, 255, .1);
+    outline-offset: -1px;
+    overflow: hidden;
+    transition: background-color .2s ease, outline-color .2s ease, box-shadow .2s ease;
+
+    &:focus-within {
+      background: rgba(14, 165, 255, .08);
+      outline-color: rgba(14, 165, 255, .65);
+      box-shadow: 0 0 0 1px rgba(14, 165, 255, .25), 0 0 18px rgba(14, 165, 255, .25);
+    }
+
+    &.error {
+      background: rgba(255, 0, 0, .08);
+      outline-color: rgba(255, 0, 0, .65);
+      box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25);
+    }
+
+    input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #BEC7D4;
+      font-size: 16px;
+
+      &::placeholder {
+        color: rgba(190, 199, 212, .5);
+      }
+    }
+  }
+
+  .login-input-icon {
+    position: absolute;
+    left: 12px;
+    width: 16px;
+    /*background: #BEC7D4;*/
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .username-icon {
+    height: 16px;
+    background-image: url("../../images/icon-username.svg");
+  }
+
+  .password-icon {
+    height: 21px;
+    background-image: url("../../images/icon-password.svg");
+  }
+
+  .password-toggle {
+    width: 22px;
+    height: 20px;
+    position: absolute;
+    right: 12px;
+    /*background: #BEC7D4;*/
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% auto;
+    background-image: url("../../images/icon-showps.svg");
+  }
+
+  .password-toggle.showed {
+    background-image: url("../../images/icon-hideps.svg");
+  }
+
+  .login-button {
+    height: 52px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #0EA5FF;
+    color: #00385C;
+
+    font-family: Inter, sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 28px;
+
+    box-shadow: 0 0 15px rgba(14, 165, 255, .2);
+    transition: background-color .18s ease, box-shadow .18s ease, transform .12s ease;
+
+    // 鼠标悬停
+    &:hover {
+      background: #38BDF8;
+      box-shadow: 0 0 24px rgba(14, 165, 255, .45);
+    }
+
+    // 鼠标按下
+    &:active {
+      background: #0284C7;
+      transform: translateY(1px);
+      box-shadow: 0 0 10px rgba(14, 165, 255, .25);
+    }
+
+    // 键盘焦点
+    &:focus-visible {
+      outline: 2px solid rgba(56, 189, 248, .8);
+      outline-offset: 3px;
+    }
+  }
+}

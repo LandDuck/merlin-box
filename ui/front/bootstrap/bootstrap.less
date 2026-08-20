@@ -1,0 +1,50 @@
+// Core variables and mixins
+@import "variables.less";
+@import "mixins.less";
+// Reset and dependencies
+@import "normalize.less";
+@import "print.less";
+@import "glyphicons.less";
+// Core CSS
+@import "scaffolding.less";
+@import "type.less";
+// Utility classes
+@import "utilities.less";
+@import "responsive-utilities.less";
+/**/
+.bg-left-padding(@lp,@size) {
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding-left: @lp;
+  background-size: @size auto;
+  display: inline-block;
+}
+
+.size-and-lineheight(@width,@height) {
+  .size(@width, @height);
+  line-height: @height;
+}
+
+.margin-left-right(@margin) {
+  margin-left: @margin;
+  margin-right: @margin;
+}
+
+
+
+//自定义的变量
+//导航高度
+@nav-height-l: 72px;
+@nav-height-m: 56px;
+@nav-height-s: 38px;
+//banner
+@banner-height-l: 880px;
+@banner-height-m: 469px;
+@banner-height-s: 172px;
+
+.omit(@p1) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: @p1;
+  overflow: hidden;
+}

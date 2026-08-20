@@ -1,0 +1,155 @@
+/*
+ * # merlin-box - A sing-box + smartdns routing and proxy script solution for ASUSWRT-Merlin routers.
+ * # Copyright (C) 2026 LandDuck <https://github.com/LandDuck/>
+ * #
+ * # This program is free software: you can redistribute it and/or modify
+ * # it under the terms of the GNU General Public License as published by
+ * # the Free Software Foundation, either version 3 of the License, or
+ * # (at your option) any later version.
+ * #
+ * # This program is distributed in the hope that it will be useful,
+ * # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * # GNU General Public License for more details.
+ * #
+ * # You should have received a copy of the GNU General Public License
+ * # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+@import (reference) "../../bootstrap/bootstrap.less";
+
+.input-layer {
+  .nlc {
+    width: 448px;
+    max-width: 448px;
+    padding: 24px;
+    background: #232A3A;
+    box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.50);
+    border-radius: 12px;
+    outline: 1px rgba(255, 255, 255, 0.10) solid;
+    outline-offset: -1px;
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    display: flex;
+  }
+
+  .title {
+    color: #DCE2F7;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 28px;
+    word-wrap: break-word;
+    margin-bottom: 8px;
+  }
+
+  .content {
+    color: #BEC7D4;
+    font-size: 14px;
+    line-height: 20px;
+    word-wrap: break-word;
+    margin-bottom: 32px;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .btn-cancel {
+      padding-left: 16px;
+      padding-right: 16px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      border-radius: 8px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      display: inline-flex;
+
+      color: #BEC7D4;
+      font-size: 16px;
+      line-height: 24px;
+      word-wrap: break-word;
+
+      margin-right: 24px;
+
+      &:hover {
+        color: #ffffff;
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+
+    .btn-ok {
+      padding-left: 24px;
+      padding-right: 24px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      background: #0EA5FF;
+      box-shadow: 0px 0px 15px rgba(14, 165, 255, 0.20);
+      border-radius: 8px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      display: inline-flex;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color .18s ease, box-shadow .18s ease, transform .12s ease;
+
+      color: #00385C;
+      font-size: 16px;
+      line-height: 24px;
+      word-wrap: break-word;
+
+      &:hover {
+        background: #38BDF8;
+        box-shadow: 0px 0px 24px rgba(14, 165, 255, 0.45);
+      }
+
+      &:active {
+        background: #0284C7;
+        transform: translateY(1px);
+        box-shadow: 0px 0px 10px rgba(14, 165, 255, 0.25);
+      }
+    }
+  }
+
+  .nlc-input {
+    margin-top: 24px;
+
+    height: 49px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 12px 0 12px;
+    background: rgba(255, 255, 255, .05);
+    border-radius: 8px;
+    outline: 1px solid rgba(255, 255, 255, .1);
+    outline-offset: -1px;
+    overflow: hidden;
+    transition: background-color .2s ease, outline-color .2s ease, box-shadow .2s ease;
+
+    &:focus-within {
+      background: rgba(14, 165, 255, .08);
+      outline-color: rgba(14, 165, 255, .65);
+      box-shadow: 0 0 0 1px rgba(14, 165, 255, .25), 0 0 18px rgba(14, 165, 255, .25);
+    }
+
+    input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #BEC7D4;
+      font-size: 16px;
+
+      &::placeholder {
+        color: rgba(190, 199, 212, .5);
+      }
+    }
+
+  }
+}
+

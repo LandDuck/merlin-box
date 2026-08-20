@@ -18,4 +18,51 @@
 
 package main
 
-// TODO
+import (
+	"log"
+	"merlin-box-ui/global"
+	"merlin-box-ui/handlers"
+	"merlin-box-ui/middleware"
+	"net/http"
+	"os"
+
+	"path/filepath"
+
+	"github.com/go-chi/chi/v5"
+)
+
+// main 函数是程序的入口点，负责启动 HTTP 服务器并设置路由和中间件。
+func main() {
+	println("Hello, Merlin Box UI!")
+
+	r := chi.NewRouter()
+
+	// 全局中间件
+	r.Use(middleware.Auth)
+
+	// 根据环境变量选择静态资源目录
+	staticDir := "./wwwroot"
+	if os.Getenv("APP_ENV") == global.EnvDev {
+		staticDir = "./../front"
+	} else {
+		global.CurrentEnv = global.EnvProd
+	}
+
+	// 默认首页和静态资源
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(staticDir, "index.html"))
+	})
+	r.Handle("/*", http.FileServer(http.Dir(staticDir)))
+
+	// API
+	r.Post("/api/login", handlers.Login)
+	r.Post("/api/init", handlers.Init)
+	r.Post("/api/status", handlers.Status)
+	r.Post("/api/save_path", handlers.SavePath)
+	r.Post("/api/test", handlers.Test)
+
+	// 启动 HTTP 服务器，监听端口 8080
+	if err := http.ListenAndServe(":8080", r); err != nil {
+		log.Fatal(err)
+	}
+}
