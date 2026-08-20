@@ -35,7 +35,7 @@ const CSS_OUTPUT = "css/main.css";
 //build临时目录
 const DIST = "dist";
 //生产环境目录
-const WWW_ROOT = "../wwwroot";
+const WWW_ROOT = "../../wwwroot";
 
 // page 依赖关系
 const pageContexts = new Map();
@@ -318,11 +318,22 @@ export async function build() {
         });
         await fs.copyFile(file, destFile);
     }
+    //复制images目录到dist/images目录
+    const imageFiles = await glob(`images/**/*.*`, {
+        onlyFiles: true
+    });
+    for (const file of imageFiles) {
+        const destFile = path.join(DIST, file);
+        await fs.mkdir(path.dirname(destFile), {
+            recursive: true
+        });
+        await fs.copyFile(file, destFile);
+    }
     //复制index.html和main.html, 同时替换里面的 '/merlin-box-ui/front/' 为 '/'
     const indexHtml = await fs.readFile("index.html", "utf8");
-    const mainHtml = await fs.readFile("main.html", "utf8");
+    //const mainHtml = await fs.readFile("main.html", "utf8");
     await fs.writeFile(path.join(DIST, "index.html"), indexHtml.replace(/\/merlin-box-ui\/front\//g, "/"), "utf8");
-    await fs.writeFile(path.join(DIST, "main.html"), mainHtml.replace(/\/merlin-box-ui\/front\//g, "/"), "utf8");
+    //await fs.writeFile(path.join(DIST, "main.html"), mainHtml.replace(/\/merlin-box-ui\/front\//g, "/"), "utf8");
     //将dist目录下的文件拷贝到www目录
     await copyToWww();
     console.log("build completed");

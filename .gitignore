@@ -5,7 +5,10 @@ check-ipv6.sh
 check-lan.sh
 /tools/update-rules/res
 node_modules
+wnode_modules
+lnode_modules
 /ui/front/css/main.css
 /ui/front/scripts/main.js
 /ui/front/scripts/pages
 tmp
+dist

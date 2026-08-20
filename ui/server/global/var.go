@@ -25,8 +25,19 @@ import (
 	"time"
 )
 
+// EnvDev 开发环境
+// EnvProd 生产环境
+const (
+	EnvDev      string = "development"
+	EnvProd     string = "production"
+	DefaultPort int    = 8080
+)
+
 // CurrentEnv 当前环境变量，默认为开发环境
 var CurrentEnv = EnvDev
+
+// Version 程序版本号，可在构建时通过 -ldflags 覆盖
+var Version = "0.0.1"
 
 // AuthTokenExpireMinutes token 过期时间（分钟）
 var authToken string
@@ -36,13 +47,6 @@ var authExpireAt time.Time
 
 // authMu 用于保护 authToken 和 authExpireAt 的读写锁
 var authMu sync.RWMutex
-
-// EnvDev 开发环境
-// EnvProd 生产环境
-const (
-	EnvDev  string = "development"
-	EnvProd string = "production"
-)
 
 // AuthTokenExpireMinutes token 过期时间（分钟）
 func IssueAuthToken() (string, error) {

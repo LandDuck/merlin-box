@@ -494,6 +494,104 @@ build_sub2box() {
 }
 
 # =========================================
+# 构建UI
+# =========================================
+build_ui() {
+
+    # 验证一下是否在路由器中， 如果在， 不执行，给出警告
+    if is_running_on_router; then
+      print_warning "在路由器中运行，跳过构建 UI，请在 PC 或服务器上运行此脚本以构建 UI"
+      return
+    fi
+
+    print_line "构建 UI"
+
+    # 检查是否存在 go 命令
+    if ! command -v go >/dev/null 2>&1; then
+      print_error "未检测到 go，请先安装 go"
+      exit 1
+    fi
+
+    # Server源码目录
+    local server_src_dir="${CUR_DIR}/ui/server" #main.go
+    # Server输出目录
+    local server_output_bin="${CUR_DIR}/bin/ui-server"
+    # 前端目录
+    local front_dir="${CUR_DIR}/ui/front"
+
+    # 询问构建arm64还是arm
+    read -p "请输入要构建的架构 (arm64 或 arm): " arch
+    if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
+      print_error "错误: 不支持的架构 '$arch'，请使用 arm64 或 arm"
+      exit 1
+    fi
+
+    print_normal "构建前端"
+
+    # 构建前端
+    (
+      cd "$front_dir" || exit 1
+      # 检测是否存在 node , 如果不存在，提示安装， 但不自动安装
+      if ! command -v node >/dev/null 2>&1; then
+        print_error "未检测到 node，请先安装 node"
+        exit 1
+      fi
+      # 检测是否存在 yarn 和 gulp，如果不存在，提示安装， 但不自动安装
+      if ! command -v yarn >/dev/null 2>&1; then
+        print_error "未检测到 yarn，请先安装 yarn"
+        exit 1
+      fi
+      if ! command -v gulp >/dev/null 2>&1; then
+        print_error "未检测到 gulp，请先安装 gulp"
+        exit 1
+      fi
+      # 检测是否存在 node_modules，如果不存在，执行 yarn install
+      if [ ! -d "node_modules" ]; then
+        print_normal "node_modules 不存在，执行 yarn install"
+        yarn install
+        if [ $? -ne 0 ]; then
+          print_error "yarn install 失败，请检查网络连接和 yarn 配置"
+          exit 1
+        fi
+      fi
+      # 执行 gulp build
+      gulp build
+      if [ $? -ne 0 ]; then
+        print_error "gulp build 失败，请检查 gulp 配置和前端代码"
+        exit 1
+      fi
+    )
+
+    if [ $? -ne 0 ]; then
+      print_error "构建 UI 前端失败"
+      exit 1
+    fi
+
+    print_normal "构建服务器端"
+
+    # 构建服务器端
+    (
+      cd "$server_src_dir" || exit 1
+      GOOS=linux GOARCH="$arch" CGO_ENABLED=0 go build -o "$server_output_bin" .
+    )
+    if [ $? -ne 0 ]; then
+      print_error "构建 UI 服务器端失败"
+      exit 1
+    fi
+
+    # 验证一下,如果存在, 则压缩 UI 服务器端可执行文件
+    if [ -f "$server_output_bin" ]; then
+      compress_executable_with_upx "$server_output_bin"
+    else
+      print_error "构建 UI 服务器端可执行文件失败: ${server_output_bin} 不存在"
+      exit 1
+    fi
+
+    print_success "UI 构建完成"
+
+}
+
+# =========================================
 # 获取 GitHub 仓库的最新 Release 版本号
 # 参数: 仓库路径 (例如: owner/repo)
 # =========================================
