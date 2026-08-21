@@ -264,6 +264,7 @@ chmod +x merlin-box.sh
 chmod +x start_merlin_box.sh
 chmod +x bin/sing-box
 chmod +x bin/smartdns
+chmod +x bin/merlin-box
 chmod +x scripts/dnsmasq.postconf
 ```
 
@@ -312,6 +313,8 @@ Main entry command:
 ./merlin-box.sh stop                       #Stop service
 ./merlin-box.sh restart                    #Restart service
 ./merlin-box.sh restart 1 1 0 0            #Restart with explicit params: IPv6 QUIC-block UDP oneself-proxy
+./merlin-box.sh server                     #Start WEB UI server, default port is 8080, can specify port on startup: ./merlin-box.sh server 8081
+./merlin-box.sh stop_server                #Stop WEB UI server
 ./merlin-box.sh -h                         #Show help information
 ./merlin-box.sh -v                         #Show version information
 ```

@@ -263,6 +263,7 @@ chmod +x merlin-box.sh
 chmod +x start_merlin_box.sh
 chmod +x bin/sing-box
 chmod +x bin/smartdns
+chmod +x bin/merlin-box
 chmod +x scripts/dnsmasq.postconf
 ```
 
@@ -311,6 +312,8 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh stop                       #停止服务
 ./merlin-box.sh restart                    #重启服务
 ./merlin-box.sh restart 1 1 0 0            #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
+./merlin-box.sh server                     #启动 WEB UI server，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081
+./merlin-box.sh stop_server                #停止 WEB UI server
 ./merlin-box.sh -h                         #显示帮助信息
 ./merlin-box.sh -v                         #显示版本信息
 ```
