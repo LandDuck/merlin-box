@@ -30,7 +30,7 @@ if (-not (Get-Command air -ErrorAction SilentlyContinue)) {
 Start-Process -NoNewWindow powershell -ArgumentList @(
     "-ExecutionPolicy", "Bypass",
     "-NoProfile",
-    "-Command", "air --build.cmd 'go build -tags development -o ./tmp/main.exe .'"
+    "-Command", "air --build.cmd 'go build -tags development -o ./tmp/main.exe .' --build.bin './tmp/main.exe' --build.args_bin server --build.args_bin --port --build.args_bin 8080"
 )
 
 #============前端============
