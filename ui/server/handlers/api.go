@@ -28,6 +28,7 @@ import (
 	"merlin-box-ui/model/resp"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -105,8 +106,17 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Init 初始化接口，返回成功响应
+// Init 初始化接口，返回是否已登录状态
 func Init(w http.ResponseWriter, r *http.Request) {
-	//直接返回成功， 啥也不做， 也不返回数据
-	httpHelper.ResponseSuccess[any](w, nil)
+	token := strings.TrimSpace(r.Header.Get("Authorization"))
+	if strings.HasPrefix(token, "Bearer ") {
+		token = strings.TrimSpace(strings.TrimPrefix(token, "Bearer "))
+	}
+
+	if global.ValidateAndRefreshAuthToken(token) {
+		httpHelper.ResponseSuccess(w, 1)
+		return
+	}
+
+	httpHelper.ResponseSuccess(w, 0)
 }

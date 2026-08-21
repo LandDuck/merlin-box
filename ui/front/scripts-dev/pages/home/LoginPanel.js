@@ -70,6 +70,10 @@ class LoginPanel extends React.Component {
                 this.$storage.set(this.$storage.keys.token, token);
                 this.$cookie.set(this.$cookie.keys.token, token, 7);
                 this.$helper.success("登录成功")
+                //调用外部回调
+                if (this.props.onSuccess) {
+                    this.props.onSuccess();
+                }
             }
         });
     }
@@ -112,6 +116,10 @@ class LoginPanel extends React.Component {
                             username: this.state.username
                         })
                         this._check();
+                    }} onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            this._login();
+                        }
                     }}/>
                 </div>
                 <div className={`login-input ${this.state.passwordError ? "error" : ""}`}>
@@ -122,6 +130,10 @@ class LoginPanel extends React.Component {
                             password: this.state.password
                         });
                         this._check();
+                    }} onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            this._login();
+                        }
                     }}/>
                     <span className={`password-toggle ${this.state.pwdToggle ? "showed" : ""}`} onClick={() => {
                         this.setState({

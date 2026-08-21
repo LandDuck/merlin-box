@@ -23,7 +23,7 @@ import cookies from "./utils/Cookies";
 import storage from "./utils/Storage";
 import $ from "jquery";
 import ReactDOM from "react-dom"
-import { createRoot } from 'react-dom/client';
+import {createRoot} from 'react-dom/client';
 import React from "react"
 
 window.$ = $;
@@ -31,6 +31,25 @@ window.ReactDOM = ReactDOM;
 window.createRoot = createRoot;
 window.React = React;
 
+/**
+ * 加载页面
+ * @param helper
+ * @param action
+ */
+function loadPage(helper, action) {
+    //获取执行参数
+    let controller = "home";
+    if (!controller || !action || controller === '' || action === '') {
+        controller = "error";
+        action = "404";
+    }
+    //加载pageJs并执行
+    helper.loadPage(controller, action, "", 0);
+}
+
+/**
+ * 主函数
+ */
 function main() {
 
     //这个东西保存弹出的layer， 如果被弹过， 这里就会存在， 不再使用加载效果
@@ -58,22 +77,20 @@ function main() {
 
     //全局初始化
     http.sendPost({
-        url: config.apis.comm_init, success: (user) => {
+        url: config.apis.comm_init,
+        success: (data) => {
             window.httpOk = true;
+            if (data === 1) {
+                loadPage(helper, "main");
+                //已经登录
+                window.loggedIn = true;
+                return
+            }
+            loadPage(helper, "index");
         }
     });
-
-    //获取执行参数
-    let controller = $("meta[name='controller']").attr("content");
-    let action = $("meta[name='action']").attr("content");
-    let params = $("meta[name='params']").attr("content");
-    if (!controller || !action || controller === '' || action === '') {
-        controller = "error";
-        action = "404";
-    }
-    //加载pageJs并执行
-    helper.loadPage(controller, action, params, 0);
 }
+
 $(document).ready(function () {
     main();
 });

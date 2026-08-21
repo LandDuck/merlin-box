@@ -27,9 +27,7 @@ class Error404 extends PageBase {
     main(params) {
         const domContainer = document.querySelector('#react-content');
         const root = window.createRoot(domContainer);
-        root.render(
-            <Frame className="error-page" noInner={true}>
-            </Frame>)
+        root.render(<Frame className="error-page" noInner={true}></Frame>)
     }
 }
 

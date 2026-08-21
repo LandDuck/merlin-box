@@ -19,21 +19,46 @@
 import PageBase from "./comm/PageBase";
 import Frame from "./comm/Frame";
 import LoginPanel from "./home/LoginPanel";
+import Main from "./home/Main";
 
 class HomeLogin extends PageBase {
+
+    /**
+     * 构造函数
+     */
+    constructor() {
+        super();
+        this.root = null;
+    }
+
+    /**
+     * 渲染页面
+     * @param comp 组件
+     */
+    render(comp) {
+        if (this.root) {
+            this.root.render(comp)
+        }
+    }
+
     /**
      * 主方法
      * @param params
      */
     main(params) {
         const domContainer = document.querySelector('#react-content');
-        const root = window.createRoot(domContainer);
-        root.render(
-            <Frame className="home-index" noInner={true}>
-                <div className="lt-gradient"></div>
-                <div className="rt-gradient"></div>
-                <LoginPanel/>
-            </Frame>)
+        this.root = window.createRoot(domContainer);
+        this.render(<Frame className="home-index" noInner={true}>
+            <div className="lt-gradient"></div>
+            <div className="rt-gradient"></div>
+            <LoginPanel onSuccess={() => {
+                this.render(<Frame className="home-main">
+                    <div className="rt-gradient"></div>
+                    <div className="lb-gradient"></div>
+                    <Main/>
+                </Frame>)
+            }}/>
+        </Frame>)
     }
 }
 
