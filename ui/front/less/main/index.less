@@ -108,18 +108,27 @@
   }
 
 
-  .system-stats {
+  .system-status {
     display: flex;
     gap: 32px;
   }
 
 
   .system-stat {
-    flex: 1;
-
+    min-width: 0;
+    /*flex: 1;*/
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 4px;
+
+    &:first-child, &:nth-child(2) {
+      flex: 1;
+    }
+
+    &:last-child, &:nth-last-child(2) {
+      width: 100px;
+    }
   }
 
 
@@ -137,7 +146,7 @@
 
 
   .stat-value {
-    display: flex;
+    //display: flex;
     align-items: center;
 
     color: #DCE2F7;
@@ -150,6 +159,13 @@
     &.danger {
       color: #FFB4AB;
     }
+
+    min-width: 0;
+    display: block; // 不用 flex 时，省略号最稳定
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
   }
 
 

@@ -19,9 +19,15 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"merlin-box-ui/model/resp"
+	"net"
 	"net/http"
+	"net/url"
+	"time"
+
+	"golang.org/x/net/proxy"
 )
 
 // ResponseResult 返回统一的响应结构体，包含状态码、消息和数据
@@ -64,4 +70,58 @@ func ResponseRequireLogin(response http.ResponseWriter) {
 		Code: 10014,
 		Msg:  "未授权或登录已过期",
 	})
+}
+
+// TestDelay 用于测试到一个域名的延时, 到达即可,  不需要下载数据. 同时支持使用 socks 代理
+func TestDelay(url string, useProxy bool) int {
+	// 只测试连接和首包响应头，不下载 body
+	client := &http.Client{
+		Timeout: 6 * time.Second,
+	}
+	if useProxy {
+		proxyUrl := "socks5://127.0.0.1:65001"
+		proxy, err := newSocks5Proxy(proxyUrl)
+		if err != nil {
+			return -1
+		}
+		client.Transport = proxy
+	}
+
+	// 记录开始时间
+	start := time.Now()
+	req, err := http.NewRequest(http.MethodHead, url, nil)
+	if err != nil {
+		return -1
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return -1
+	}
+	defer resp.Body.Close()
+	// 记录结束时间
+	duration := time.Since(start)
+	return int(duration.Milliseconds())
+}
+
+// newSocks5Proxy 创建一个支持 socks5 代理的 http.Transport
+func newSocks5Proxy(proxyURL string) (*http.Transport, error) {
+	u, err := url.Parse(proxyURL)
+	if err != nil {
+		return nil, err
+	}
+
+	dialer, err := proxy.FromURL(u, proxy.Direct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &http.Transport{
+		DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+			// 通过 socks5 连接目标地址
+			return dialer.Dial(network, addr)
+		},
+		TLSHandshakeTimeout: 10 * time.Second,
+		IdleConnTimeout:     30 * time.Second,
+		DisableKeepAlives:   true, // 你这是测速场景，关掉复用更稳定
+	}, nil
 }

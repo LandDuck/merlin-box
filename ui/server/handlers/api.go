@@ -65,15 +65,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 // Status 返回系统当前状态
 func Status(response http.ResponseWriter, request *http.Request) {
+
 	// 判断是否存在 /tmp/merlin-box.pid 文件，如果存在读取创建时间并与当前时间比较，获取相差的秒数。
-	path := "/tmp/merlin-box.pid"
+	var path string
+	if global.CurrentEnv == global.EnvDev {
+		path = "./merlin-box.pid"
+	} else {
+		path = "/tmp/merlin-box.pid"
+	}
 	// 检查文件是否存在
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		httpHelper.ResponseSuccess(response, resp.BaseResponse[resp.StatusResponse]{
-			Data: resp.StatusResponse{
-				Duration: 0,
-				Status:   0,
-			},
+		httpHelper.ResponseSuccess(response, resp.StatusResponse{
+			Duration: 0,
+			Status:   0,
 		})
 		return
 	}
@@ -86,11 +90,20 @@ func Status(response http.ResponseWriter, request *http.Request) {
 	creationTime := fileInfo.ModTime()
 	// 计算当前时间与创建时间的差值，单位为秒
 	duration := int((time.Now().Sub(creationTime)).Seconds())
-	httpHelper.ResponseSuccess(response, resp.BaseResponse[resp.StatusResponse]{
-		Data: resp.StatusResponse{
-			Duration: duration,
-			Status:   2,
-		},
+	// 测速
+	domesticDelay := httpHelper.TestDelay("https://www.baidu.com", false)
+	var internationalDelay = -1
+	if global.CurrentEnv == global.EnvDev {
+		internationalDelay = httpHelper.TestDelay("https://www.google.com", false)
+	} else {
+		internationalDelay = httpHelper.TestDelay("https://www.google.com", true)
+	}
+	httpHelper.ResponseSuccess(response, resp.StatusResponse{
+		WorkingDir:         global.WorkingDir,
+		Duration:           duration,
+		Status:             1,
+		DomesticDelay:      domesticDelay,
+		InternationalDelay: internationalDelay,
 	})
 }
 

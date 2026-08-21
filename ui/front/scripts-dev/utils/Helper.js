@@ -25,7 +25,7 @@ import 'moment/locale/zh-cn'
 import AlertDialog from "./dialog/AlertDialog";
 import InputDialog from "./dialog/InputDialog";
 import LogDialog from "./dialog/LogDialog";
-import { message } from 'antd';
+import {message} from 'antd';
 
 moment.locale("zh-cn")
 
@@ -237,6 +237,35 @@ class Helper {
      */
     datetimeDiff(time1, time2) {
         return moment(time1).diff(moment(time2));
+    }
+
+
+    /**
+     * 将一个传入的 秒, 转换为 xx 天 xx小时 xx分钟 xx秒
+     * 注意, 不足的情况下不显示前面的单位
+     * @param seconds
+     * @returns {string}
+     */
+    formatDuration(seconds) {
+        let duration = moment.duration(seconds, 'seconds');
+        let days = duration.days();
+        let hours = duration.hours();
+        let minutes = duration.minutes();
+        let secs = duration.seconds();
+
+        let result = '';
+        if (days > 0) {
+            result += days + '天';
+        }
+        if (hours > 0 || result) {
+            result += hours + '小时';
+        }
+        if (minutes > 0 || result) {
+            result += minutes + '分钟';
+        }
+        result += secs + '秒';
+
+        return result;
     }
 
     /**

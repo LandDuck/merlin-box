@@ -39,7 +39,7 @@ class LoginPanel extends React.Component {
      * 校验方法
      * @private
      */
-    _check() {
+    #check() {
         this.state.usernameError = !this.state.username.isUserName(3, 16);
         this.state.passwordError = !this.state.password.isPassword(6, 32);
         this.setState({
@@ -56,8 +56,8 @@ class LoginPanel extends React.Component {
      * 登录方法
      * @private
      */
-    _login() {
-        if (!this._check()) {
+    #login() {
+        if (!this.#check()) {
             return;
         }
         this.$http.sendPost({
@@ -78,7 +78,6 @@ class LoginPanel extends React.Component {
         });
     }
 
-
     /**
      * 第一次挂载后
      */
@@ -95,7 +94,7 @@ class LoginPanel extends React.Component {
 
     /**
      * 渲染方法
-     * @returns {JSX.Element}
+     * @returns
      */
     render() {
         return <div className="login-card">
@@ -115,10 +114,10 @@ class LoginPanel extends React.Component {
                         this.setState({
                             username: this.state.username
                         })
-                        this._check();
+                        this.#check();
                     }} onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                            this._login();
+                            this.#login();
                         }
                     }}/>
                 </div>
@@ -129,10 +128,10 @@ class LoginPanel extends React.Component {
                         this.setState({
                             password: this.state.password
                         });
-                        this._check();
+                        this.#check();
                     }} onKeyDown={(e) => {
                         if (e.key === "Enter") {
-                            this._login();
+                            this.#login();
                         }
                     }}/>
                     <span className={`password-toggle ${this.state.pwdToggle ? "showed" : ""}`} onClick={() => {
@@ -142,7 +141,7 @@ class LoginPanel extends React.Component {
                     }}/>
                 </div>
                 <button className="login-button" onClick={(e) => {
-                    this._login();
+                    this.#login();
                     e.preventDefault();
                     e.stopPropagation();
                     /*this.$helper.showAlertLayer({

@@ -36,6 +36,9 @@ const (
 // CurrentEnv 当前环境变量，默认为开发环境
 var CurrentEnv = EnvDev
 
+// WorkingDir 当前工作目录
+var WorkingDir string
+
 // Version 程序版本号，可在构建时通过 -ldflags 覆盖
 var Version = "0.0.1"
 

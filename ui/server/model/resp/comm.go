@@ -31,10 +31,14 @@ type BaseResponse[T any] struct {
 
 // StatusResponse 系统状态响应结构体，包含请求耗时、状态码和请求路径
 type StatusResponse struct {
-	// Duration 系统运行时间，单位为秒
+	// Duration 系统运行时间，s
 	Duration int `json:"duration"`
-	// Status 状态码，0 未配置，1 未启动，2 正在运行
+	// Status 状态码，0 未启动，1 正在运行
 	Status int `json:"status"`
-	// Path merlin-box 的路径
-	Path string `json:"path"`
+	// WorkingDir merlin-box 的路径
+	WorkingDir string `json:"workingDir"`
+	// DomesticDelay 国内延迟 ms
+	DomesticDelay int `json:"domesticDelay"`
+	// InternationalDelay 国际延迟 ms
+	InternationalDelay int `json:"internationalDelay"`
 }

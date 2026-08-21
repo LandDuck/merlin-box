@@ -116,6 +116,16 @@ func commandSummary() string {
 
 // main 主函数, 用于启动命令行工具或服务器
 func main() {
+
+	// 设置当前工作目录
+	workingDir, err := os.Getwd()
+	if err != nil {
+		logger.Error("Failed to get working directory: ", err)
+		os.Exit(1)
+	}
+	global.WorkingDir = workingDir
+
+	// 启动
 	if err := runCommand(os.Args[1:]); err != nil {
 		logger.Error(err)
 		os.Exit(1)

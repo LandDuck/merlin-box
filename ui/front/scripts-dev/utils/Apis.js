@@ -19,6 +19,7 @@
 export default {
     comm_init: 'api/init',
     comm_login: 'api/login',
+    comm_status: 'api/status',
 }
 
 
