@@ -26,5 +26,8 @@ const DbPath = "./db/db.json"
 // ConfDir 目录
 const ConfDir = "./conf"
 
+// CoreDir 目录
+const CoreDir = "."
+
 // AuthTokenExpireMinutes 是 token 过期时间（分钟）
 const AuthTokenExpireMinutes = 20

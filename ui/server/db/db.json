@@ -7,6 +7,6 @@
   ],
   "device": {
     "blacklist": "",
-    "whitelist": "# hahah\nAA:BB:CC:DD:EE:CC"
+    "whitelist": ""
   }
 }

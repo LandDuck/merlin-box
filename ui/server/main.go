@@ -123,7 +123,9 @@ func main() {
 		logger.Error("Failed to get working directory: ", err)
 		os.Exit(1)
 	}
-	global.WorkingDir = workingDir
+	// 需要跟 global.CoreDir 拼接一下， 并计算一个完整的路径
+	// 因为开发模式下与生产模式下的路径不一样
+	global.WorkingDir = filepath.Join(workingDir, global.CoreDir)
 
 	// 启动
 	if err := runCommand(os.Args[1:]); err != nil {
