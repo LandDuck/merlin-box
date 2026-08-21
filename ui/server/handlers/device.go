@@ -110,3 +110,31 @@ func SaveIP6ControlConfig(w http.ResponseWriter, r *http.Request) {
 
 	httpHelper.ResponseSuccess(w, "保存成功")
 }
+
+// GetDomainControlConfig 获取域名控制配置
+func GetDomainControlConfig(w http.ResponseWriter, r *http.Request) {
+	domainInfo, err := dbHelper.GetDomainControlConfig()
+	if err != nil {
+		httpHelper.ResponseFailure(w, "读取域名控制配置失败")
+		return
+	}
+	httpHelper.ResponseSuccess(w, domainInfo)
+}
+
+// SaveDomainControlConfig 保存域名控制配置
+func SaveDomainControlConfig(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[req.SaveDomainControlConfig](w, r)
+	if !ok {
+		return
+	}
+
+	if err := dbHelper.SaveDomainControlConfig(dbModel.DomainControlInfo{
+		Blocklist: requestData.Blocklist,
+		Blacklist: requestData.Blacklist,
+	}); err != nil {
+		httpHelper.ResponseFailure(w, "保存域名控制配置失败")
+		return
+	}
+
+	httpHelper.ResponseSuccess(w, "保存成功")
+}

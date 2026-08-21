@@ -20,3 +20,5 @@ ip4-blacklist.txt
 ip6-blacklist.txt
 ip4-whitelist.txt
 ip6-whitelist.txt
+site-blacklist.txt
+site-blocklist.txt

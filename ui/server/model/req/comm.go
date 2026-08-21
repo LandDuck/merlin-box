@@ -49,3 +49,11 @@ type SaveIP6ControlConfig struct {
 	// Whitelist 白名单 IPv6 地址, 一行一个
 	Whitelist string `json:"whitelist"`
 }
+
+// SaveDomainControlConfig 保存域名控制配置请求结构体
+type SaveDomainControlConfig struct {
+	// Blocklist 域名屏蔽列表, 一行一个
+	Blocklist string `json:"blocklist"`
+	// Blacklist 域名黑名单列表, 一行一个
+	Blacklist string `json:"blacklist"`
+}

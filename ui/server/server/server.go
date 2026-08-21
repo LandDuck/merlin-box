@@ -65,6 +65,8 @@ func startHTTPServer(port int) {
 	router.Post("/api/save_ip4_control_config", handlers.SaveIP4ControlConfig)
 	router.Post("/api/get_ip6_control_config", handlers.GetIP6ControlConfig)
 	router.Post("/api/save_ip6_control_config", handlers.SaveIP6ControlConfig)
+	router.Post("/api/get_domain_control_config", handlers.GetDomainControlConfig)
+	router.Post("/api/save_domain_control_config", handlers.SaveDomainControlConfig)
 	router.Post("/api/start", handlers.Start)
 	router.Post("/api/stop", handlers.Stop)
 	router.Post("/api/restart", handlers.Restart)

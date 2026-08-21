@@ -28,6 +28,8 @@ type Database struct {
 	IP4 IPControlInfo `json:"ip4"`
 	// IP6 IPv6 控制信息
 	IP6 IPControlInfo `json:"ip6"`
+	// Domain 域名控制信息
+	Domain DomainControlInfo `json:"domain"`
 }
 
 // Manager 管理员结构体，包含用户名和密码
@@ -52,4 +54,12 @@ type IPControlInfo struct {
 	Blacklist string `json:"blacklist"`
 	// Whitelist 白名单 IP 地址, 一行一个
 	Whitelist string `json:"whitelist"`
+}
+
+// DomainControlInfo 域名黑名单/屏蔽列表控制信息
+type DomainControlInfo struct {
+	// Blocklist 域名屏蔽列表, 一行一个
+	Blocklist string `json:"blocklist"`
+	// Blacklist 域名黑名单列表, 一行一个
+	Blacklist string `json:"blacklist"`
 }

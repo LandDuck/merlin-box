@@ -659,6 +659,13 @@
 
       box-shadow: 0 0 12px rgba(151, 203, 255, .15);
     }
+
+    &.error {
+      border-color: rgba(255, 0, 0, .65);
+      background: rgba(255, 0, 0, .08);
+      outline-color: rgba(255, 0, 0, .65);
+      box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25);
+    }
   }
 
 
@@ -680,7 +687,7 @@
 
     font-family: Geist, sans-serif;
 
-    font-size: 11px;
+    font-size: 12px;
     line-height: 16px;
   }
 
@@ -705,6 +712,8 @@
     font-weight: 700;
     line-height: 16px;
 
+
+    min-width: 100px;
 
     transition: .2s;
 

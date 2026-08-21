@@ -16,5 +16,9 @@
   "ip6": {
     "blacklist": "",
     "whitelist": ""
+  },
+  "domain": {
+    "blocklist": "ad.com",
+    "blacklist": ""
   }
 }

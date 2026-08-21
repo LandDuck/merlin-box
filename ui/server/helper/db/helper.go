@@ -202,3 +202,36 @@ func SaveIP6ControlConfig(ipInfo dbModel.IPControlInfo) error {
 	}
 	return os.WriteFile(global.DbPath, content, 0o644)
 }
+
+// GetDomainControlConfig 获取域名控制配置
+func GetDomainControlConfig() (dbModel.DomainControlInfo, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return dbModel.DomainControlInfo{}, err
+	}
+	return file.Domain, nil
+}
+
+// SaveDomainControlConfig 保存域名控制配置
+func SaveDomainControlConfig(domainInfo dbModel.DomainControlInfo) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	file.Domain = domainInfo
+
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	blacklistPath := global.ConfDir + "/site-blacklist.txt"
+	blocklistPath := global.ConfDir + "/site-blocklist.txt"
+	if err := syncConfigFile(blacklistPath, domainInfo.Blacklist); err != nil {
+		logger.Warn("write domain blacklist file failed:", err)
+	}
+	if err := syncConfigFile(blocklistPath, domainInfo.Blocklist); err != nil {
+		logger.Warn("write domain blocklist file failed:", err)
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}
