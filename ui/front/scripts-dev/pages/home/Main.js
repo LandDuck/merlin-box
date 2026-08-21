@@ -39,12 +39,12 @@ class Main extends React.Component {
      * @returns
      */
     render() {
-        const status = <Status/>;
-        const nodeList = <NodeList/>;
-        const domainControl = <DomainControl/>;
-        const deviceControl = <DeviceControl/>;
+        const status = <Status key={"status"}/>;
+        const nodeList = <NodeList key={"nodeList"}/>;
+        const domainControl = <DomainControl key={"domainControl"}/>;
+        const deviceControl = <DeviceControl key={"deviceControl"}/>;
         return [
-            <div className="hero-header">
+            <div className="hero-header" key={"hero-header"}>
                 <h1 className="hero-title">
                     Merlin-box-UI
                 </h1>

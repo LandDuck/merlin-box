@@ -269,45 +269,12 @@ class Http {
         this.instance.interceptors.response.use(function (response) {
             if (response != null && response.data != null && response.data.code !== 0) {
                 switch (response.data.code) {
-                    case 10010:  //需要登录
-                        window.$storage.remove('token')
-                        window.$storage.remove('uuid')
-                        if (response.data.data) {
-                            window.$helper.redirectSecurity('~/home/index?controller=' + response.data.data.controller + "&action=" + response.data.data.action, true)
-                        } else {
-                            window.$helper.redirect_home()
-                            //window.location.replace("/")
-                        }
-                        break
-                    case 10404:  //去404
-                        window.$helper.redirectSecurity('~/error/404')
-                        break
-                    case 10302:  //去指定位置
-                        if (response.data.msg && response.data.msg !== '') {
-                            //先弹出
-                            window.$helper.toast(response.data.msg)
-                            //1.5秒后跳转
-                            setTimeout(() => {
-                                window.$helper.redirectSecurity(response.data.data)
-                            }, 1500)
-                        } else {
-                            window.$helper.redirectSecurity(response.data.data)
-                        }
-                        break
-                    case 11302:  //去指定位置
-                        if (response.data.msg && response.data.msg !== '') {
-                            //先弹出
-                            window.$helper.toast(response.data.msg)
-                            //1.5秒后跳转
-                            setTimeout(() => {
-                                window.$helper.redirectSecurity(response.data.data, true)
-                            }, 1500)
-                        } else {
-                            window.$helper.redirectSecurity(response.data.data, true)
-                        }
-                        break
-                    case 10400:  //去首页
-                        window.$helper.redirectSecurity('~/')
+                    case 10014:
+                        //需要登录
+                        window.$storage.remove(window.$storage.keys.token)
+                        window.$cookie.remove(window.$cookie.keys.token)
+                        //刷新页面
+                        window.location.reload()
                         break
                     case -1:
                         return response

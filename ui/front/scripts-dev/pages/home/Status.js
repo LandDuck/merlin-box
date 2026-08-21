@@ -138,11 +138,11 @@ class Status extends React.Component {
                         <span className="icon-play"/>
                         启动代理
                     </button> : [
-                        <button className="btn-primary">
+                        <button className="btn-primary" key={"stop"}>
                             <span className="icon-play"/>
                             停止代理
                         </button>,
-                        <button className="btn-secondary">
+                        <button className="btn-secondary" key={"reboot"}>
                             <span className="icon-reboot"/>
                             重启代理
                         </button>

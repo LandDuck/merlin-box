@@ -39,7 +39,7 @@ func Auth(next http.Handler) http.Handler {
 		}
 
 		if !global.ValidateAndRefreshAuthToken(token) {
-			w.WriteHeader(http.StatusUnauthorized)
+			//w.WriteHeader(http.StatusUnauthorized)
 			httpHelper.ResponseRequireLogin(w)
 			return
 		}

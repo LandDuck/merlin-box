@@ -109,6 +109,14 @@ class Storage {
             return val
         }
     }
+
+    /**
+     * 从本地存储中删除一个值
+     * @param key
+     */
+    remove(key) {
+        localStorage.removeItem(this.mergeKey(key));
+    }
 }
 
 export default new Storage()
