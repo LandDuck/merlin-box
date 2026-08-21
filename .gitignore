@@ -14,3 +14,5 @@ tmp
 dist
 device_whitelist.txt
 device_blacklist.txt
+/ui/server/merlin-box-ui
+/ui/server/merlin-box-ui.exe
