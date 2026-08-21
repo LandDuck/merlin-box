@@ -35,14 +35,27 @@ class Main extends React.Component {
     }
 
     /**
+     * 退出登录
+     */
+    #logout() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_logout,
+            success: () => {
+                //刷新页面
+                window.location.reload();
+            }
+        });
+    }
+
+    /**
      * 渲染方法
      * @returns
      */
     render() {
         const status = <Status key={"status"}/>;
-        const nodeList = <NodeList key={"nodeList"}/>;
-        const domainControl = <DomainControl key={"domainControl"}/>;
-        const deviceControl = <DeviceControl key={"deviceControl"}/>;
+        //const nodeList = <NodeList key={"nodeList"}/>;
+        //const domainControl = <DomainControl key={"domainControl"}/>;
+        //const deviceControl = <DeviceControl key={"deviceControl"}/>;
         return [
             <div className="hero-header" key={"hero-header"}>
                 <h1 className="hero-title">
@@ -51,11 +64,16 @@ class Main extends React.Component {
                 <p className="hero-description">
                     基于 ASUSWRT-Merlin 路由器环境的 sing-box + smartdns 分流代理脚本方案。
                 </p>
+                <a href="javascript:void(0);" className={"logout-btn"} onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.#logout();
+                }}>退出登录</a>
             </div>,
             status,
-            nodeList,
-            domainControl,
-            deviceControl
+            //nodeList,
+            //domainControl,
+            //deviceControl
         ]
     }
 }

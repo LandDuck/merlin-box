@@ -79,3 +79,13 @@ func ValidateAndRefreshAuthToken(token string) bool {
 	authExpireAt = now.Add(time.Duration(AuthTokenExpireMinutes) * time.Minute)
 	return true
 }
+
+// RevokeAuthToken 撤销 token
+func RevokeAuthToken(token string) {
+	authMu.Lock()
+	defer authMu.Unlock()
+	if token == authToken {
+		authToken = ""
+		authExpireAt = time.Time{}
+	}
+}

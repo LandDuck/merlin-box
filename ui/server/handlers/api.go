@@ -32,6 +32,16 @@ import (
 	"time"
 )
 
+// Logout 处理登出请求
+func Logout(w http.ResponseWriter, r *http.Request) {
+	token := strings.TrimSpace(r.Header.Get("Authorization"))
+	if strings.HasPrefix(token, "Bearer ") {
+		token = strings.TrimSpace(strings.TrimPrefix(token, "Bearer "))
+	}
+	global.RevokeAuthToken(token)
+	httpHelper.ResponseSuccess(w, "登出成功")
+}
+
 // Login 处理登录请求
 func Login(w http.ResponseWriter, r *http.Request) {
 
