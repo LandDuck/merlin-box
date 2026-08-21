@@ -174,7 +174,6 @@ class IPControl extends React.Component {
                 <ol>
                     <li>🚀 白名单 IP 会强制直连，不经过代理；⛔ 黑名单 IP 会强制走代理，且黑名单优先。</li>
                     <li>📝 支持使用 # 注释，允许空行；每行一个 IP，也可在 IP 后追加 # 注释。</li>
-                    <li>⚠️ 只要白名单中有内容，就会启用白名单功能；当白名单中没有有效的 {version} 地址时，可能导致所有 {version} 流量都不会走代理。</li>
                 </ol>
             </div>
             <div className="device-config">
