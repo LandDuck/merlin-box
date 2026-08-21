@@ -27,7 +27,7 @@ class Config {
      */
     constructor() {
         this.apis = Apis
-        let apiUrl = "http://127.0.0.1:8080/";  //正式地址
+        let apiUrl = "http://127.0.0.1:65006/";  //正式地址
         /*if (IS_DEV) {
             apiUrl = "http://retail.tencentads.com/webapi/";//开发地址
         }

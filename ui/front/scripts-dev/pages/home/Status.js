@@ -25,6 +25,15 @@ class Status extends React.Component {
     //定义一个setTimeout的定时器
     #timer = null;
 
+    //定义一个获取日志的定时器
+    #getLogTimer = null;
+
+    //定义一个日志变量
+    #log = "";
+
+    //定义一个日志计数器
+    #logCount = 0;
+
     /**
      * 构造方法
      * @param props
@@ -96,6 +105,89 @@ class Status extends React.Component {
     }
 
     /**
+     * 停止代理
+     */
+    #stop() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_stop,
+            success: () => {
+                //this.$helper.success("代理已停止");
+                this.#getLog()
+                this.$helper.showLogLayer({
+                    title: "正在停止代理",
+                    content: () => {
+                        return this.#log;
+                    }
+                })
+            }
+        });
+    }
+
+    /**
+     * 启动代理
+     */
+    #start() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_start,
+            success: () => {
+                //this.$helper.success("代理已启动");
+                this.#getLog()
+                this.$helper.showLogLayer({
+                    title: "正在启动代理",
+                    content: () => {
+                        return this.#log;
+                    }
+                })
+            }
+        });
+    }
+
+    /**
+     * 重启代理
+     */
+    #restart() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_restart,
+            success: () => {
+                //this.$helper.success("代理已重启");
+                this.#getLog()
+                this.$helper.showLogLayer({
+                    title: "正在重启代理",
+                    content: () => {
+                        return this.#log;
+                    }
+                })
+            }
+        });
+    }
+
+    /**
+     * 获取日志
+     */
+    #getLog() {
+        this.#logCount = 0;
+        this.#log = "";
+        clearInterval(this.#getLogTimer);
+        this.#getLogTimer = setInterval(() => {
+            this.$http.sendPost({
+                url: this.$config.apis.comm_service_log,
+                success: (log) => {
+                    const serverLog = log.replaceAll("\n", "<br/>");
+                    if (serverLog !== this.#log) {
+                        this.#log = serverLog;
+                    } else {
+                        this.#logCount++;
+                    }
+                }
+            });
+            if (this.#logCount > 7) {
+                clearInterval(this.#getLogTimer);
+                this.#getLogTimer = null;
+            }
+        }, 500);
+    }
+
+    /**
      * 渲染方法
      * @return
      */
@@ -134,15 +226,21 @@ class Status extends React.Component {
             </div>
             <div className="system-actions">
                 {
-                    this.state.status === 0 ? <button className="btn-primary">
+                    this.state.status === 0 ? <button className="btn-primary" onClick={(e) => {
+                        this.#start();
+                    }}>
                         <span className="icon-play"/>
                         启动代理
                     </button> : [
-                        <button className="btn-primary" key={"stop"}>
+                        <button className="btn-primary" key={"stop"} onClick={(e) => {
+                            this.#stop();
+                        }}>
                             <span className="icon-play"/>
                             停止代理
                         </button>,
-                        <button className="btn-secondary" key={"reboot"}>
+                        <button className="btn-secondary" key={"reboot"} onClick={(e) => {
+                            this.#restart();
+                        }}>
                             <span className="icon-reboot"/>
                             重启代理
                         </button>

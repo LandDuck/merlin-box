@@ -139,6 +139,13 @@ show_version() {
 # 启动服务
 #=========================================
 start() {
+
+  #如果未在路由器中执行, 直接return并给出警告
+  if ! is_running_on_router; then
+      print_warning "⚠️ 当前环境非路由器，无法启动 merlin-box。"
+      return 1
+  fi
+
   local start_enable_ipv6="${1:-$MB_ENABLE_IPV6}"
   local start_disable_quic_from_lan="${2:-$MB_DISABLE_QUIC_FROM_LAN}"
   local start_enable_udp="${3:-$MB_ENABLE_UDP}"
@@ -221,6 +228,13 @@ start() {
 # 停止服务
 #=========================================
 stop() {
+
+  #如果未在路由器中执行, 直接return并给出警告
+  if ! is_running_on_router; then
+      print_warning "⚠️ 当前环境非路由器，无法停止 merlin-box。"
+      return 1
+  fi
+
 	print_line "stop merlin-box"
 
 	stop_singbox
@@ -240,6 +254,14 @@ stop() {
 # 重启服务
 #=========================================
 restart() {
+
+  #如果未在路由器中执行, 直接return并给出警告
+  if ! is_running_on_router; then
+      print_warning "⚠️ 当前环境非路由器，无法重启 merlin-box。"
+      #print_warning "⚠️ 当前环境非路由器，无法重启 merlin-box。"
+      return 1
+  fi
+
   stop_singbox
   stop_smartdns
   clear_iptables

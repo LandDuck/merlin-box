@@ -88,6 +88,9 @@ class DialogBase extends React.Component {
      */
     componentWillUnmount() {
         //window.removeEventListener("keyup", this.esc);
+        if (this.onUnmount) {
+            this.onUnmount();
+        }
     }
 }
 

@@ -25,6 +25,49 @@ import (
 	"time"
 )
 
+var serviceLogMu sync.RWMutex
+
+// ServiceLog 保存最近一次 merlin-box 脚本执行输出
+var ServiceLog string
+
+// ServiceRunning 标记当前是否有脚本在执行
+var ServiceRunning bool
+
+// SetServiceLog 设置最新脚本输出日志
+func SetServiceLog(log string) {
+	serviceLogMu.Lock()
+	defer serviceLogMu.Unlock()
+	ServiceLog = log
+}
+
+// AppendServiceLog 追加脚本输出日志
+func AppendServiceLog(log string) {
+	serviceLogMu.Lock()
+	defer serviceLogMu.Unlock()
+	ServiceLog += log
+}
+
+// GetServiceLog 获取最新脚本输出日志
+func GetServiceLog() string {
+	serviceLogMu.RLock()
+	defer serviceLogMu.RUnlock()
+	return ServiceLog
+}
+
+// SetServiceRunning 设置脚本运行状态
+func SetServiceRunning(running bool) {
+	serviceLogMu.Lock()
+	defer serviceLogMu.Unlock()
+	ServiceRunning = running
+}
+
+// IsServiceRunning 当前是否有脚本在执行
+func IsServiceRunning() bool {
+	serviceLogMu.RLock()
+	defer serviceLogMu.RUnlock()
+	return ServiceRunning
+}
+
 // EnvDev 开发环境
 // EnvProd 生产环境
 const (

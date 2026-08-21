@@ -29,12 +29,28 @@ class LogDialog extends DialogBase {
     //当前的配置
     #config = null;
 
+    //获取定时器
+    #timer = null;
+
     constructor(props) {
         super(props);
         this.#props = props;
         this.#config = props.config;
         //合并状态
-        this.state = Object.assign(this.state, {});
+        this.state = Object.assign(this.state, {
+            content: ""
+        });
+    }
+
+    /**
+     * 组件卸载
+     * 由DialogBase的componentWillUnmount接管并调用
+     */
+    onUnmount() {
+        if (this.#timer) {
+            clearInterval(this.#timer);
+            this.#timer = null;
+        }
     }
 
     /**
@@ -42,12 +58,27 @@ class LogDialog extends DialogBase {
      * 注意: 被DialogBase的componentDidMount接管并调用
      */
     onReady() {
-
+        //检查 this.#config.content 是不是一个fun
+        if (this.#config.content && typeof this.#config.content === "function") {
+            clearInterval(this.#timer);
+            this.#timer = setInterval(() => {
+                let content = this.#config.content();
+                if (content !== this.state.content) {
+                    this.setState({
+                        content: content
+                    });
+                }
+            }, 500);
+        } else {
+            this.setState({
+                content: this.#config.content || ""
+            });
+        }
     }
 
     /**
      * 渲染
-     * @returns {JSX.Element}
+     * @returns
      */
     render() {
         return (<div className="ns-layer log-layer">
@@ -58,7 +89,7 @@ class LogDialog extends DialogBase {
                     </div>
                     <div className="content">
                         <div className="nlc-content" dangerouslySetInnerHTML={
-                            {__html: this.#config.content}
+                            {__html: this.state.content}
                         }>
                         </div>
                     </div>
