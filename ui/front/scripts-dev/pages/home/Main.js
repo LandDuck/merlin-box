@@ -20,6 +20,7 @@ import Status from "./Status";
 import NodeList from "./NodeList";
 import DomainControl from "./DomainControl";
 import DeviceControl from "./DeviceControl";
+import IPControl from "./IPControl";
 
 /**
  * ManagerPanel
@@ -56,6 +57,8 @@ class Main extends React.Component {
         //const nodeList = <NodeList key={"nodeList"}/>;
         //const domainControl = <DomainControl key={"domainControl"}/>;
         const deviceControl = <DeviceControl key={"deviceControl"}/>;
+        const ip4Control = <IPControl key={"ip4Control"} title={"IPv4 控制"} version={"ipv4"} getConfigApi={this.$config.apis.comm_getIP4ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP4ControlConfig}/>;
+        const ip6Control = <IPControl key={"ip6Control"} title={"IPv6 控制"} version={"ipv6"} getConfigApi={this.$config.apis.comm_getIP6ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP6ControlConfig}/>;
         return [
             <div className="hero-header" key={"hero-header"}>
                 <h1 className="hero-title">
@@ -73,6 +76,8 @@ class Main extends React.Component {
             status,
             //nodeList,
             //domainControl,
+            ip4Control,
+            ip6Control,
             deviceControl
         ]
     }

@@ -27,6 +27,10 @@ export default {
     comm_service_log: 'api/service_log',
     comm_getDeviceControlConfig: 'api/get_device_control_config',
     comm_saveDeviceControlConfig: 'api/save_device_control_config',
+    comm_getIP4ControlConfig: 'api/get_ip4_control_config',
+    comm_saveIP4ControlConfig: 'api/save_ip4_control_config',
+    comm_getIP6ControlConfig: 'api/get_ip6_control_config',
+    comm_saveIP6ControlConfig: 'api/save_ip6_control_config',
 }
 
 

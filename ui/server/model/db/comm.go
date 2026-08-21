@@ -24,6 +24,10 @@ type Database struct {
 	Managers []Manager `json:"managers"`
 	// Device 设备信息
 	Device DeviceInfo `json:"device"`
+	// IP4 IPv4 控制信息
+	IP4 IPControlInfo `json:"ip4"`
+	// IP6 IPv6 控制信息
+	IP6 IPControlInfo `json:"ip6"`
 }
 
 // Manager 管理员结构体，包含用户名和密码
@@ -39,5 +43,13 @@ type DeviceInfo struct {
 	// Blacklist 黑名单 MAC 地址, 一行一个
 	Blacklist string `json:"blacklist"`
 	// Whitelist 白名单 MAC 地址, 一行一个
+	Whitelist string `json:"whitelist"`
+}
+
+// IPControlInfo IP 白名单/黑名单控制信息
+type IPControlInfo struct {
+	// Blacklist 黑名单 IP 地址, 一行一个
+	Blacklist string `json:"blacklist"`
+	// Whitelist 白名单 IP 地址, 一行一个
 	Whitelist string `json:"whitelist"`
 }

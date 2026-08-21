@@ -8,5 +8,13 @@
   "device": {
     "blacklist": "",
     "whitelist": ""
+  },
+  "ip4": {
+    "blacklist": "",
+    "whitelist": ""
+  },
+  "ip6": {
+    "blacklist": "",
+    "whitelist": ""
   }
 }

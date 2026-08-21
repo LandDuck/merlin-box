@@ -33,3 +33,19 @@ type SaveDeviceControlConfig struct {
 	// Whitelist 白名单 MAC 地址, 一行一个
 	Whitelist string `json:"whitelist"`
 }
+
+// SaveIP4ControlConfig 保存 IPv4 控制配置请求结构体
+type SaveIP4ControlConfig struct {
+	// Blacklist 黑名单 IPv4 地址, 一行一个
+	Blacklist string `json:"blacklist"`
+	// Whitelist 白名单 IPv4 地址, 一行一个
+	Whitelist string `json:"whitelist"`
+}
+
+// SaveIP6ControlConfig 保存 IPv6 控制配置请求结构体
+type SaveIP6ControlConfig struct {
+	// Blacklist 黑名单 IPv6 地址, 一行一个
+	Blacklist string `json:"blacklist"`
+	// Whitelist 白名单 IPv6 地址, 一行一个
+	Whitelist string `json:"whitelist"`
+}

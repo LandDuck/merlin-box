@@ -16,3 +16,7 @@ device_whitelist.txt
 device_blacklist.txt
 /ui/server/merlin-box-ui
 /ui/server/merlin-box-ui.exe
+ip4-blacklist.txt
+ip6-blacklist.txt
+ip4-whitelist.txt
+ip6-whitelist.txt

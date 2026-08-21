@@ -54,3 +54,59 @@ func SaveDeviceControlConfig(w http.ResponseWriter, r *http.Request) {
 
 	httpHelper.ResponseSuccess(w, "保存成功")
 }
+
+// GetIP4ControlConfig 获取 IPv4 控制配置
+func GetIP4ControlConfig(w http.ResponseWriter, r *http.Request) {
+	ipInfo, err := dbHelper.GetIP4ControlConfig()
+	if err != nil {
+		httpHelper.ResponseFailure(w, "读取 IPv4 控制配置失败")
+		return
+	}
+	httpHelper.ResponseSuccess(w, ipInfo)
+}
+
+// SaveIP4ControlConfig 保存 IPv4 控制配置
+func SaveIP4ControlConfig(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[req.SaveIP4ControlConfig](w, r)
+	if !ok {
+		return
+	}
+
+	if err := dbHelper.SaveIP4ControlConfig(dbModel.IPControlInfo{
+		Blacklist: requestData.Blacklist,
+		Whitelist: requestData.Whitelist,
+	}); err != nil {
+		httpHelper.ResponseFailure(w, "保存 IPv4 控制配置失败")
+		return
+	}
+
+	httpHelper.ResponseSuccess(w, "保存成功")
+}
+
+// GetIP6ControlConfig 获取 IPv6 控制配置
+func GetIP6ControlConfig(w http.ResponseWriter, r *http.Request) {
+	ipInfo, err := dbHelper.GetIP6ControlConfig()
+	if err != nil {
+		httpHelper.ResponseFailure(w, "读取 IPv6 控制配置失败")
+		return
+	}
+	httpHelper.ResponseSuccess(w, ipInfo)
+}
+
+// SaveIP6ControlConfig 保存 IPv6 控制配置
+func SaveIP6ControlConfig(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[req.SaveIP6ControlConfig](w, r)
+	if !ok {
+		return
+	}
+
+	if err := dbHelper.SaveIP6ControlConfig(dbModel.IPControlInfo{
+		Blacklist: requestData.Blacklist,
+		Whitelist: requestData.Whitelist,
+	}); err != nil {
+		httpHelper.ResponseFailure(w, "保存 IPv6 控制配置失败")
+		return
+	}
+
+	httpHelper.ResponseSuccess(w, "保存成功")
+}

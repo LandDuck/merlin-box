@@ -108,3 +108,97 @@ func SaveDeviceControlConfig(deviceInfo dbModel.DeviceInfo) error {
 
 	return os.WriteFile(global.DbPath, content, 0o644)
 }
+
+// getIPConfig 获取 IP 控制配置
+func getIPConfig(file dbModel.Database, kind string) dbModel.IPControlInfo {
+	if kind == "ip4" {
+		return file.IP4
+	}
+	return file.IP6
+}
+
+// saveIPConfig 保存 IP 控制配置
+func saveIPConfig(file *dbModel.Database, kind string, ipInfo dbModel.IPControlInfo) {
+	if kind == "ip4" {
+		file.IP4 = ipInfo
+		return
+	}
+	file.IP6 = ipInfo
+}
+
+// syncConfigFile 同步配置文件到 conf 目录
+func syncConfigFile(path string, content string) error {
+	if strings.TrimSpace(content) == "" {
+		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			return err
+		}
+		return nil
+	}
+	return os.WriteFile(path, []byte(content), 0o644)
+}
+
+// GetIP4ControlConfig 获取 IPv4 控制配置
+func GetIP4ControlConfig() (dbModel.IPControlInfo, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return dbModel.IPControlInfo{}, err
+	}
+	return file.IP4, nil
+}
+
+// SaveIP4ControlConfig 保存 IPv4 控制配置
+func SaveIP4ControlConfig(ipInfo dbModel.IPControlInfo) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	file.IP4 = ipInfo
+
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	whitelistPath := global.ConfDir + "/ip4-whitelist.txt"
+	blacklistPath := global.ConfDir + "/ip4-blacklist.txt"
+	if err := syncConfigFile(whitelistPath, ipInfo.Whitelist); err != nil {
+		logger.Warn("write IPv4 whitelist file failed:", err)
+	}
+	if err := syncConfigFile(blacklistPath, ipInfo.Blacklist); err != nil {
+		logger.Warn("write IPv4 blacklist file failed:", err)
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}
+
+// GetIP6ControlConfig 获取 IPv6 控制配置
+func GetIP6ControlConfig() (dbModel.IPControlInfo, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return dbModel.IPControlInfo{}, err
+	}
+	return file.IP6, nil
+}
+
+// SaveIP6ControlConfig 保存 IPv6 控制配置
+func SaveIP6ControlConfig(ipInfo dbModel.IPControlInfo) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	file.IP6 = ipInfo
+
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	whitelistPath := global.ConfDir + "/ip6-whitelist.txt"
+	blacklistPath := global.ConfDir + "/ip6-blacklist.txt"
+	if err := syncConfigFile(whitelistPath, ipInfo.Whitelist); err != nil {
+		logger.Warn("write IPv6 whitelist file failed:", err)
+	}
+	if err := syncConfigFile(blacklistPath, ipInfo.Blacklist); err != nil {
+		logger.Warn("write IPv6 blacklist file failed:", err)
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}
