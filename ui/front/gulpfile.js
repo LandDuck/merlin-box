@@ -52,6 +52,21 @@ const esbuildConfig = {
         ".js": "jsx"
     }
 }
+
+/**
+ * 创建 esbuild 配置，并注入编译常量
+ * @param {boolean} isDev
+ * @returns {object}
+ */
+function createEsbuildConfig(isDev) {
+    return {
+        ...esbuildConfig,
+        define: {
+            ...(esbuildConfig.define || {}),
+            IS_DEV: isDev ? "true" : "false"
+        }
+    };
+}
 // main context
 let mainContext = null;
 
@@ -108,7 +123,7 @@ async function createPageContext(file) {
             file
         ],
         outfile,
-        ...esbuildConfig
+        ...createEsbuildConfig(true)
     });
     await ctx.watch();
     pageContexts.set(file, ctx);
@@ -156,7 +171,7 @@ async function initMain() {
             `${SRC}/main.js`
         ],
         outfile: `${OUT}/main.js`,
-        ...esbuildConfig
+        ...createEsbuildConfig(true)
     });
     await mainContext.watch();
     console.log("watch main");
@@ -285,7 +300,7 @@ export async function build() {
             `${SRC}/main.js`
         ],
         outfile: `${DIST}/${OUT}/main.js`,
-        ...esbuildConfig,
+        ...createEsbuildConfig(false),
         minify: true
     });
     //build pages
@@ -296,7 +311,7 @@ export async function build() {
                 file
             ],
             outfile: `${DIST}/${pageOutput(file)}`,
-            ...esbuildConfig,
+            ...createEsbuildConfig(false),
             minify: true
         });
     }

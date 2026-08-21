@@ -27,16 +27,17 @@ class Config {
      */
     constructor() {
         this.apis = Apis
-        let apiUrl = "http://127.0.0.1:65006/";  //正式地址
-        /*if (IS_DEV) {
-            apiUrl = "http://retail.tencentads.com/webapi/";//开发地址
-        }
-        if (IS_TEST) {
+        const apiUrlByCurrentUrl = `${window.location.protocol}//${window.location.host}/`;
+        /*let apiUrl = apiUrlByCurrentUrl;  //正式地址
+        if (IS_DEV) {
+            apiUrl = apiUrlByCurrentUrl;//开发地址
+        }*/
+        /*if (IS_TEST) {
             apiUrl = "https://edutest.retail.tencent.com/webapi/";//测试地址
         }*/
         this.data = {
             version: "20260724",
-            apiUrl: apiUrl
+            apiUrl: apiUrlByCurrentUrl
         }
     }
 }

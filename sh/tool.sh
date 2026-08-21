@@ -599,3 +599,28 @@ compress_executable_with_upx() {
         return 1
     fi
 }
+
+# =========================================
+# 启动WEBUI服务
+# =========================================
+start_server(){
+
+  local server_bin="${CUR_DIR}/bin/merlin-box"
+  if [ ! -f "$server_bin" ]; then
+    print_error "merlin-box 可执行文件不存在，请先构建 UI"
+    exit 1
+  fi
+
+  # 第一个参数是端口，如果没传入使用 8080
+  local port="${1:-8080}"
+
+  #启动命令 merlin-box server --port 8080. 注意后台运行
+  nohup "$server_bin" server --port "$port" > /dev/null 2>&1 &
+  if [ $? -eq 0 ]; then
+    print_success "✅ WEBUI 服务已启动，端口: $port"
+  else
+    print_error "❌ WEBUI 服务启动失败，请检查 merlin-box 可执行文件"
+    exit 1
+  fi
+
+}
