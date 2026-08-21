@@ -16,9 +16,11 @@
  * # along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package main
+package tools
 
 import (
+	logger "merlin-box-ui/helper/log"
+
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -35,36 +37,6 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
-
-const (
-	reset  = "\033[0m"
-	red    = "\033[31m"
-	green  = "\033[32m"
-	yellow = "\033[33m"
-)
-
-// colorize 根据当前输出是否为终端决定是否添加 ANSI 颜色。
-func colorize(text, color string) string {
-	if fi, err := os.Stdout.Stat(); err == nil && (fi.Mode()&os.ModeCharDevice) != 0 {
-		return color + text + reset
-	}
-	return text
-}
-
-// printSuccess 输出成功级别提示信息。
-func printSuccess(message string) {
-	fmt.Println(colorize("[SUCCESS] "+message, green))
-}
-
-// printWarning 输出警告级别提示信息。
-func printWarning(message string) {
-	fmt.Println(colorize("[WARNING] "+message, yellow))
-}
-
-// printError 输出错误级别提示信息到标准错误。
-func printError(message string) {
-	fmt.Fprintln(os.Stderr, colorize("[ERROR] "+message, red))
-}
 
 // isLocalIP 判断节点地址是否属于本地/私网/回环等应跳过的地址。
 func isLocalIP(server string) bool {
@@ -111,7 +83,7 @@ func isPrivateLikeIP(ip net.IP) bool {
 		privateCIDRs := []string{
 			"10.0.0.0/8",
 			"172.16.0.0/12",
-			"192.168.0.0/16",
+			"192.0.0.0/8",
 		}
 		for _, cidr := range privateCIDRs {
 			_, n, _ := net.ParseCIDR(cidr)
@@ -136,9 +108,9 @@ func isPrivateLikeIP(ip net.IP) bool {
 // fetchSubscription 拉取订阅链接内容并返回去除首尾空白后的文本。
 func fetchSubscription(rawURL string, timeout time.Duration) (string, error) {
 	headers := map[string]string{
-		"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1",
+		"User-Agent": "clash.meta",
 	}
-	printSuccess("正在拉取订阅: " + rawURL)
+	logger.Success("正在拉取订阅: " + rawURL)
 	req, err := http.NewRequest(http.MethodGet, rawURL, nil)
 	if err != nil {
 		return "", err
@@ -203,7 +175,7 @@ func parseSS(uri string) map[string]any {
 	raw := uri
 	defer func() {
 		if recover() != nil {
-			printWarning("跳过无法解析的 Shadowsocks URI: " + raw)
+			logger.Warn("跳过无法解析的 Shadowsocks URI: " + raw)
 		}
 	}()
 
@@ -215,7 +187,7 @@ func parseSS(uri string) map[string]any {
 	}
 
 	if !strings.Contains(uri, "@") {
-		printWarning("跳过无法解析的 Shadowsocks URI: " + uri)
+		logger.Warn("跳过无法解析的 Shadowsocks URI: " + uri)
 		return nil
 	}
 
@@ -224,13 +196,13 @@ func parseSS(uri string) map[string]any {
 	serverPart := parts[1]
 	i := strings.LastIndex(serverPart, ":")
 	if i <= 0 || i == len(serverPart)-1 {
-		printWarning("跳过无法解析的 Shadowsocks URI: " + raw)
+		logger.Warn("跳过无法解析的 Shadowsocks URI: " + raw)
 		return nil
 	}
 	server := serverPart[:i]
 	port, err := strconv.Atoi(serverPart[i+1:])
 	if err != nil {
-		printWarning("跳过无法解析的 Shadowsocks URI: " + raw)
+		logger.Warn("跳过无法解析的 Shadowsocks URI: " + raw)
 		return nil
 	}
 
@@ -239,7 +211,7 @@ func parseSS(uri string) map[string]any {
 		if nodeName == "" {
 			nodeName = fmt.Sprintf("%s:%d", server, port)
 		}
-		printWarning(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", nodeName, server))
+		logger.Warn(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", nodeName, server))
 		return nil
 	}
 
@@ -253,7 +225,7 @@ func parseSS(uri string) map[string]any {
 	} else {
 		mp := strings.SplitN(userinfo, ":", 2)
 		if len(mp) != 2 {
-			printWarning("跳过无法解析的 Shadowsocks URI: " + raw)
+			logger.Warn("跳过无法解析的 Shadowsocks URI: " + raw)
 			return nil
 		}
 		method, password = mp[0], mp[1]
@@ -282,19 +254,19 @@ func parseVMess(uri string) map[string]any {
 	}
 	decoded, err := base64.StdEncoding.DecodeString(b64)
 	if err != nil {
-		printWarning("跳过无法解析的 VMess URI: " + raw)
+		logger.Warn("跳过无法解析的 VMess URI: " + raw)
 		return nil
 	}
 
 	var data map[string]any
 	if err := json.Unmarshal(decoded, &data); err != nil {
-		printWarning("跳过无法解析的 VMess URI: " + raw)
+		logger.Warn("跳过无法解析的 VMess URI: " + raw)
 		return nil
 	}
 
 	server := asString(data["add"])
 	if server == "" {
-		printWarning("跳过无法解析的 VMess URI: " + raw)
+		logger.Warn("跳过无法解析的 VMess URI: " + raw)
 		return nil
 	}
 	if isLocalIP(server) {
@@ -302,13 +274,13 @@ func parseVMess(uri string) map[string]any {
 		if name == "" {
 			name = server
 		}
-		printWarning(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", name, server))
+		logger.Warn(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", name, server))
 		return nil
 	}
 
 	port, err := toInt(data["port"])
 	if err != nil {
-		printWarning("跳过无法解析的 VMess URI: " + raw)
+		logger.Warn("跳过无法解析的 VMess URI: " + raw)
 		return nil
 	}
 	tag := asString(data["ps"])
@@ -359,7 +331,7 @@ func parseVMess(uri string) map[string]any {
 func parseTrojan(uri string) map[string]any {
 	u, err := url.Parse(uri)
 	if err != nil {
-		printWarning("跳过无法解析的 Trojan URI: " + uri)
+		logger.Warn("跳过无法解析的 Trojan URI: " + uri)
 		return nil
 	}
 	password := ""
@@ -368,7 +340,7 @@ func parseTrojan(uri string) map[string]any {
 	}
 	server := u.Hostname()
 	if server == "" {
-		printWarning("跳过无法解析的 Trojan URI: " + uri)
+		logger.Warn("跳过无法解析的 Trojan URI: " + uri)
 		return nil
 	}
 	port := 443
@@ -385,7 +357,7 @@ func parseTrojan(uri string) map[string]any {
 		name = "trojan-" + server
 	}
 	if isLocalIP(server) {
-		printWarning(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", name, server))
+		logger.Warn(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", name, server))
 		return nil
 	}
 	sni := u.Query().Get("sni")
@@ -409,7 +381,7 @@ func parseTrojan(uri string) map[string]any {
 func parseVLess(uri string) map[string]any {
 	u, err := url.Parse(uri)
 	if err != nil {
-		printWarning("跳过无法解析的 Vless URI: " + uri)
+		logger.Warn("跳过无法解析的 Vless URI: " + uri)
 		return nil
 	}
 	uuid := ""
@@ -418,7 +390,7 @@ func parseVLess(uri string) map[string]any {
 	}
 	server := u.Hostname()
 	if server == "" {
-		printWarning("跳过无法解析的 Vless URI: " + uri)
+		logger.Warn("跳过无法解析的 Vless URI: " + uri)
 		return nil
 	}
 	port := 443
@@ -435,7 +407,7 @@ func parseVLess(uri string) map[string]any {
 		name = "vless-" + server
 	}
 	if isLocalIP(server) {
-		printWarning(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", name, server))
+		logger.Warn(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", name, server))
 		return nil
 	}
 
@@ -472,7 +444,7 @@ func parseVLess(uri string) map[string]any {
 				"public_key": query.Get("pbk"),
 				"short_id":   query.Get("sid"),
 			}
-			printWarning("检测到 Reality 配置，已为节点启用 uTLS: " + asString(outbound["tag"]))
+			logger.Warn("检测到 Reality 配置，已为节点启用 uTLS: " + asString(outbound["tag"]))
 		}
 		outbound["tls"] = tls
 	}
@@ -520,7 +492,7 @@ func parseURI(uri string) map[string]any {
 	if i := strings.Index(uri, "://"); i > 0 {
 		proto = strings.ToUpper(uri[:i])
 	}
-	printWarning("跳过未实现的转换协议: " + proto)
+	logger.Warn("跳过未实现的转换协议: " + proto)
 	return nil
 }
 
@@ -528,7 +500,7 @@ func parseURI(uri string) map[string]any {
 func parseClashYAML(content string) []map[string]any {
 	var data map[string]any
 	if err := yaml.Unmarshal([]byte(content), &data); err != nil {
-		printWarning("Clash YAML 解析失败: " + err.Error())
+		logger.Warn("Clash YAML 解析失败: " + err.Error())
 		return nil
 	}
 
@@ -552,7 +524,7 @@ func parseClashYAML(content string) []map[string]any {
 		server := firstNonEmpty(asString(p["server"]), asString(p["host"]), asString(p["address"]))
 
 		if server != "" && isLocalIP(server) {
-			printWarning(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", tag, server))
+			logger.Warn(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", tag, server))
 			continue
 		}
 
@@ -649,13 +621,13 @@ func parseClashYAML(content string) []map[string]any {
 						"public_key": asString(reality["public_key"]),
 						"short_id":   asString(reality["short_id"]),
 					}
-					printWarning("检测到 Reality 配置，已为节点启用 uTLS: " + asString(ob["tag"]))
+					logger.Warn("检测到 Reality 配置，已为节点启用 uTLS: " + asString(ob["tag"]))
 				}
 				ob["tls"] = tls
 			}
 			outbounds = append(outbounds, ob)
 		default:
-			printWarning("跳过不支持的 Clash 协议: " + t)
+			logger.Warn("跳过不支持的 Clash 协议: " + t)
 		}
 	}
 	return outbounds
@@ -727,25 +699,25 @@ func convert(subscriptionURL string) (map[string]any, error) {
 
 	outbounds := make([]map[string]any, 0)
 	if strings.HasPrefix(content, "proxies:") || strings.Contains(left(content, 200), "proxies:") {
-		printSuccess("检测到 Clash YAML 格式")
+		logger.Success("检测到 Clash YAML 格式")
 		outbounds = parseClashYAML(content)
 	} else {
 		normalized := strings.ReplaceAll(content, "\n", "")
 		base64Like, _ := regexp.MatchString(`^[A-Za-z0-9+/=]+$`, normalized)
 		if isBase64(content) || base64Like {
-			printSuccess("检测到 Base64 格式")
+			logger.Success("检测到 Base64 格式")
 			uris, err := decodeBase64Sub(content)
 			if err != nil {
 				return nil, err
 			}
-			printSuccess(fmt.Sprintf("共解析到 %d 条 URI", len(uris)))
+			logger.Success(fmt.Sprintf("共解析到 %d 条 URI", len(uris)))
 			for _, uri := range uris {
 				if ob := parseURI(uri); ob != nil {
 					outbounds = append(outbounds, ob)
 				}
 			}
 		} else {
-			printSuccess("尝试按行解析 URI")
+			logger.Success("尝试按行解析 URI")
 			for _, line := range strings.Split(content, "\n") {
 				line = strings.TrimSpace(line)
 				if line == "" {
@@ -758,47 +730,8 @@ func convert(subscriptionURL string) (map[string]any, error) {
 		}
 	}
 
-	printSuccess(fmt.Sprintf("成功转换 %d 个节点", len(outbounds)))
+	logger.Success(fmt.Sprintf("成功转换 %d 个节点", len(outbounds)))
 	return buildSingboxConfig(outbounds)
-}
-
-// main 处理命令行参数并输出转换后的 sing-box JSON。
-func main() {
-	if len(os.Args) < 2 {
-		printWarning("用法: go run main.go <订阅链接> [输出文件]")
-		printWarning("示例: go run main.go https://example.com/sub > config.json")
-		os.Exit(1)
-	}
-
-	rawURL := os.Args[1]
-	outputFile := ""
-	if len(os.Args) > 2 {
-		outputFile = os.Args[2]
-	}
-
-	config, err := convert(rawURL)
-	if err != nil {
-		printError("转换失败: " + err.Error())
-		os.Exit(1)
-	}
-
-	result, err := json.MarshalIndent(config, "", "  ")
-	if err != nil {
-		printError("转换失败: " + err.Error())
-		os.Exit(1)
-	}
-
-	if outputFile != "" {
-		if err := os.WriteFile(outputFile, result, 0o644); err != nil {
-			printError("转换失败: " + err.Error())
-			os.Exit(1)
-		}
-		printSuccess("已保存到 " + outputFile)
-		return
-	}
-
-	fmt.Println(string(result))
-	printSuccess("已完成转换，复制上面的 JSON 配置到 sing-box 即可使用")
 }
 
 // left 返回字符串前 n 个字符，不足 n 则原样返回。
@@ -909,4 +842,33 @@ func mustIntDefault(v any, fallback int) int {
 		return n
 	}
 	return fallback
+}
+
+// Sub2box 处理命令行参数并输出转换后的 sing-box JSON。
+func Sub2box(rawURL string, outputFile string) {
+
+	config, err := convert(rawURL)
+
+	if err != nil {
+		logger.Error("转换失败: " + err.Error())
+		os.Exit(1)
+	}
+
+	result, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		logger.Error("转换失败: " + err.Error())
+		os.Exit(1)
+	}
+
+	if outputFile != "" {
+		if err := os.WriteFile(outputFile, result, 0o644); err != nil {
+			logger.Error("转换失败: " + err.Error())
+			os.Exit(1)
+		}
+		logger.Success("已保存到 " + outputFile)
+		return
+	}
+
+	fmt.Println(string(result))
+	logger.Success("已完成转换，复制上面的 JSON 配置到 sing-box 即可使用")
 }

@@ -205,7 +205,7 @@ merlin-box/
 ├─ bin/
 │  ├─ sing-box              # sing-box executable
 │  ├─ smartdns              # smartdns executable
-│  ├─ ui-server             # WEB UI server executable (TODO)
+│  ├─ merlin-box             # WEB UI server executable (TODO)
 │  └─ sub2box               # sub2box executable (for converting subscriptions to sing-box configuration)
 ├─ conf/
 │  ├─ config.json           # sing-box configuration
@@ -338,7 +338,6 @@ Tool commands:
 ./merlin-box.sh tool build_singbox          #Build sing-box executable ¹
 ./merlin-box.sh tool download_smartdns      #Download smartdns executable ¹
 ./merlin-box.sh tool sub2box                #Convert subscription to sing-box configuration ³
-./merlin-box.sh tool build_sub2box          #Build sub2box executable ¹
 ./merlin-box.sh tool -h
 ```
 

@@ -19,102 +19,105 @@
 package main
 
 import (
-	"errors"
-	"flag"
 	"fmt"
-	"log"
 	"merlin-box-ui/global"
-	"merlin-box-ui/handlers"
-	"merlin-box-ui/middleware"
-	"net/http"
+	logger "merlin-box-ui/helper/log"
+	"merlin-box-ui/server"
+	"merlin-box-ui/tools"
 	"os"
 	"path/filepath"
-	"strconv"
-
-	"github.com/go-chi/chi/v5"
+	"sort"
+	"strings"
 )
 
-// printVersion 打印程序版本信息。
+// commandFunc 定义命令处理函数的类型
+type commandFunc func(args []string) error
+
+// command 结构体表示一个命令行命令，包括其描述和执行函数
+type command struct {
+	description string
+	run         commandFunc
+}
+
+// printVersion 打印全局版本信息
 func printVersion() {
-	fmt.Println(global.Version)
+	logger.Success(global.Version)
 }
 
-// parseCommandLine 解析命令行参数，返回端口号、是否退出标志和错误信息。
-func parseCommandLine() (int, bool, error) {
-	if len(os.Args) > 1 && os.Args[1] == "version" {
-		printVersion()
-		return 0, true, nil
+// printUsage 打印命令行工具的使用说明
+func printUsage() {
+	name := filepath.Base(os.Args[0])
+	var lines []string
+	lines = append(lines, fmt.Sprintf("Usage:\n  %s <command> [arguments]\n\nCommands:\n", name))
+	for _, commandName := range []string{"version", "server", "tool"} {
+		cmd := commands[commandName]
+		lines = append(lines, fmt.Sprintf("  %-12s %s", commandName, cmd.description))
 	}
-
-	flagSet := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-	flagSet.SetOutput(os.Stdout)
-
-	port := flagSet.Int("port", global.DefaultPort, "HTTP server port")
-	versionFlag := flagSet.Bool("version", false, "Print version and exit")
-	flagSet.Usage = func() {
-		command := filepath.Base(os.Args[0])
-		_, _ = fmt.Fprintf(flagSet.Output(), "Usage:\n  %s [--port PORT]\n  %s version\n\nOptions:\n", command, command)
-		flagSet.PrintDefaults()
-	}
-
-	if err := flagSet.Parse(os.Args[1:]); err != nil {
-		if errors.Is(err, flag.ErrHelp) {
-			return 0, true, nil
-		}
-		return 0, false, err
-	}
-
-	if *versionFlag {
-		printVersion()
-		return 0, true, nil
-	}
-
-	if *port < 1 || *port > 65535 {
-		return 0, false, fmt.Errorf("invalid port: %d", *port)
-	}
-
-	return *port, false, nil
+	lines = append(lines, fmt.Sprintf("\nExamples:\n  %s version\n  %s server --port 80\n  %s tool <tool_name>", name, name, name))
+	logger.Warn(strings.Join(lines, "\n"))
 }
 
-// main 函数是程序的入口点，负责启动 HTTP 服务器并设置路由和中间件。
+// commands 存储可用的命令及其处理函数
+var commands = map[string]command{
+	"version": {
+		description: "Print the global version",
+		run: func(args []string) error {
+			if len(args) > 0 {
+				logger.Warn("version command does not accept arguments: ", args)
+				return fmt.Errorf("version command does not accept arguments")
+			}
+			logger.Debug("Running command: version")
+			printVersion()
+			return nil
+		},
+	},
+	"server": {
+		description: "Run the web service",
+		run: func(args []string) error {
+			logger.Debug("Running command: server with args: ", args)
+			return server.RunServer(args)
+		},
+	},
+	"tool": {
+		description: "Run a tool entry function",
+		run: func(args []string) error {
+			logger.Debug("Running command: tool with args: ", args)
+			return tools.RunTool(args)
+		},
+	},
+}
+
+// runCommand 根据命令行参数执行相应的命令
+func runCommand(args []string) error {
+	if len(args) == 0 {
+		logger.Warn("No command provided")
+		printUsage()
+		return nil
+	}
+
+	cmd, ok := commands[args[0]]
+	if !ok {
+		logger.Error("unknown command: ", args[0], "\n", commandSummary())
+		return fmt.Errorf("unknown command: %s\n\n%s", args[0], commandSummary())
+	}
+
+	return cmd.run(args[1:])
+}
+
+// commandSummary 返回可用命令的简要说明
+func commandSummary() string {
+	var names []string
+	for name := range commands {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	return "Available commands: " + strings.Join(names, ", ")
+}
+
+// main 主函数, 用于启动命令行工具或服务器
 func main() {
-	port, shouldExit, err := parseCommandLine()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if shouldExit {
-		return
-	}
-
-	r := chi.NewRouter()
-
-	// 全局中间件
-	r.Use(middleware.Auth)
-
-	// 根据环境变量选择静态资源目录
-	staticDir := "./wwwroot"
-	if os.Getenv("APP_ENV") == global.EnvDev {
-		staticDir = "./../front"
-	} else {
-		global.CurrentEnv = global.EnvProd
-	}
-
-	// 默认首页和静态资源
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filepath.Join(staticDir, "index.html"))
-	})
-	r.Handle("/*", http.FileServer(http.Dir(staticDir)))
-
-	// API
-	r.Post("/api/login", handlers.Login)
-	r.Post("/api/init", handlers.Init)
-	r.Post("/api/status", handlers.Status)
-	r.Post("/api/save_path", handlers.SavePath)
-	r.Post("/api/test", handlers.Test)
-
-	// 启动 HTTP 服务器，监听端口
-	address := ":" + strconv.Itoa(port)
-	if err := http.ListenAndServe(address, r); err != nil {
-		log.Fatal(err)
+	if err := runCommand(os.Args[1:]); err != nil {
+		logger.Error(err)
+		os.Exit(1)
 	}
 }

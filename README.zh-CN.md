@@ -204,7 +204,7 @@ merlin-box/
 ├─ bin/
 │  ├─ sing-box              # sing-box 可执行文件
 │  ├─ smartdns              # smartdns 可执行文件
-│  ├─ ui-server             # WEB UI server 可执行文件（待实现）
+│  ├─ merlin-box             # WEB UI server 可执行文件（待实现）
 │  └─ sub2box               # sub2box 可执行文件（用于将订阅转换为 sing-box 配置）
 ├─ conf/
 │  ├─ config.json           # sing-box 配置
@@ -338,7 +338,6 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh tool download_smartdns      #下载 smartdns 可执行文件 ¹
 ./merlin-box.sh tool download_singbox       #下载 sing-box 可执行文件 ¹
 ./merlin-box.sh tool sub2box                #将订阅转换为 sing-box 配置 ³
-./merlin-box.sh tool build_sub2box          #构建 sub2box 可执行文件 ¹
 ./merlin-box.sh tool -h
 ```
 
