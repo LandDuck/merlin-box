@@ -605,6 +605,8 @@ compress_executable_with_upx() {
 # =========================================
 start_server(){
 
+  stop_server
+
   local server_bin="${CUR_DIR}/bin/merlin-box"
   if [ ! -f "$server_bin" ]; then
     print_error "merlin-box 可执行文件不存在，请先构建 UI"
@@ -623,4 +625,24 @@ start_server(){
     exit 1
   fi
 
+}
+
+
+# ========================================
+# 停止WEBUI服务
+# ========================================
+stop_server(){
+  print_line "stopping server"
+
+  # 与 stop_smartdns 保持一致，直接按进程名查找并优雅/强制停止
+  if ps | grep -v grep | grep -q "merlin-box"; then
+    print_normal "⚠️ 侦测到正在运行的 WEBUI 服务实例，正在尝试停止..."
+    killall -15 merlin-box 2>/dev/null
+    sleep 1
+    killall -9 merlin-box 2>/dev/null
+    sleep 1
+    print_success "✅ WEBUI 服务已成功停止。"
+  else
+    print_normal "🔍 未发现运行中的 WEBUI 服务实例，无需停止。"
+  fi
 }

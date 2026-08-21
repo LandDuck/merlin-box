@@ -25,6 +25,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	"golang.org/x/net/proxy"
@@ -72,6 +73,8 @@ func ResponseRequireLogin(response http.ResponseWriter) {
 	})
 }
 
+var socks5ProxyCache sync.Map // key: proxyURL, value: *http.Transport
+
 // TestDelay 用于测试到一个域名的延时, 到达即可,  不需要下载数据. 同时支持使用 socks 代理
 func TestDelay(url string, useProxy bool) int {
 	// 只测试连接和首包响应头，不下载 body
@@ -80,11 +83,11 @@ func TestDelay(url string, useProxy bool) int {
 	}
 	if useProxy {
 		proxyUrl := "socks5://127.0.0.1:65001"
-		proxy, err := newSocks5Proxy(proxyUrl)
+		proxyTransport, err := getSocks5Proxy(proxyUrl)
 		if err != nil {
 			return -1
 		}
-		client.Transport = proxy
+		client.Transport = proxyTransport
 	}
 
 	// 记录开始时间
@@ -101,6 +104,20 @@ func TestDelay(url string, useProxy bool) int {
 	// 记录结束时间
 	duration := time.Since(start)
 	return int(duration.Milliseconds())
+}
+
+func getSocks5Proxy(proxyURL string) (*http.Transport, error) {
+	if transport, ok := socks5ProxyCache.Load(proxyURL); ok {
+		return transport.(*http.Transport), nil
+	}
+
+	transport, err := newSocks5Proxy(proxyURL)
+	if err != nil {
+		return nil, err
+	}
+
+	realTransport, _ := socks5ProxyCache.LoadOrStore(proxyURL, transport)
+	return realTransport.(*http.Transport), nil
 }
 
 // newSocks5Proxy 创建一个支持 socks5 代理的 http.Transport
@@ -122,6 +139,6 @@ func newSocks5Proxy(proxyURL string) (*http.Transport, error) {
 		},
 		TLSHandshakeTimeout: 10 * time.Second,
 		IdleConnTimeout:     30 * time.Second,
-		DisableKeepAlives:   true, // 你这是测速场景，关掉复用更稳定
+		DisableKeepAlives:   false,
 	}, nil
 }

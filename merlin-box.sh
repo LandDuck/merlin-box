@@ -441,6 +441,9 @@ main() {
 	  server)
 	    start_server "$2"
       ;;
+    stop_server)
+      stop_server
+      ;;
     tool)
       case "$2" in
         compress_singbox)
