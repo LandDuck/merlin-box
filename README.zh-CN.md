@@ -201,10 +201,12 @@ merlin-box/
 │  ├─ server                # WEB UI 后端（待实现）
 │  └─ front                 # WEB UI 前端（待实现）
 ├─ wwwroot/                 # WEB UI 静态资源（待实现）
+├─ db/                      # WEB UI 数据库
+│  └─ db.json               # WEB UI 数据库文件，注意第一次拿到后修改登录用户名密码，密码是md5加密后的字符串
 ├─ bin/
 │  ├─ sing-box              # sing-box 可执行文件
 │  ├─ smartdns              # smartdns 可执行文件
-│  ├─ merlin-box             # WEB UI server 可执行文件（待实现）
+│  └─ merlin-box             # WEB UI server 可执行文件（待实现）
 ├─ conf/
 │  ├─ config.json           # sing-box 配置
 │  └─ smartdns.conf         # smartdns 配置
@@ -214,7 +216,7 @@ merlin-box/
 │  ├─ fun.sh                # 核心逻辑
 │  └─ tool.sh               # tool 子命令的实现
 ├─ tools/
-│  ├─sub2box/              # 用于将订阅转换为 sing-box 配置的工具
+│  ├─ sub2box/              # 用于将订阅转换为 sing-box 配置的工具
 │  └─ update-rules/         # 规则更新脚本
 └─ res/
    ├─ chn-ip4.txt           # 中国 IPv4
@@ -312,7 +314,7 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh stop                       #停止服务
 ./merlin-box.sh restart                    #重启服务
 ./merlin-box.sh restart 1 1 0 0            #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
-./merlin-box.sh server                     #启动 WEB UI server，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081
+./merlin-box.sh server                     #启动 WEB UI server，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081 。登录用户名密码默认为 admin/merlinbox。
 ./merlin-box.sh stop_server                #停止 WEB UI server
 ./merlin-box.sh -h                         #显示帮助信息
 ./merlin-box.sh -v                         #显示版本信息

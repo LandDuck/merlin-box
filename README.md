@@ -202,10 +202,12 @@ merlin-box/
 │  ├─ server                # WEB UI server (TODO)
 │  └─ front                 # WEB UI front-end (TODO)
 ├─ wwwroot/                 # WEB UI static files (TODO)
+├─ db/                      # WEB UI database
+│  └─ db.json               # WEB UI database file, note to change the login username and password after first obtaining it, the password is an md5 encrypted string
 ├─ bin/
 │  ├─ sing-box              # sing-box executable
 │  ├─ smartdns              # smartdns executable
-│  ├─ merlin-box             # WEB UI server executable (TODO)
+│  └─ merlin-box             # WEB UI server executable (TODO)
 ├─ conf/
 │  ├─ config.json           # sing-box configuration
 │  └─ smartdns.conf         # smartdns configuration
@@ -313,7 +315,7 @@ Main entry command:
 ./merlin-box.sh stop                       #Stop service
 ./merlin-box.sh restart                    #Restart service
 ./merlin-box.sh restart 1 1 0 0            #Restart with explicit params: IPv6 QUIC-block UDP oneself-proxy
-./merlin-box.sh server                     #Start WEB UI server, default port is 8080, can specify port on startup: ./merlin-box.sh server 8081
+./merlin-box.sh server                     #Start WEB UI server, default port is 8080, can specify port on startup: ./merlin-box.sh server 8081. Login username/password defaults to admin/merlinbox.
 ./merlin-box.sh stop_server                #Stop WEB UI server
 ./merlin-box.sh -h                         #Show help information
 ./merlin-box.sh -v                         #Show version information
