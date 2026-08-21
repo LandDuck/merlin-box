@@ -71,6 +71,7 @@ func startHTTPServer(port int) {
 	router.Post("/api/stop", handlers.Stop)
 	router.Post("/api/restart", handlers.Restart)
 	router.Post("/api/service_log", handlers.GetServiceLog)
+	router.Post("/api/show_dhcp_client_list", handlers.ShowDhcpClientList)
 
 	//router.Post("/api/save_path", handlers.SavePath)
 	//router.Post("/api/test", handlers.Test)

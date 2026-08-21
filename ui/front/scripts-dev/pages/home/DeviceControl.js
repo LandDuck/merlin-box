@@ -108,6 +108,23 @@ class DeviceControl extends React.Component {
         });
     }
 
+    /**
+     * 显示DHCP客户端列表
+     */
+    #showDhcpClientList() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_showDhcpClientList,
+            success: (data) => {
+                const content = (data || "")
+                    .replace(/\x1b\[[0-9;]*m/g, "")
+                    .replace(/\r\n|\r|\n/g, "<br/>");
+                this.$helper.showLogLayer({
+                    title: "DHCP客户端列表",
+                    content: content
+                });
+            }
+        });
+    }
 
     /**
      * 第一次挂载后
@@ -122,6 +139,7 @@ class DeviceControl extends React.Component {
     componentWillUnmount() {
 
     }
+
 
     /**
      * 渲染方法
@@ -178,6 +196,15 @@ class DeviceControl extends React.Component {
             </div>
             <div className="device-footer">
                 <button className="save-button" onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.#showDhcpClientList();
+                }}>
+                    显示DHCP客户端列表
+                </button>
+                <button className="save-button" onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     // 保存配置逻辑
                     this.#save();
                 }}>

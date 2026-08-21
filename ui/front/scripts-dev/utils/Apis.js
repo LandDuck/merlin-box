@@ -25,6 +25,7 @@ export default {
     comm_restart: 'api/restart',
     comm_start: 'api/start',
     comm_service_log: 'api/service_log',
+    comm_showDhcpClientList: 'api/show_dhcp_client_list',
     comm_getDeviceControlConfig: 'api/get_device_control_config',
     comm_saveDeviceControlConfig: 'api/save_device_control_config',
     comm_getIP4ControlConfig: 'api/get_ip4_control_config',
@@ -34,6 +35,5 @@ export default {
     comm_getDomainControlConfig: 'api/get_domain_control_config',
     comm_saveDomainControlConfig: 'api/save_domain_control_config',
 }
-
 
 

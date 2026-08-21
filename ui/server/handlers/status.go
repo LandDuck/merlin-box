@@ -152,6 +152,24 @@ func runServiceScriptAsync(action string) error {
 	return nil
 }
 
+// runServiceScript 执行 merlin-box.sh 并返回输出
+func runServiceScript(args ...string) (string, error) {
+	scriptPath := filepath.Join(global.WorkingDir, "merlin-box.sh")
+	if _, err := os.Stat(scriptPath); err != nil {
+		return "", fmt.Errorf("脚本不存在: %s: %w", scriptPath, err)
+	}
+
+	commandArgs := append([]string{scriptPath}, args...)
+	cmd := exec.Command("bash", commandArgs...)
+	cmd.Dir = global.WorkingDir
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("执行脚本失败: %w", err)
+	}
+	return string(output), nil
+}
+
 // Start 启动 merlin-box 服务，并异步返回脚本输出日志
 func Start(w http.ResponseWriter, r *http.Request) {
 	if err := runServiceScriptAsync("start"); err != nil {
@@ -182,4 +200,14 @@ func Restart(w http.ResponseWriter, r *http.Request) {
 // GetServiceLog 返回最近一次脚本执行日志
 func GetServiceLog(w http.ResponseWriter, r *http.Request) {
 	httpHelper.ResponseSuccess(w, global.GetServiceLog())
+}
+
+// ShowDhcpClientList 返回 DHCP 客户端列表
+func ShowDhcpClientList(w http.ResponseWriter, r *http.Request) {
+	output, err := runServiceScript("tool", "show_devices")
+	if err != nil {
+		httpHelper.ResponseFailure(w, "获取 DHCP 客户端列表失败: "+err.Error())
+		return
+	}
+	httpHelper.ResponseSuccess(w, output)
 }
