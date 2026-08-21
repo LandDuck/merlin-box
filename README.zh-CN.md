@@ -205,7 +205,6 @@ merlin-box/
 │  ├─ sing-box              # sing-box 可执行文件
 │  ├─ smartdns              # smartdns 可执行文件
 │  ├─ merlin-box             # WEB UI server 可执行文件（待实现）
-│  └─ sub2box               # sub2box 可执行文件（用于将订阅转换为 sing-box 配置）
 ├─ conf/
 │  ├─ config.json           # sing-box 配置
 │  └─ smartdns.conf         # smartdns 配置
@@ -349,7 +348,7 @@ chmod +x scripts/dnsmasq.postconf
 - 在生产模式下（路由器中），使用wget从本仓库的 raw 文件下载最新规则文件并覆盖本地文件。
 3. 订阅转换有两种行为：
 - 在开发模式下，会调用python脚本将订阅转换为 sing-box 配置。
-- 在生产模式下（路由器中），调用 sub2box（开发中） 二进制文件进行转换。
+- 在生产模式下（路由器中），调用 merlin-box（开发中） 二进制文件进行转换。
 
 ---
 

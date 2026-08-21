@@ -229,12 +229,12 @@ subscription_to_singbox_config() {
 
   print_normal "将订阅链接转换为 sing-box 配置文件，Url=$subscription_url"
 
-  # sub2box 可执行文件路径
+  # merlin-box 可执行文件路径
   local merlinbox_bin="${CUR_DIR}/bin/merlin-box"
   # sub2box Python 脚本路径
   local sub2box_py="${CUR_DIR}/tools/sub2box/main.py"
 
-  # 验证是否在路由器中运行，如果在，使用 sub2box 可执行文件执行转换，否则使用 Python 脚本执行转换
+  # 验证是否在路由器中运行，如果在，使用 merlin-box 可执行文件执行转换，否则使用 Python 脚本执行转换
   if is_running_on_router; then
     print_warning "在路由器中运行，使用 merlin-box 执行转换"
     if [ ! -f "$merlinbox_bin" ]; then

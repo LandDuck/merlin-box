@@ -206,7 +206,6 @@ merlin-box/
 │  ├─ sing-box              # sing-box executable
 │  ├─ smartdns              # smartdns executable
 │  ├─ merlin-box             # WEB UI server executable (TODO)
-│  └─ sub2box               # sub2box executable (for converting subscriptions to sing-box configuration)
 ├─ conf/
 │  ├─ config.json           # sing-box configuration
 │  └─ smartdns.conf         # smartdns configuration
@@ -351,7 +350,7 @@ Tool commands:
 
 3. Subscription conversion has two behaviors:
 - In development mode, a Python script is called to convert the subscription to sing-box configuration.
-- In production mode (on the router), the sub2box (under development) binary file is called for conversion.
+- In production mode (on the router), the merlin-box (under development) binary file is called for conversion.
 
 ---
 
