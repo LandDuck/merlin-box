@@ -232,10 +232,10 @@ class Status extends React.Component {
                         <span className="icon-play"/>
                         启动代理
                     </button> : [
-                        <button className="btn-primary" key={"stop"} onClick={(e) => {
+                        <button className="btn-secondary" key={"stop"} onClick={(e) => {
                             this.#stop();
                         }}>
-                            <span className="icon-play"/>
+                            <span className="icon-stop"/>
                             停止代理
                         </button>,
                         <button className="btn-secondary" key={"reboot"} onClick={(e) => {
