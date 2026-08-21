@@ -93,7 +93,7 @@ show_help() {
 命令:
   start        启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]
   stop         停止服务
-  restart      重启服务
+  restart      重启服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]
   install      设置 merlin-box 开机自启
   uninstall    卸载 merlin-box 开机自启
   tool         工具命令
@@ -248,7 +248,7 @@ restart() {
     rm -f "$PID_FILE"
   fi
   sleep 2
-  start
+  start "$1" "$2" "$3" "$4"
 }
 
 #=========================================
@@ -475,7 +475,12 @@ main() {
       esac
       ;;
 	  restart)
-			restart
+	    if [ "$#" -gt 5 ]; then
+        print_error "错误: restart 最多支持 4 个可选参数，当前传入: $(($# - 1))"
+        print_normal "用法: $SCRIPT_NAME restart [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]"
+        exit 1
+      fi
+			restart "$2" "$3" "$4" "$5"
 			;;
 		-h|--help)
 			show_help

@@ -311,6 +311,7 @@ Main entry command:
 ./merlin-box.sh start 1 1 0 0              #Start with explicit params: IPv6 QUIC-block UDP oneself-proxy
 ./merlin-box.sh stop                       #Stop service
 ./merlin-box.sh restart                    #Restart service
+./merlin-box.sh restart 1 1 0 0            #Restart with explicit params: IPv6 QUIC-block UDP oneself-proxy
 ./merlin-box.sh -h                         #Show help information
 ./merlin-box.sh -v                         #Show version information
 ```

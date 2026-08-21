@@ -310,6 +310,7 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh start 1 1 0 0              #显式参数启动：IPv6 QUIC拦截 UDP 自身代理
 ./merlin-box.sh stop                       #停止服务
 ./merlin-box.sh restart                    #重启服务
+./merlin-box.sh restart 1 1 0 0            #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
 ./merlin-box.sh -h                         #显示帮助信息
 ./merlin-box.sh -v                         #显示版本信息
 ```
