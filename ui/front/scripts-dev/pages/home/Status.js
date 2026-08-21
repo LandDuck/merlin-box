@@ -113,7 +113,7 @@ class Status extends React.Component {
                     {
                         !this.state.workingDir || this.state.workingDir === "" ? <div className="stat-value status danger">
                             未配置
-                        </div> : <div className="stat-value status">
+                        </div> : <div className="stat-value status" title={this.state.workingDir}>
                             {/*<span className="status-dot"/>*/}
                             {this.state.workingDir}
                         </div>

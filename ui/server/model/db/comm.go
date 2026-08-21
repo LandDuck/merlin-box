@@ -22,6 +22,8 @@ package db
 type Database struct {
 	// Managers 管理员列表
 	Managers []Manager `json:"managers"`
+	// Device 设备信息
+	Device DeviceInfo `json:"device"`
 }
 
 // Manager 管理员结构体，包含用户名和密码
@@ -30,4 +32,12 @@ type Manager struct {
 	Username string `json:"username"`
 	// Password 密码 一个MD5加密后的字符串(小写) 32位
 	Password string `json:"password"`
+}
+
+// DeviceInfo 设备信息结构体，包含设备名称和版本号
+type DeviceInfo struct {
+	// Blacklist 黑名单 MAC 地址, 一行一个
+	Blacklist string `json:"blacklist"`
+	// Whitelist 白名单 MAC 地址, 一行一个
+	Whitelist string `json:"whitelist"`
 }

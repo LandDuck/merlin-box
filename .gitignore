@@ -12,3 +12,5 @@ lnode_modules
 /ui/front/scripts/pages
 tmp
 dist
+device_whitelist.txt
+device_blacklist.txt

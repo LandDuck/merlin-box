@@ -55,7 +55,7 @@ class Main extends React.Component {
         const status = <Status key={"status"}/>;
         //const nodeList = <NodeList key={"nodeList"}/>;
         //const domainControl = <DomainControl key={"domainControl"}/>;
-        //const deviceControl = <DeviceControl key={"deviceControl"}/>;
+        const deviceControl = <DeviceControl key={"deviceControl"}/>;
         return [
             <div className="hero-header" key={"hero-header"}>
                 <h1 className="hero-title">
@@ -73,7 +73,7 @@ class Main extends React.Component {
             status,
             //nodeList,
             //domainControl,
-            //deviceControl
+            deviceControl
         ]
     }
 }

@@ -21,6 +21,8 @@ export default {
     comm_login: 'api/login',
     comm_status: 'api/status',
     comm_logout: 'api/logout',
+    comm_getDeviceControlConfig: 'api/get_device_control_config',
+    comm_saveDeviceControlConfig: 'api/save_device_control_config',
 }
 
 

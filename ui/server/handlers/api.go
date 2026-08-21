@@ -24,6 +24,7 @@ import (
 	dbHelper "merlin-box-ui/helper/db"
 	httpHelper "merlin-box-ui/helper/http"
 	validateHelper "merlin-box-ui/helper/validate"
+	dbModel "merlin-box-ui/model/db"
 	"merlin-box-ui/model/req"
 	"merlin-box-ui/model/resp"
 	"net/http"
@@ -101,11 +102,12 @@ func Status(response http.ResponseWriter, request *http.Request) {
 	// 计算当前时间与创建时间的差值，单位为秒
 	duration := int((time.Now().Sub(creationTime)).Seconds())
 	// 测速
-	domesticDelay := httpHelper.TestDelay("https://www.baidu.com", false)
+	var domesticDelay = -1
 	var internationalDelay = -1
 	if global.CurrentEnv == global.EnvDev {
-		internationalDelay = httpHelper.TestDelay("https://www.google.com", false)
+		//internationalDelay = httpHelper.TestDelay("https://www.google.com", false)
 	} else {
+		domesticDelay = httpHelper.TestDelay("https://www.baidu.com", false)
 		internationalDelay = httpHelper.TestDelay("https://www.google.com", true)
 	}
 	httpHelper.ResponseSuccess(response, resp.StatusResponse{
@@ -117,10 +119,32 @@ func Status(response http.ResponseWriter, request *http.Request) {
 	})
 }
 
-func SavePath(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(map[string]any{
-		"success": true,
-	})
+// GetDeviceControlConfig 获取设备控制配置
+func GetDeviceControlConfig(w http.ResponseWriter, r *http.Request) {
+	deviceInfo, err := dbHelper.GetDeviceControlConfig()
+	if err != nil {
+		httpHelper.ResponseFailure(w, "读取设备控制配置失败")
+		return
+	}
+	httpHelper.ResponseSuccess(w, deviceInfo)
+}
+
+// SaveDeviceControlConfig 保存设备控制配置
+func SaveDeviceControlConfig(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[req.SaveDeviceControlConfig](w, r)
+	if !ok {
+		return
+	}
+
+	if err := dbHelper.SaveDeviceControlConfig(dbModel.DeviceInfo{
+		Blacklist: requestData.Blacklist,
+		Whitelist: requestData.Whitelist,
+	}); err != nil {
+		httpHelper.ResponseFailure(w, "保存设备控制配置失败")
+		return
+	}
+
+	httpHelper.ResponseSuccess(w, "保存成功")
 }
 
 func Test(w http.ResponseWriter, r *http.Request) {

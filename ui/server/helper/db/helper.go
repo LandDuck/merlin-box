@@ -23,8 +23,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"merlin-box-ui/global"
+	logger "merlin-box-ui/helper/log"
 	dbModel "merlin-box-ui/model/db"
 	"os"
+	"strings"
 )
 
 // ReadFile 读取数据库文件并解析为 dbModel.File 结构体
@@ -56,4 +58,53 @@ func CheckManager(username, password string) (bool, error) {
 		}
 	}
 	return false, nil
+}
+
+// GetDeviceControlConfig 获取设备控制配置
+func GetDeviceControlConfig() (dbModel.DeviceInfo, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return dbModel.DeviceInfo{}, err
+	}
+	return file.Device, nil
+}
+
+// SaveDeviceControlConfig 保存设备控制配置
+func SaveDeviceControlConfig(deviceInfo dbModel.DeviceInfo) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	file.Device = deviceInfo
+
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	//需要同步处理 global.ConfDir 目录下的 device_blacklist.txt  和 device_whitelist.txt
+	//如果 trim 后结果为空，则删除文件；如果不为空，则写入文件
+	blacklistPath := global.ConfDir + "/device_blacklist.txt"
+	whitelistPath := global.ConfDir + "/device_whitelist.txt"
+
+	if strings.TrimSpace(deviceInfo.Blacklist) == "" {
+		if err := os.Remove(blacklistPath); err != nil && !os.IsNotExist(err) {
+			logger.Warn("remove blacklist file failed:", err)
+		}
+	} else {
+		if err := os.WriteFile(blacklistPath, []byte(deviceInfo.Blacklist), 0o644); err != nil {
+			logger.Warn("write blacklist file failed:", err)
+		}
+	}
+	if strings.TrimSpace(deviceInfo.Whitelist) == "" {
+		if err := os.Remove(whitelistPath); err != nil && !os.IsNotExist(err) {
+			logger.Warn("remove whitelist file failed:", err)
+		}
+	} else {
+		if err := os.WriteFile(whitelistPath, []byte(deviceInfo.Whitelist), 0o644); err != nil {
+			logger.Warn("write whitelist file failed:", err)
+		}
+	}
+
+	return os.WriteFile(global.DbPath, content, 0o644)
 }

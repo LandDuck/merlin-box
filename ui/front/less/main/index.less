@@ -757,6 +757,31 @@
     background-color: transparent;
   }
 
+  .device-hint {
+    padding: 12px 16px;
+
+    background: rgba(151, 203, 255, .08);
+    border: 1px solid rgba(151, 203, 255, .2);
+    border-radius: 10px;
+
+    ol {
+      margin: 0;
+      padding-left: 0px;
+
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    li {
+      color: #BEC7D4;
+
+      font-family: Geist, sans-serif;
+      font-size: 12px;
+      line-height: 18px;
+    }
+  }
+
 
   .device-config {
     display: flex;
@@ -789,7 +814,7 @@
 
   .device-editor {
 
-    height: 128px;
+    height: 256px;
 
     padding: 16px;
 
@@ -815,6 +840,7 @@
 
     line-height: 16px;
 
+    transition: .2s;
 
     &::placeholder {
       color: rgba(190, 199, 212, .3);
@@ -826,6 +852,14 @@
 
       box-shadow: 0 0 12px rgba(151, 203, 255, .15);
     }
+
+    &.error {
+      border-color: rgba(255, 0, 0, .65);
+      background: rgba(255, 0, 0, .08);
+      outline-color: rgba(255, 0, 0, .65);
+      box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25);
+    }
+
   }
 
 
