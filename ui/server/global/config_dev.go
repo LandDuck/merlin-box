@@ -23,8 +23,8 @@ package global
 // DbPath 是数据库文件的路径，开发环境下使用相对路径 "./db/db.json"
 const DbPath = "./db/db.json"
 
-// ConfDir 目录
-const ConfDir = "../../conf"
+// ResDir 目录
+const ResDir = "../../res"
 
 // CoreDir 目录
 const CoreDir = "../.."

@@ -82,10 +82,10 @@ func SaveDeviceControlConfig(deviceInfo dbModel.DeviceInfo) error {
 		return err
 	}
 
-	//需要同步处理 global.ConfDir 目录下的 device_blacklist.txt  和 device_whitelist.txt
+	//需要同步处理 global.ResDir 目录下的 device_blacklist.txt  和 device_whitelist.txt
 	//如果 trim 后结果为空，则删除文件；如果不为空，则写入文件
-	blacklistPath := global.ConfDir + "/device_blacklist.txt"
-	whitelistPath := global.ConfDir + "/device_whitelist.txt"
+	blacklistPath := global.ResDir + "/device_blacklist.txt"
+	whitelistPath := global.ResDir + "/device_whitelist.txt"
 
 	if strings.TrimSpace(deviceInfo.Blacklist) == "" {
 		if err := os.Remove(blacklistPath); err != nil && !os.IsNotExist(err) {
@@ -126,7 +126,7 @@ func saveIPConfig(file *dbModel.Database, kind string, ipInfo dbModel.IPControlI
 	file.IP6 = ipInfo
 }
 
-// syncConfigFile 同步配置文件到 conf 目录
+// syncConfigFile 同步配置文件到 res 目录
 func syncConfigFile(path string, content string) error {
 	if strings.TrimSpace(content) == "" {
 		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
@@ -159,8 +159,8 @@ func SaveIP4ControlConfig(ipInfo dbModel.IPControlInfo) error {
 		return err
 	}
 
-	whitelistPath := global.ConfDir + "/ip4-whitelist.txt"
-	blacklistPath := global.ConfDir + "/ip4-blacklist.txt"
+	whitelistPath := global.ResDir + "/ip4-whitelist.txt"
+	blacklistPath := global.ResDir + "/ip4-blacklist.txt"
 	if err := syncConfigFile(whitelistPath, ipInfo.Whitelist); err != nil {
 		logger.Warn("write IPv4 whitelist file failed:", err)
 	}
@@ -192,8 +192,8 @@ func SaveIP6ControlConfig(ipInfo dbModel.IPControlInfo) error {
 		return err
 	}
 
-	whitelistPath := global.ConfDir + "/ip6-whitelist.txt"
-	blacklistPath := global.ConfDir + "/ip6-blacklist.txt"
+	whitelistPath := global.ResDir + "/ip6-whitelist.txt"
+	blacklistPath := global.ResDir + "/ip6-blacklist.txt"
 	if err := syncConfigFile(whitelistPath, ipInfo.Whitelist); err != nil {
 		logger.Warn("write IPv6 whitelist file failed:", err)
 	}
@@ -225,8 +225,8 @@ func SaveDomainControlConfig(domainInfo dbModel.DomainControlInfo) error {
 		return err
 	}
 
-	blacklistPath := global.ConfDir + "/site-blacklist.txt"
-	blocklistPath := global.ConfDir + "/site-blocklist.txt"
+	blacklistPath := global.ResDir + "/site-blacklist.txt"
+	blocklistPath := global.ResDir + "/site-blocklist.txt"
 	if err := syncConfigFile(blacklistPath, domainInfo.Blacklist); err != nil {
 		logger.Warn("write domain blacklist file failed:", err)
 	}
