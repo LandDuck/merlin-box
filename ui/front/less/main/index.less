@@ -23,6 +23,25 @@
   justify-content: center;
   position: relative;
 
+  .base-config {
+    .domain-editor {
+      height: auto;
+
+      .item {
+        height: 32px;
+        align-self: stretch;
+        justify-content: space-between;
+        align-items: center;
+        display: flex;
+        margin-bottom: 16px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
   .inner {
     margin-left: auto;
     margin-right: auto;
@@ -597,12 +616,9 @@
 
 
   .title-icon {
-
     display: block;
-
     background: #BEC7D4;
   }
-
 
   .blacklist-icon {
     width: 20px;
@@ -610,6 +626,24 @@
 
     /*background: #FFB4AB;*/
     background-image: url("../../images/icon-black.svg");
+    background-color: transparent;
+  }
+
+  .base-config-icon {
+    width: 20px;
+    height: 20px;
+
+    /*background: #97CBFF;*/
+    background-image: url("../../images/icon-base-config.svg");
+    background-color: transparent;
+  }
+
+  .dns-config-icon {
+    width: 20px;
+    height: 20px;
+
+    /*background: #4AE176;*/
+    background-image: url("../../images/icon-dns.svg");
     background-color: transparent;
   }
 
@@ -632,7 +666,8 @@
 
     resize: none;
 
-    overflow: auto;
+    overflow: hidden;
+    overflow-y: auto;
 
     color: #BEC7D4;
 
@@ -665,6 +700,13 @@
       background: rgba(255, 0, 0, .08);
       outline-color: rgba(255, 0, 0, .65);
       box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25);
+    }
+
+
+    //滚动条样式
+    &::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
     }
   }
 
@@ -836,7 +878,8 @@
 
     resize: none;
 
-    overflow: auto;
+    overflow: hidden;
+    overflow-y: auto;
 
 
     background: rgba(17, 24, 39, .4);
@@ -874,6 +917,11 @@
       background: rgba(255, 0, 0, .08);
       outline-color: rgba(255, 0, 0, .65);
       box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25);
+    }
+
+    &::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
     }
 
   }

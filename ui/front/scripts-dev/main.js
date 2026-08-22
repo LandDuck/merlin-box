@@ -31,6 +31,13 @@ window.ReactDOM = ReactDOM;
 window.createRoot = createRoot;
 window.React = React;
 
+import {Switch} from 'antd';
+import {Select} from 'antd';
+
+window.antd={};
+window.antd.Switch = Switch;
+window.antd.Select = Select;
+
 /**
  * 加载页面
  * @param helper

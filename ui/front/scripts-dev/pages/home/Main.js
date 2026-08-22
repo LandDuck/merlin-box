@@ -21,6 +21,7 @@ import NodeList from "./NodeList";
 import DomainControl from "./DomainControl";
 import DeviceControl from "./DeviceControl";
 import IPControl from "./IPControl";
+import BaseConfig from "./BaseConfig";
 
 /**
  * ManagerPanel
@@ -55,6 +56,7 @@ class Main extends React.Component {
     render() {
         const status = <Status key={"status"}/>;
         //const nodeList = <NodeList key={"nodeList"}/>;
+        const baseConfig = <BaseConfig key={"baseConfig"}/>;
         const domainControl = <DomainControl key={"domainControl"}/>;
         const deviceControl = <DeviceControl key={"deviceControl"}/>;
         const ip4Control = <IPControl key={"ip4Control"} title={"IPv4 控制"} version={"ipv4"} getConfigApi={this.$config.apis.comm_getIP4ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP4ControlConfig}/>;
@@ -74,6 +76,7 @@ class Main extends React.Component {
                 }}>退出登录</a>
             </div>,
             status,
+            baseConfig,
             //nodeList,
             domainControl,
             ip4Control,
