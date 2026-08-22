@@ -120,6 +120,7 @@ class DeviceControl extends React.Component {
                     .replace(/\r\n|\r|\n/g, "<br/>");
                 this.$helper.showLogLayer({
                     title: "DHCP客户端列表",
+                    okText: "关闭",
                     content: content
                 });
             }

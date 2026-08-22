@@ -639,7 +639,9 @@ stop_server(){
   print_line "stopping server"
 
   # 与 stop_smartdns 保持一致，直接按进程名查找并优雅/强制停止
-  if ps | grep -v grep | grep -q "merlin-box"; then
+  local server_bin="${CUR_DIR}/bin/merlin-box"
+
+  if ps | grep -v grep | grep -q "$server_bin"; then
     print_normal "⚠️ 侦测到正在运行的 WEBUI 服务实例，正在尝试停止..."
     killall -15 merlin-box 2>/dev/null
     sleep 1

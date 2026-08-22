@@ -26,6 +26,7 @@ import (
 	logger "merlin-box-ui/helper/log"
 	dbModel "merlin-box-ui/model/db"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -274,4 +275,53 @@ func SaveBaseConfig(config dbModel.BaseConfigFull) error {
 		return err
 	}
 	return os.WriteFile(global.DbPath, content, 0o644)
+}
+
+const (
+	defaultEnableIPv6     = 1
+	defaultDisableQUIC    = 1
+	defaultEnableUDP      = 0
+	defaultRouteSelfProxy = 0
+)
+
+// GetBaseConfigScriptArgs 获取 start/restart 使用的基础配置脚本参数
+func GetBaseConfigScriptArgs() ([]string, error) {
+	content, err := os.ReadFile(global.DbPath)
+	if err != nil {
+		return nil, err
+	}
+
+	var file struct {
+		BaseConfig struct {
+			EnableIPv6     *int `json:"enableIPv6"`
+			EnableUDP      *int `json:"enableUDP"`
+			DisableQUIC    *int `json:"disableQUIC"`
+			RouteSelfProxy *int `json:"routeSelfProxy"`
+		} `json:"baseConfig"`
+	}
+	if err := json.Unmarshal(content, &file); err != nil {
+		return nil, err
+	}
+
+	enableIPv6 := fallbackBinaryConfig(file.BaseConfig.EnableIPv6, defaultEnableIPv6)
+	disableQUIC := fallbackBinaryConfig(file.BaseConfig.DisableQUIC, defaultDisableQUIC)
+	enableUDP := fallbackBinaryConfig(file.BaseConfig.EnableUDP, defaultEnableUDP)
+	routeSelfProxy := fallbackBinaryConfig(file.BaseConfig.RouteSelfProxy, defaultRouteSelfProxy)
+
+	return []string{
+		strconv.Itoa(enableIPv6),
+		strconv.Itoa(disableQUIC),
+		strconv.Itoa(enableUDP),
+		strconv.Itoa(routeSelfProxy),
+	}, nil
+}
+
+func fallbackBinaryConfig(value *int, defaultValue int) int {
+	if value == nil {
+		return defaultValue
+	}
+	if *value != 0 && *value != 1 {
+		return defaultValue
+	}
+	return *value
 }

@@ -22,6 +22,7 @@ import (
 	"bufio"
 	"fmt"
 	"merlin-box-ui/global"
+	dbHelper "merlin-box-ui/helper/db"
 	httpHelper "merlin-box-ui/helper/http"
 	"merlin-box-ui/model/resp"
 	"net/http"
@@ -41,23 +42,27 @@ func Status(response http.ResponseWriter, request *http.Request) {
 	} else {
 		path = "/tmp/merlin-box.pid"
 	}
+
+	var status int
+	var duration int
+
 	// 检查文件是否存在
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		httpHelper.ResponseSuccess(response, resp.StatusResponse{
-			Duration: 0,
-			Status:   0,
-		})
-		return
+		status = 0
+	} else {
+		status = 1
 	}
 	fileInfo, err := os.Stat(path)
 	if err != nil {
-		httpHelper.ResponseFailure(response, "无法获取文件信息")
-		return
+		status = 0
+	} else {
+		// 获取文件的创建时间
+		creationTime := fileInfo.ModTime()
+		// 计算当前时间与创建时间的差值，单位为秒
+		duration = int((time.Now().Sub(creationTime)).Seconds())
+		status = 1
 	}
-	// 获取文件的创建时间
-	creationTime := fileInfo.ModTime()
-	// 计算当前时间与创建时间的差值，单位为秒
-	duration := int((time.Now().Sub(creationTime)).Seconds())
+
 	// 测速
 	var domesticDelay = -1
 	var internationalDelay = -1
@@ -70,14 +75,14 @@ func Status(response http.ResponseWriter, request *http.Request) {
 	httpHelper.ResponseSuccess(response, resp.StatusResponse{
 		WorkingDir:         global.WorkingDir,
 		Duration:           duration,
-		Status:             1,
+		Status:             status,
 		DomesticDelay:      domesticDelay,
 		InternationalDelay: internationalDelay,
 	})
 }
 
 // runServiceScriptAsync 异步执行 merlin-box.sh，并持续追加日志到全局变量
-func runServiceScriptAsync(action string) error {
+func runServiceScriptAsync(action string, args ...string) error {
 	scriptPath := filepath.Join(global.WorkingDir, "merlin-box.sh")
 	if _, err := os.Stat(scriptPath); err != nil {
 		return fmt.Errorf("脚本不存在: %s: %w", scriptPath, err)
@@ -93,7 +98,8 @@ func runServiceScriptAsync(action string) error {
 	go func() {
 		defer global.SetServiceRunning(false)
 
-		cmd := exec.Command("bash", scriptPath, action)
+		commandArgs := append([]string{scriptPath, action}, args...)
+		cmd := exec.Command("bash", commandArgs...)
 		cmd.Dir = global.WorkingDir
 
 		stdout, err := cmd.StdoutPipe()
@@ -172,7 +178,12 @@ func runServiceScript(args ...string) (string, error) {
 
 // Start 启动 merlin-box 服务，并异步返回脚本输出日志
 func Start(w http.ResponseWriter, r *http.Request) {
-	if err := runServiceScriptAsync("start"); err != nil {
+	args, err := dbHelper.GetBaseConfigScriptArgs()
+	if err != nil {
+		httpHelper.ResponseFailure(w, "读取基础配置失败")
+		return
+	}
+	if err := runServiceScriptAsync("start", args...); err != nil {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
@@ -190,7 +201,14 @@ func Stop(w http.ResponseWriter, r *http.Request) {
 
 // Restart 重启 merlin-box 服务，并异步返回脚本输出日志
 func Restart(w http.ResponseWriter, r *http.Request) {
-	if err := runServiceScriptAsync("restart"); err != nil {
+	//restart 1 1 0 0 #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
+	//读取db.json， 将 baseConfig 中的 值读过来，如果没有相关的值，使用上面的默认值
+	args, err := dbHelper.GetBaseConfigScriptArgs()
+	if err != nil {
+		httpHelper.ResponseFailure(w, "读取基础配置失败")
+		return
+	}
+	if err := runServiceScriptAsync("restart", args...); err != nil {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}

@@ -62,7 +62,7 @@ if [ ! -d "$SCRIPT_DIR/front/node_modules" ]; then
   echo "[run.sh] Installing front-end dependencies..."
   (
     cd -- "$SCRIPT_DIR/front"
-    npm install --no-fund --no-audit
+    yarn install
   )
 fi
 

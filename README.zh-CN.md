@@ -119,17 +119,17 @@
       </td>
     </tr>
     <tr>
+      <td>UI</td>
+      <td>✅ 已支持</td>
+      <td>
+        已经实现除节点管理以外的所有功能。
+      </td>
+    </tr>
+    <tr>
       <td>ping 代理</td>
       <td>⏳ 暂不支持</td>
       <td>
         不在当前代理范围内。
-      </td>
-    </tr>
-    <tr>
-      <td>UI</td>
-      <td>⏳ 暂不支持</td>
-      <td>
-        待实现。
       </td>
     </tr>
   </tbody>
@@ -143,7 +143,7 @@
 - ⚠️脚本无法检测上游服务器是否支持 IPv6，若上游不支持 IPv6，且 MB_ENABLE_IPV6=1，由于会走IPV6优先模式，可能导致无法上网。
 - QUIC 属于 UDP，无论是否开启 UDP 代理，项目均采取拦截方案（DROP UDP 443），因此会导致依赖 H3/QUIC 的网站在客户端侧无法以 QUIC 访问（通常会回退到 TCP/TLS；个别站点可能表现为打不开或异常）。
 - ⚠️设备黑白名单功能依赖  device_blacklist.txt/device_whitelist.txt 文件是否存在，只要文件存在，脚本就会启用黑/白名单功能，如果不需要此功能，请删除这两个文件。
-
+- WEB UI 使用 ./merlin-box.sh server 启动，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081 。登录用户名密码默认为 admin/merlinbox。
 ---
 
 # ⚙️ 核心运行逻辑
@@ -197,16 +197,16 @@ sing-box（conf/config.json）配置参考：
 merlin-box/
 ├─ merlin-box.sh            # 主入口脚本（start/stop）
 ├─ start_merlin_box.sh      # 用于支持开机启动
-├─ ui/                      # WEB UI 开发目录（待实现）
-│  ├─ server                # WEB UI 后端（待实现）
-│  └─ front                 # WEB UI 前端（待实现）
-├─ wwwroot/                 # WEB UI 静态资源（待实现）
+├─ ui/                      # WEB UI 开发目录
+│  ├─ server                # WEB UI 后端
+│  └─ front                 # WEB UI 前端
+├─ wwwroot/                 # WEB UI 静态资源
 ├─ db/                      # WEB UI 数据库
 │  └─ db.json               # WEB UI 数据库文件，注意第一次拿到后修改登录用户名密码，密码是md5加密后的字符串
 ├─ bin/
 │  ├─ sing-box              # sing-box 可执行文件
 │  ├─ smartdns              # smartdns 可执行文件
-│  └─ merlin-box             # WEB UI server 可执行文件（待实现）
+│  └─ merlin-box             # WEB UI server 可执行文件
 ├─ conf/
 │  ├─ config.json           # sing-box 配置
 │  └─ smartdns.conf         # smartdns 配置
@@ -314,7 +314,7 @@ chmod +x scripts/dnsmasq.postconf
 ./merlin-box.sh stop                       #停止服务
 ./merlin-box.sh restart                    #重启服务
 ./merlin-box.sh restart 1 1 0 0            #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
-./merlin-box.sh server                     #启动 WEB UI server，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081 。登录用户名密码默认为 admin/merlinbox。
+./merlin-box.sh server                     #启动 WEB UI server，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081 。
 ./merlin-box.sh stop_server                #停止 WEB UI server
 ./merlin-box.sh -h                         #显示帮助信息
 ./merlin-box.sh -v                         #显示版本信息

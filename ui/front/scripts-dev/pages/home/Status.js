@@ -70,7 +70,7 @@ class Status extends React.Component {
         this.#timer = setTimeout(() => {
             // 定时器逻辑
             this.#refreshStatus();
-        }, 1000);
+        }, 2000);
     }
 
     /**
@@ -108,6 +108,7 @@ class Status extends React.Component {
      * 停止代理
      */
     #stop() {
+        clearInterval(this.#getLogTimer);
         this.$http.sendPost({
             url: this.$config.apis.comm_stop,
             success: () => {
@@ -115,6 +116,11 @@ class Status extends React.Component {
                 this.#getLog()
                 this.$helper.showLogLayer({
                     title: "正在停止代理",
+                    okText: "关闭",
+                    onOk: () => {
+                        clearInterval(this.#getLogTimer);
+                        //this.#refreshStatus();
+                    },
                     content: () => {
                         return this.#log;
                     }
@@ -127,6 +133,7 @@ class Status extends React.Component {
      * 启动代理
      */
     #start() {
+        clearInterval(this.#getLogTimer);
         this.$http.sendPost({
             url: this.$config.apis.comm_start,
             success: () => {
@@ -134,6 +141,11 @@ class Status extends React.Component {
                 this.#getLog()
                 this.$helper.showLogLayer({
                     title: "正在启动代理",
+                    okText: "关闭",
+                    onOk: () => {
+                        clearInterval(this.#getLogTimer);
+                        //this.#refreshStatus();
+                    },
                     content: () => {
                         return this.#log;
                     }
@@ -146,6 +158,7 @@ class Status extends React.Component {
      * 重启代理
      */
     #restart() {
+        clearInterval(this.#getLogTimer);
         this.$http.sendPost({
             url: this.$config.apis.comm_restart,
             success: () => {
@@ -153,6 +166,11 @@ class Status extends React.Component {
                 this.#getLog()
                 this.$helper.showLogLayer({
                     title: "正在重启代理",
+                    okText: "关闭",
+                    onOk: () => {
+                        clearInterval(this.#getLogTimer);
+                        //this.#refreshStatus();
+                    },
                     content: () => {
                         return this.#log;
                     }
@@ -172,7 +190,10 @@ class Status extends React.Component {
             this.$http.sendPost({
                 url: this.$config.apis.comm_service_log,
                 success: (log) => {
-                    const serverLog = log.replaceAll("\n", "<br/>");
+                    //const serverLog = log.replaceAll("\n", "<br/>");
+                    const serverLog = (log || "")
+                        .replace(/\x1b\[[0-9;]*m/g, "")
+                        .replace(/\r\n|\r|\n/g, "<br/>");
                     if (serverLog !== this.#log) {
                         this.#log = serverLog;
                     } else {
@@ -180,11 +201,11 @@ class Status extends React.Component {
                     }
                 }
             });
-            if (this.#logCount > 7) {
+            if (this.#logCount > 8) {
                 clearInterval(this.#getLogTimer);
                 this.#getLogTimer = null;
             }
-        }, 500);
+        }, 700);
     }
 
     /**

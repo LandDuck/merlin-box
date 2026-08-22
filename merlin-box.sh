@@ -23,7 +23,7 @@ CUR_DIR=$(cd "$(dirname "$0")"; pwd)
 # 脚本名称
 SCRIPT_NAME="$(basename "$0")"
 # 脚本版本
-SCRIPT_VERSION="1.0.3"
+SCRIPT_VERSION="1.0.4"
 # PID
 PID_FILE="/tmp/merlin-box.pid"
 
@@ -145,7 +145,7 @@ start() {
 
   #如果未在路由器中执行, 直接return并给出警告
   if ! is_running_on_router; then
-      print_warning "⚠️ 当前环境非路由器，无法启动 merlin-box。"
+      print_warning "⚠️ 当前环境非路由器，无法启动 merlin-box。$1 $2 $3 $4"
       return 1
   fi
 
@@ -188,7 +188,7 @@ start() {
   MB_ENABLE_UDP="$start_enable_udp"
   MB_ENABLE_ONESELF_PROXY="$start_enable_oneself_proxy"
 
-	print_line "start merlin-box"
+	print_line "start merlin-box ${MB_ENABLE_IPV6} ${MB_DISABLE_QUIC_FROM_LAN} ${MB_ENABLE_UDP} ${MB_ENABLE_ONESELF_PROXY}"
 
   # 如果已经启用IPV6支持，使用 check_ipv6_support 函数检测当前路由是否支持IPv6，如果不支持则禁用IPv6支持
   if [ "$MB_ENABLE_IPV6" -eq 1 ]; then
@@ -260,10 +260,12 @@ restart() {
 
   #如果未在路由器中执行, 直接return并给出警告
   if ! is_running_on_router; then
-      print_warning "⚠️ 当前环境非路由器，无法重启 merlin-box。"
+      print_warning "⚠️ 当前环境非路由器，无法重启 merlin-box。$1 $2 $3 $4"
       #print_warning "⚠️ 当前环境非路由器，无法重启 merlin-box。"
       return 1
   fi
+
+  print_line "restart merlin-box $1 $2 $3 $4"
 
   stop_singbox
   stop_smartdns

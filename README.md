@@ -120,17 +120,17 @@ This project aims to clearly separate responsibilities:
       </td>
     </tr>
     <tr>
+      <td>UI</td>
+      <td>✅ Supported</td>
+      <td>
+        All features except node management have been implemented.
+      </td>
+    </tr>
+    <tr>
       <td>Ping Proxy</td>
       <td>⏳ Not Supported</td>
       <td>
         Not in the current proxy scope.
-      </td>
-    </tr>
-    <tr>
-      <td>UI</td>
-      <td>⏳ Not Supported</td>
-      <td>
-        TODO.
       </td>
     </tr>
   </tbody>
@@ -144,7 +144,7 @@ This project aims to clearly separate responsibilities:
 - ⚠️ The script cannot detect whether the upstream server supports IPv6. If the upstream does not support IPv6 and MB_ENABLE_IPV6=1, since IPv6 priority mode will be used, you may not be able to connect to the internet.
 - QUIC is part of UDP. Regardless of whether UDP proxy is enabled, the project adopts an interception scheme (DROP UDP 443), which means websites that rely on H3/QUIC will not be able to access via QUIC on the client side (usually falls back to TCP/TLS; some sites may fail to open or behave abnormally).
 - ⚠️ Device blacklist and whitelist functionality depends on whether device_blacklist.txt/device_whitelist.txt files exist. As long as the files exist, the script will enable the blacklist/whitelist functionality. If you do not need this feature, please delete these two files.
-
+- WEB UI is started using ./merlin-box.sh server, with the default port being 8080. You can specify a port when starting: ./merlin-box.sh server 8081. The default login username/password is admin/merlinbox.
 ---
 
 # ⚙️ Core Execution Logic
@@ -198,16 +198,16 @@ sing-box (conf/config.json) configuration reference:
 merlin-box/
 ├─ merlin-box.sh            # Main entry script (start/stop)
 ├─ start_merlin_box.sh      # For boot startup support
-├─ ui/                      # WEB UI Development Directory (TODO)
-│  ├─ server                # WEB UI server (TODO)
-│  └─ front                 # WEB UI front-end (TODO)
-├─ wwwroot/                 # WEB UI static files (TODO)
+├─ ui/                      # WEB UI Development Directory
+│  ├─ server                # WEB UI server
+│  └─ front                 # WEB UI front-end
+├─ wwwroot/                 # WEB UI static files
 ├─ db/                      # WEB UI database
 │  └─ db.json               # WEB UI database file, note to change the login username and password after first obtaining it, the password is an md5 encrypted string
 ├─ bin/
 │  ├─ sing-box              # sing-box executable
 │  ├─ smartdns              # smartdns executable
-│  └─ merlin-box             # WEB UI server executable (TODO)
+│  └─ merlin-box             # WEB UI server executable
 ├─ conf/
 │  ├─ config.json           # sing-box configuration
 │  └─ smartdns.conf         # smartdns configuration
@@ -315,7 +315,7 @@ Main entry command:
 ./merlin-box.sh stop                       #Stop service
 ./merlin-box.sh restart                    #Restart service
 ./merlin-box.sh restart 1 1 0 0            #Restart with explicit params: IPv6 QUIC-block UDP oneself-proxy
-./merlin-box.sh server                     #Start WEB UI server, default port is 8080, can specify port on startup: ./merlin-box.sh server 8081. Login username/password defaults to admin/merlinbox.
+./merlin-box.sh server                     #Start WEB UI server, default port is 8080, can specify port on startup: ./merlin-box.sh server 8081. 
 ./merlin-box.sh stop_server                #Stop WEB UI server
 ./merlin-box.sh -h                         #Show help information
 ./merlin-box.sh -v                         #Show version information

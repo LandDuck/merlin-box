@@ -72,43 +72,43 @@ class BaseConfig extends React.Component {
     //国际DNS列表
     #foreignDnsList = [
         {
-            "value": "https://cloudflare-dns.com/dns-query",
+            "value": "https://1.1.1.1/dns-query",
             "label": "Cloudflare"
         },
         {
-            "value": "https://security.cloudflare-dns.com/dns-query",
+            "value": "https://1.1.1.2/dns-query",
             "label": "Cloudflare Security"
         },
         {
-            "value": "https://family.cloudflare-dns.com/dns-query",
+            "value": "https://1.1.1.3/dns-query",
             "label": "Cloudflare Family"
         },
         {
-            "value": "https://dns.google/dns-query",
+            "value": "https://8.8.8.8/dns-query",
             "label": "Google"
         },
         {
-            "value": "https://dns.quad9.net/dns-query",
+            "value": "https://9.9.9.9/dns-query",
             "label": "Quad9 Security"
         },
         {
-            "value": "https://dns10.quad9.net/dns-query",
+            "value": "https://9.9.9.10/dns-query",
             "label": "Quad9 Unfiltered"
         },
         {
-            "value": "https://dns11.quad9.net/dns-query",
+            "value": "https://9.9.9.11/dns-query",
             "label": "Quad9 Security + ECS"
         },
         {
-            "value": "https://dns.adguard-dns.com/dns-query",
+            "value": "https://94.140.14.14/dns-query",
             "label": "AdGuard"
         },
         {
-            "value": "https://family.adguard-dns.com/dns-query",
+            "value": "https://94.140.14.15/dns-query",
             "label": "AdGuard Family"
         },
         {
-            "value": "https://doh.opendns.com/dns-query",
+            "value": "https://208.67.222.222/dns-query",
             "label": "OpenDNS"
         }
     ]
