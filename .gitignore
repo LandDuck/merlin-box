@@ -13,3 +13,4 @@ dist
 device_blacklist.txt
 /ui/server/merlin-box-ui
 /ui/server/merlin-box-ui.exe
+RELEASE.md
