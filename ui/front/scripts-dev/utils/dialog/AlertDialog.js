@@ -63,6 +63,25 @@ class AlertDialog extends DialogBase {
                         </div>
                     </div>
                     <div className="btn">
+                        {
+                            this.#config.onCancel ?
+                                <a href="#" className="btn btn-cancel hover-btn" onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!this.$helper.allowClick("btn-cancel")) {
+                                        return;
+                                    }
+                                    let result = this.#config.onCancel();
+                                    if (result !== false) {
+                                        this.$helper.closeLayer(null, true, this.#config._elId);
+                                    }
+                                }}>
+                                    {
+                                        this.#config.cancelText ? this.#config.cancelText : "取消"
+                                    }
+                                </a>
+                                : null
+                        }
                         <a href="#" className="btn btn-ok hover-btn" onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();

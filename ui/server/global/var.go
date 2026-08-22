@@ -87,6 +87,7 @@ var Version = "0.0.1"
 
 // AuthTokenExpireMinutes token 过期时间（分钟）
 var authToken string
+var authUsername string
 
 // authExpireAt token 过期时间
 var authExpireAt time.Time
@@ -95,7 +96,7 @@ var authExpireAt time.Time
 var authMu sync.RWMutex
 
 // AuthTokenExpireMinutes token 过期时间（分钟）
-func IssueAuthToken() (string, error) {
+func IssueAuthToken(username string) (string, error) {
 	buffer := make([]byte, 32)
 	if _, err := rand.Read(buffer); err != nil {
 		return "", err
@@ -104,6 +105,7 @@ func IssueAuthToken() (string, error) {
 	token := hex.EncodeToString(buffer)
 	authMu.Lock()
 	authToken = token
+	authUsername = username
 	authExpireAt = time.Now().Add(time.Duration(AuthTokenExpireMinutes) * time.Minute)
 	authMu.Unlock()
 	return token, nil
@@ -129,6 +131,17 @@ func RevokeAuthToken(token string) {
 	defer authMu.Unlock()
 	if token == authToken {
 		authToken = ""
+		authUsername = ""
 		authExpireAt = time.Time{}
 	}
+}
+
+// GetAuthUsername 获取当前 token 对应的用户名
+func GetAuthUsername(token string) string {
+	authMu.RLock()
+	defer authMu.RUnlock()
+	if token == "" || token != authToken || time.Now().After(authExpireAt) {
+		return ""
+	}
+	return authUsername
 }

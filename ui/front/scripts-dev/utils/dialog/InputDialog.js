@@ -33,7 +33,10 @@ class InputDialog extends DialogBase {
         this.#props = props;
         this.#config = props.config;
         //合并状态
-        this.state = Object.assign(this.state, {});
+        this.state = Object.assign(this.state, {
+            value: this.#config.value || "",
+            error: false
+        });
     }
 
     /**
@@ -46,7 +49,7 @@ class InputDialog extends DialogBase {
 
     /**
      * 渲染
-     * @returns {JSX.Element}
+     * @return
      */
     render() {
         return (<div className="ns-layer input-layer">
@@ -60,8 +63,18 @@ class InputDialog extends DialogBase {
                             {__html: this.#config.content}
                         }>
                         </div>
-                        <div className="nlc-input">
-                            <input autoComplete="off"/>
+                        <div className={`nlc-input ${this.state.error ? 'error' : ''}`}>
+                            <input autoComplete="off" value={this.state.value} onChange={(e) => {
+                                this.state.value = e.target.value;
+                                let error = false;
+                                if (this.#config.onCheck) {
+                                    error = !this.#config.onCheck(this.state.value);
+                                }
+                                this.setState({
+                                    value: this.state.value,
+                                    error: error
+                                });
+                            }} type="text" placeholder={this.#config.placeholder || ""}/>
                         </div>
                     </div>
                     <div className="btn">
@@ -91,7 +104,7 @@ class InputDialog extends DialogBase {
                             }
                             let result = true;
                             if (this.#config.onOk) {
-                                result = this.#config.onOk();
+                                result = this.#config.onOk(this.state.value);
                             }
                             if (result !== false) {
                                 this.$helper.closeLayer(null, true, this.#config._elId);

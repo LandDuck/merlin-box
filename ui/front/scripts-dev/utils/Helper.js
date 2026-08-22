@@ -88,18 +88,21 @@ class Helper {
      * @param config
      */
     showAlertLayer(config) {
+        console.log("showAlertLayer", config)
         if (config && config.dontCloseOther) {
             if (!config._elId) {
                 config._elId = `ns-layer-out-${this.getUUid()}`;
             }
             let element = this.getLayerOutEle("ns-layer-out", config._elId);
             const root = window.createRoot(element);
+            console.log("showAlertLayer1", config)
             root.render(<AlertDialog config={config}/>);
             return;
         }
         this.closeLayer(() => {
             let element = this.getLayerOutEle();
             const root = window.createRoot(element);
+            console.log("showAlertLayer2", config)
             root.render(<AlertDialog config={config}/>);
         });
     }
@@ -166,8 +169,7 @@ class Helper {
                 $(element).removeClass("show");
             }
             setTimeout(() => {
-                const root = window.createRoot(element);
-                root.unmount();
+                window.unmountRoot(element);
                 if (deleteOutEl) {
                     element.remove();
                 }
@@ -348,6 +350,13 @@ class Helper {
     error(msg) {
         console.log("error", msg)
         message.error(msg);
+    }
+
+    /**
+     * 显示 warning
+     */
+    warning(msg) {
+        message.warning(msg);
     }
 
     /**

@@ -26,6 +26,12 @@ type Login struct {
 	Password string `json:"password" validate:"required,min=6,max=32,passwordfmt"`
 }
 
+// ChangePassword 修改密码请求结构体
+type ChangePassword struct {
+	// Password 新密码
+	Password string `json:"password" validate:"required,min=6,max=32,passwordfmt"`
+}
+
 // SaveDeviceControlConfig 保存设备控制配置请求结构体
 type SaveDeviceControlConfig struct {
 	// Blacklist 黑名单 MAC 地址, 一行一个

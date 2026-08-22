@@ -50,6 +50,50 @@ class Main extends React.Component {
     }
 
     /**
+     * 修改密码
+     */
+    #changePassword() {
+        this.$helper.showInputLayer({
+            title: "修改登录密码",
+            content: "请输入一个新密码。",
+            onCheck: (value) => {
+                if (!value.isPassword(6, 32)) {
+                    return false;
+                }
+                return true;
+            },
+            onOk: (value) => {
+                if (!value || value.trim() === "") {
+                    this.$helper.error("密码不能为空。");
+                    return false;
+                }
+                this.$helper.showAlertLayer({
+                    title: "操作提示",
+                    content: "您确定要修改登录密码吗？",
+                    onCancel: () => {
+                        this.$helper.warning("已取消修改密码。");
+                        return true;
+                    },
+                    onOk: () => {
+                        //提交修改
+                        this.$http.sendPost({
+                            url: this.$config.apis.comm_changePassword,
+                            data: {
+                                password: value
+                            },
+                            success: () => {
+                                //刷新页面
+                                this.$helper.success("密码修改成功。");
+                            }
+                        });
+                    }
+                })
+                return false
+            }
+        })
+    }
+
+    /**
      * 渲染方法
      * @returns
      */
@@ -69,6 +113,11 @@ class Main extends React.Component {
                 <p className="hero-description">
                     基于 ASUSWRT-Merlin 路由器环境的 sing-box + smartdns 分流代理脚本方案。
                 </p>
+                <a href="javascript:void(0);" className={"logout-btn change-pwd-btn"} onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.#changePassword();
+                }}>修改密码</a>
                 <a href="javascript:void(0);" className={"logout-btn"} onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();

@@ -60,13 +60,39 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := global.IssueAuthToken()
+	token, err := global.IssueAuthToken(requestData.Username)
 	if err != nil {
 		httpHelper.ResponseFailure(w, "生成登录凭证失败")
 		return
 	}
 
 	httpHelper.ResponseSuccess(w, token)
+}
+
+// ChangePassword 处理修改密码请求
+func ChangePassword(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[req.ChangePassword](w, r)
+	if !ok {
+		return
+	}
+
+	token := strings.TrimSpace(r.Header.Get("Authorization"))
+	if strings.HasPrefix(token, "Bearer ") {
+		token = strings.TrimSpace(strings.TrimPrefix(token, "Bearer "))
+	}
+
+	username := global.GetAuthUsername(token)
+	if username == "" {
+		httpHelper.ResponseRequireLogin(w)
+		return
+	}
+
+	if err := dbHelper.ChangeManagerPassword(username, requestData.Password); err != nil {
+		httpHelper.ResponseFailure(w, "修改密码失败")
+		return
+	}
+
+	httpHelper.ResponseSuccess(w, "密码修改成功")
 }
 
 // Init 初始化接口，返回是否已登录状态

@@ -19,6 +19,7 @@
 export default {
     comm_init: 'api/init',
     comm_login: 'api/login',
+    comm_changePassword: 'api/change_password',
     comm_status: 'api/status',
     comm_logout: 'api/logout',
     comm_stop: 'api/stop',

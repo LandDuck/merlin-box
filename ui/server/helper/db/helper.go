@@ -61,6 +61,35 @@ func CheckManager(username, password string) (bool, error) {
 	return false, nil
 }
 
+// ChangeManagerPassword 修改指定管理员密码（明文会按 MD5 小写存储）
+func ChangeManagerPassword(username, password string) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+
+	passwordMD5 := md5.Sum([]byte(password))
+	passwordHash := hex.EncodeToString(passwordMD5[:])
+
+	found := false
+	for i := range file.Managers {
+		if file.Managers[i].Username == username {
+			file.Managers[i].Password = passwordHash
+			found = true
+			break
+		}
+	}
+	if !found {
+		return os.ErrNotExist
+	}
+
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}
+
 // GetDeviceControlConfig 获取设备控制配置
 func GetDeviceControlConfig() (dbModel.DeviceInfo, error) {
 	file, err := ReadFile()

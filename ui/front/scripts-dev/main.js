@@ -23,12 +23,40 @@ import cookies from "./utils/Cookies";
 import storage from "./utils/Storage";
 import $ from "jquery";
 import ReactDOM from "react-dom"
-import {createRoot} from 'react-dom/client';
+import {createRoot as reactCreateRoot} from 'react-dom/client';
 import React from "react"
 
 window.$ = $;
 window.ReactDOM = ReactDOM;
-window.createRoot = createRoot;
+const reactRoots = new WeakMap();
+window.createRoot = (container) => {
+    if (!container) {
+        return reactCreateRoot(container);
+    }
+    const existingRoot = reactRoots.get(container);
+    if (existingRoot) {
+        return existingRoot;
+    }
+    const root = reactCreateRoot(container);
+    const unmount = root.unmount.bind(root);
+    root.unmount = () => {
+        unmount();
+        reactRoots.delete(container);
+    };
+    reactRoots.set(container, root);
+    return root;
+};
+window.unmountRoot = (container) => {
+    if (!container) {
+        return false;
+    }
+    const root = reactRoots.get(container);
+    if (!root) {
+        return false;
+    }
+    root.unmount();
+    return true;
+};
 window.React = React;
 
 import {Switch} from 'antd';
@@ -101,4 +129,3 @@ function main() {
 $(document).ready(function () {
     main();
 });
-
