@@ -15,6 +15,8 @@
  * # You should have received a copy of the GNU General Public License
  * # along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import Copyright from "../comm/Copyright";
+
 /**
  * LoginPanel
  */
@@ -159,6 +161,7 @@ class LoginPanel extends React.Component {
                 }}>
                     Login
                 </button>
+                <Copyright/>
             </div>
         </div>
     }

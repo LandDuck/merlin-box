@@ -22,6 +22,7 @@ import DomainControl from "./DomainControl";
 import DeviceControl from "./DeviceControl";
 import IPControl from "./IPControl";
 import BaseConfig from "./BaseConfig";
+import Copyright from "../comm/Copyright";
 
 /**
  * ManagerPanel
@@ -105,6 +106,7 @@ class Main extends React.Component {
         const deviceControl = <DeviceControl key={"deviceControl"}/>;
         const ip4Control = <IPControl key={"ip4Control"} title={"IPv4 控制"} version={"ipv4"} getConfigApi={this.$config.apis.comm_getIP4ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP4ControlConfig}/>;
         const ip6Control = <IPControl key={"ip6Control"} title={"IPv6 控制"} version={"ipv6"} getConfigApi={this.$config.apis.comm_getIP6ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP6ControlConfig}/>;
+        const copyright = <Copyright key={"copyright"}/>;
         return [
             <div className="hero-header" key={"hero-header"}>
                 <h1 className="hero-title">
@@ -130,7 +132,8 @@ class Main extends React.Component {
             domainControl,
             ip4Control,
             ip6Control,
-            deviceControl
+            deviceControl,
+            copyright
         ]
     }
 }
