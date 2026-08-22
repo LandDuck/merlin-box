@@ -110,6 +110,7 @@ tool 子命令:
   download_smartdns  下载 smartdns 可执行文件
   sub2box            将订阅链接转换为 sing-box 配置文件
   build_ui           构建 web-ui
+  package            打包为tar.gz文件
 
 test 子命令:
   print        测试彩色打印输出
@@ -493,13 +494,16 @@ main() {
         build_ui)
           build_ui
           ;;
+        package)
+          package "$3"
+          ;;
         -h|--help|"")
           print_normal "用法: $SCRIPT_NAME tool <subcommand>"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, build_ui"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, build_ui, package"
           ;;
         *)
           print_error "错误: 不支持的工具子命令 '$2'"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, build_ui"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, build_ui, package"
           exit 1
           ;;
       esac

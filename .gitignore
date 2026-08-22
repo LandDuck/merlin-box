@@ -1,8 +1,6 @@
 source
 logs
 .idea
-check-ipv6.sh
-check-lan.sh
 /tools/update-rules/res
 node_modules
 wnode_modules

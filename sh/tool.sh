@@ -465,8 +465,12 @@ build_ui() {
     # 前端目录
     local front_dir="${CUR_DIR}/ui/front"
 
+    local arch="${1:-}"
     # 询问构建arm64还是arm
-    read -p "请输入要构建的架构 (arm64 或 arm): " arch
+    if [ -z "$arch" ]; then
+      read -p "请输入要构建的架构 (arm64 或 arm): " arch
+    fi
+
     if [ "$arch" != "arm64" ] && [ "$arch" != "arm" ]; then
       print_error "错误: 不支持的架构 '$arch'，请使用 arm64 或 arm"
       exit 1
@@ -645,4 +649,40 @@ stop_server(){
   else
     print_normal "🔍 未发现运行中的 WEBUI 服务实例，无需停止。"
   fi
+}
+
+# =========================================
+# 打包为 tar.gz 文件
+# =========================================
+package() {
+
+  local arch="${1:-}"
+  if [ -z "$arch" ]; then
+    read -p "请输入要打包的架构 (arm64 或 arm): " arch
+  fi
+
+  print_normal " 准备处理 smartdns "
+  local smartdns_version=$(get_github_latest_release "pymumu/smartdns")
+  print_warning "远程仓库最新版本: $smartdns_version"
+  download_smartdns "$smartdns_version" "$arch"
+
+  print_normal " 准备处理 singbox "
+  local singbox_version=$(get_github_latest_release "sagernet/sing-box")
+  print_warning "远程仓库最新版本: $singbox_version"
+  build_singbox "$singbox_version" "$arch"
+
+  print_normal " 准备处理 merlinbox "
+  build_ui "$arch"
+
+  print_normal " 打包为 tar.gz 文件 "
+  local package_name="merlin-box-${arch}_${SCRIPT_VERSION}.tar.gz"
+  local package_name_noui="merlin-box-noui-${arch}_${SCRIPT_VERSION}.tar.gz"
+  local package_dir="${CUR_DIR}/dist"
+
+  mkdir -p "$package_dir"
+  tar -czf "${package_dir}/${package_name}" -C "${CUR_DIR}" --exclude='conf/logs' bin conf db res scripts sh wwwroot *.sh LICENSE *.md
+  tar -czf "${package_dir}/${package_name_noui}" --exclude='bin/merlin-box' --exclude='conf/logs' -C "${CUR_DIR}" bin conf db res scripts sh *.sh LICENSE *.md
+
+  print_success "✅ 打包完成: ${package_dir}/${package_name} 和 ${package_dir}/${package_name_noui}"
+
 }
