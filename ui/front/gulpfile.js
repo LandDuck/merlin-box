@@ -36,6 +36,12 @@ const CSS_OUTPUT = "css/main.css";
 const DIST = "dist";
 //生产环境目录
 const WWW_ROOT = "../../wwwroot";
+//构建产物头部版权声明
+const COPYRIGHT_BANNER = `/*!
+ * merlin-box - A sing-box + smartdns routing and proxy script solution for ASUSWRT-Merlin routers.
+ * Copyright (C) 2026 LandDuck <https://github.com/LandDuck/>
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */`;
 
 // page 依赖关系
 const pageContexts = new Map();
@@ -205,21 +211,22 @@ async function copyToWww(file) {
 
 /**
  * 构建less文件
- * @param {{ minify?: boolean, output?: string }} [options]
+ * @param {{ minify?: boolean, output?: string, banner?: string }} [options]
  * @returns {Promise<void>}
  */
 async function buildLess(options = {}) {
-    const {minify = false, output = CSS_OUTPUT} = options;
+    const {minify = false, output = CSS_OUTPUT, banner = ""} = options;
     const input = await fs.readFile(LESS_ENTRY, "utf8");
     const result = await less.render(input, {
         filename: LESS_ENTRY,
         compress: minify
     });
     const css = result.css.replace(/\.\.\/\.\.\//g, "../");
+    const outputCss = banner ? `${banner}\n${css}` : css;
     await fs.mkdir(path.dirname(output), {
         recursive: true
     });
-    await fs.writeFile(output, css, "utf8");
+    await fs.writeFile(output, outputCss, "utf8");
     console.log("build:", output);
 }
 
@@ -301,6 +308,9 @@ export async function build() {
         ],
         outfile: `${DIST}/${OUT}/main.js`,
         ...createEsbuildConfig(false),
+        banner: {
+            js: COPYRIGHT_BANNER
+        },
         minify: true
     });
     //build pages
@@ -312,12 +322,16 @@ export async function build() {
             ],
             outfile: `${DIST}/${pageOutput(file)}`,
             ...createEsbuildConfig(false),
+            banner: {
+                js: COPYRIGHT_BANNER
+            },
             minify: true
         });
     }
     //build less
     await buildLess({
         minify: true,
+        banner: COPYRIGHT_BANNER,
         output: `${DIST}/${CSS_OUTPUT}`
     });
     //复制scripts目录中除了main.js之外的所有文件到dist/scripts目录(不包含任何子目录)
