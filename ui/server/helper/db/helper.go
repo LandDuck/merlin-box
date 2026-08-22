@@ -235,3 +235,43 @@ func SaveDomainControlConfig(domainInfo dbModel.DomainControlInfo) error {
 	}
 	return os.WriteFile(global.DbPath, content, 0o644)
 }
+
+// GetBaseConfig 获取基础配置（含DNS）
+func GetBaseConfig() (dbModel.BaseConfigFull, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return dbModel.BaseConfigFull{}, err
+	}
+	return dbModel.BaseConfigFull{
+		EnableIPv6:     file.BaseConfig.EnableIPv6,
+		EnableUDP:      file.BaseConfig.EnableUDP,
+		DisableQUIC:    file.BaseConfig.DisableQUIC,
+		RouteSelfProxy: file.BaseConfig.RouteSelfProxy,
+		DnsChina:       file.DNS.China,
+		DnsForeign:     file.DNS.Foreign,
+	}, nil
+}
+
+// SaveBaseConfig 保存基础配置（含DNS）
+func SaveBaseConfig(config dbModel.BaseConfigFull) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	file.BaseConfig = dbModel.BaseConfigInfo{
+		EnableIPv6:     config.EnableIPv6,
+		EnableUDP:      config.EnableUDP,
+		DisableQUIC:    config.DisableQUIC,
+		RouteSelfProxy: config.RouteSelfProxy,
+	}
+	file.DNS = dbModel.DNSInfo{
+		China:   config.DnsChina,
+		Foreign: config.DnsForeign,
+	}
+
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}

@@ -34,6 +34,8 @@ export default {
     comm_saveIP6ControlConfig: 'api/save_ip6_control_config',
     comm_getDomainControlConfig: 'api/get_domain_control_config',
     comm_saveDomainControlConfig: 'api/save_domain_control_config',
+    comm_getBaseConfig: 'api/get_base_config',
+    comm_saveBaseConfig: 'api/save_base_config',
 }
 
 

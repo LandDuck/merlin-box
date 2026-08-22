@@ -21,6 +21,98 @@
  */
 class BaseConfig extends React.Component {
 
+    //中国DNS列表
+    #chinaDnsList = [
+        {
+            "value": "223.5.5.5",
+            "label": "阿里 DNS(223.5.5.5)"
+        },
+        {
+            "value": "223.6.6.6",
+            "label": "阿里 DNS(223.6.6.6)"
+        },
+        {
+            "value": "119.28.28.28",
+            "label": "腾讯 DNSPod(119.28.28.28)"
+        },
+        {
+            "value": "119.29.29.29",
+            "label": "腾讯 DNSPod(119.29.29.29)"
+        },
+        {
+            "value": "114.114.114.114",
+            "label": "114 DNS(114.114.114.114)"
+        },
+        {
+            "value": "114.114.115.115",
+            "label": "114 DNS(114.114.115.115)"
+        },
+        {
+            "value": "180.76.76.76",
+            "label": "百度 DNS(180.76.76.76)"
+        },
+        {
+            "value": "180.184.1.1",
+            "label": "火山引擎 DNS(180.184.1.1)"
+        },
+        {
+            "value": "180.184.2.2",
+            "label": "火山引擎 DNS(180.184.2.2)"
+        },
+        {
+            "value": "1.2.4.8",
+            "label": "CNNIC SDNS(1.2.4.8)"
+        },
+        {
+            "value": "210.2.4.8",
+            "label": "CNNIC SDNS(210.2.4.8)"
+        }
+    ]
+
+    //国际DNS列表
+    #foreignDnsList = [
+        {
+            "value": "https://cloudflare-dns.com/dns-query",
+            "label": "Cloudflare"
+        },
+        {
+            "value": "https://security.cloudflare-dns.com/dns-query",
+            "label": "Cloudflare Security"
+        },
+        {
+            "value": "https://family.cloudflare-dns.com/dns-query",
+            "label": "Cloudflare Family"
+        },
+        {
+            "value": "https://dns.google/dns-query",
+            "label": "Google"
+        },
+        {
+            "value": "https://dns.quad9.net/dns-query",
+            "label": "Quad9 Security"
+        },
+        {
+            "value": "https://dns10.quad9.net/dns-query",
+            "label": "Quad9 Unfiltered"
+        },
+        {
+            "value": "https://dns11.quad9.net/dns-query",
+            "label": "Quad9 Security + ECS"
+        },
+        {
+            "value": "https://dns.adguard-dns.com/dns-query",
+            "label": "AdGuard"
+        },
+        {
+            "value": "https://family.adguard-dns.com/dns-query",
+            "label": "AdGuard Family"
+        },
+        {
+            "value": "https://doh.opendns.com/dns-query",
+            "label": "OpenDNS"
+        }
+    ]
+
     /**
      * 构造方法
      * @param props
@@ -28,10 +120,18 @@ class BaseConfig extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            inited: false,
+
             enableIPv6: 1,
             enableUDP: 0,
             disableQUIC: 1,
             routeSelfProxy: 0,
+
+            dnsChina1: "223.5.5.5",
+            dnsChina2: "119.28.28.28",
+
+            dnsForeign1: "https://cloudflare-dns.com/dns-query",
+            dnsForeign2: "https://dns.google/dns-query"
         };
     }
 
@@ -39,7 +139,61 @@ class BaseConfig extends React.Component {
      * 组件挂载完成后执行
      */
     componentDidMount() {
+        this.#load();
+    }
 
+    /**
+     * 加载数据
+     */
+    #load() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_getBaseConfig,
+            success: (data) => {
+                this.setState({
+                    enableIPv6: data.enableIPv6 ?? 1,
+                    enableUDP: data.enableUDP ?? 0,
+                    disableQUIC: data.disableQUIC ?? 1,
+                    routeSelfProxy: data.routeSelfProxy ?? 0,
+                    dnsChina1: (data.dnsChina && data.dnsChina[0]) || "223.5.5.5",
+                    dnsChina2: (data.dnsChina && data.dnsChina[1]) || "119.28.28.28",
+                    dnsForeign1: (data.dnsForeign && data.dnsForeign[0]) || "https://cloudflare-dns.com/dns-query",
+                    dnsForeign2: (data.dnsForeign && data.dnsForeign[1]) || "https://dns.google/dns-query",
+                    inited: true
+                });
+            }
+        });
+    }
+
+    /**
+     * 保存数据（合并传入的更新值，避免 setState 异步问题）
+     * @param {object} updates - 需要更新的字段
+     */
+    #saveWith(updates) {
+        const s = {...this.state, ...updates};
+
+        if (s.dnsChina1 === s.dnsChina2) {
+            this.$helper.error("大陆DNS不能配置相同的地址");
+            return;
+        }
+        if (s.dnsForeign1 === s.dnsForeign2) {
+            this.$helper.error("国际DNS不能配置相同的地址");
+            return;
+        }
+
+        this.$http.sendPost({
+            url: this.$config.apis.comm_saveBaseConfig,
+            data: {
+                enableIPv6: s.enableIPv6,
+                enableUDP: s.enableUDP,
+                disableQUIC: s.disableQUIC,
+                routeSelfProxy: s.routeSelfProxy,
+                dnsChina: [s.dnsChina1, s.dnsChina2],
+                dnsForeign: [s.dnsForeign1, s.dnsForeign2]
+            },
+            success: () => {
+                this.$helper.success("保存成功");
+            }
+        });
     }
 
     /**
@@ -47,7 +201,7 @@ class BaseConfig extends React.Component {
      * @return
      */
     render() {
-        return <div className="domain-config base-config mb-item">
+        return this.state.inited ? <div className="domain-config base-config mb-item">
             <div className="domain-panel">
                 <div className="panel-title">
                     <span className="title-icon base-config-icon"/>
@@ -60,9 +214,11 @@ class BaseConfig extends React.Component {
                         </div>
                         <div className="item-comp">
                             <antd.Switch
-                                defaultChecked={this.state.enableIPv6 === 1}
+                                checked={this.state.enableIPv6 === 1}
                                 onChange={(checked) => {
-                                    this.setState({enableIPv6: checked ? 1 : 0});
+                                    const val = checked ? 1 : 0;
+                                    this.setState({enableIPv6: val});
+                                    this.#saveWith({enableIPv6: val});
                                 }}
                             />
                         </div>
@@ -73,9 +229,11 @@ class BaseConfig extends React.Component {
                         </div>
                         <div className="item-comp">
                             <antd.Switch
-                                defaultChecked={this.state.enableUDP === 1}
+                                checked={this.state.enableUDP === 1}
                                 onChange={(checked) => {
-                                    this.setState({enableUDP: checked ? 1 : 0});
+                                    const val = checked ? 1 : 0;
+                                    this.setState({enableUDP: val});
+                                    this.#saveWith({enableUDP: val});
                                 }}
                             />
                         </div>
@@ -86,9 +244,11 @@ class BaseConfig extends React.Component {
                         </div>
                         <div className="item-comp">
                             <antd.Switch
-                                defaultChecked={this.state.disableQUIC === 1}
+                                checked={this.state.disableQUIC === 1}
                                 onChange={(checked) => {
-                                    this.setState({disableQUIC: checked ? 1 : 0});
+                                    const val = checked ? 1 : 0;
+                                    this.setState({disableQUIC: val});
+                                    this.#saveWith({disableQUIC: val});
                                 }}
                             />
                         </div>
@@ -99,23 +259,15 @@ class BaseConfig extends React.Component {
                         </div>
                         <div className="item-comp">
                             <antd.Switch
-                                defaultChecked={this.state.routeSelfProxy === 1}
+                                checked={this.state.routeSelfProxy === 1}
                                 onChange={(checked) => {
-                                    this.setState({routeSelfProxy: checked ? 1 : 0});
+                                    const val = checked ? 1 : 0;
+                                    this.setState({routeSelfProxy: val});
+                                    this.#saveWith({routeSelfProxy: val});
                                 }}
                             />
                         </div>
                     </div>
-                </div>
-                <div className="panel-footer">
-                      <span className="hint">
-                       这里是一段帮助内容
-                      </span>
-                    <button className="apply-button" onClick={() => {
-
-                    }}>
-                        保存配置
-                    </button>
                 </div>
             </div>
             <div className="domain-panel">
@@ -130,16 +282,13 @@ class BaseConfig extends React.Component {
                         </div>
                         <div className="item-comp">
                             <antd.Select
-                                defaultValue="lucy"
+                                value={this.state.dnsChina1}
                                 style={{width: 230}}
-                                onChange={() => {
+                                onChange={(val) => {
+                                    this.setState({dnsChina1: val});
+                                    this.#saveWith({dnsChina1: val});
                                 }}
-                                options={[
-                                    {value: 'jack', label: 'Jack'},
-                                    {value: 'lucy', label: 'Lucy'},
-                                    {value: 'Yiminghe', label: 'yiminghe'},
-                                    {value: 'disabled', label: 'Disabled', disabled: true},
-                                ]}
+                                options={this.#chinaDnsList}
                             />
                         </div>
                     </div>
@@ -149,70 +298,51 @@ class BaseConfig extends React.Component {
                         </div>
                         <div className="item-comp">
                             <antd.Select
-                                defaultValue="lucy"
+                                value={this.state.dnsChina2}
                                 style={{width: 230}}
-                                onChange={() => {
+                                onChange={(val) => {
+                                    this.setState({dnsChina2: val});
+                                    this.#saveWith({dnsChina2: val});
                                 }}
-                                options={[
-                                    {value: 'jack', label: 'Jack'},
-                                    {value: 'lucy', label: 'Lucy'},
-                                    {value: 'Yiminghe', label: 'yiminghe'},
-                                    {value: 'disabled', label: 'Disabled', disabled: true},
-                                ]}
+                                options={this.#chinaDnsList}
                             />
                         </div>
                     </div>
                     <div className="item">
                         <div className="item-name">
-                            国外DNS1
+                            国际DNS1
                         </div>
                         <div className="item-comp">
                             <antd.Select
-                                defaultValue="lucy"
+                                value={this.state.dnsForeign1}
                                 style={{width: 230}}
-                                onChange={() => {
+                                onChange={(val) => {
+                                    this.setState({dnsForeign1: val});
+                                    this.#saveWith({dnsForeign1: val});
                                 }}
-                                options={[
-                                    {value: 'jack', label: 'Jack'},
-                                    {value: 'lucy', label: 'Lucy'},
-                                    {value: 'Yiminghe', label: 'yiminghe'},
-                                    {value: 'disabled', label: 'Disabled', disabled: true},
-                                ]}
+                                options={this.#foreignDnsList}
                             />
                         </div>
                     </div>
                     <div className="item">
                         <div className="item-name">
-                            国外DNS2
+                            国际DNS2
                         </div>
                         <div className="item-comp">
                             <antd.Select
-                                defaultValue="lucy"
+                                value={this.state.dnsForeign2}
                                 style={{width: 230}}
-                                onChange={() => {
+                                onChange={(val) => {
+                                    this.setState({dnsForeign2: val});
+                                    this.#saveWith({dnsForeign2: val});
                                 }}
-                                options={[
-                                    {value: 'jack', label: 'Jack'},
-                                    {value: 'lucy', label: 'Lucy'},
-                                    {value: 'Yiminghe', label: 'yiminghe'},
-                                    {value: 'disabled', label: 'Disabled', disabled: true},
-                                ]}
+                                options={this.#foreignDnsList}
                             />
                         </div>
                     </div>
-                </div>
-                <div className="panel-footer">
-                      <span className="hint">
-                       这里是一段帮助内容
-                      </span>
-                    <button className="apply-button" onClick={() => {
-
-                    }}>
-                        保存配置
-                    </button>
                 </div>
             </div>
-        </div>
+        </div> : null
     }
 }
 

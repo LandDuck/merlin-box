@@ -5,6 +5,22 @@
       "password": "5fa528c7bee1703d3e1bbf78027d2989"
     }
   ],
+  "baseConfig": {
+    "enableIPv6": 1,
+    "enableUDP": 0,
+    "disableQUIC": 1,
+    "routeSelfProxy": 0
+  },
+  "dns": {
+    "china": [
+      "223.5.5.5",
+      "119.28.28.28"
+    ],
+    "foreign": [
+      "https://cloudflare-dns.com/dns-query",
+      "https://dns.google/dns-query"
+    ]
+  },
   "device": {
     "blacklist": "",
     "whitelist": ""
