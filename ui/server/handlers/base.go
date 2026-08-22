@@ -87,6 +87,17 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 验证旧密码是否正确
+	matched, err := dbHelper.CheckManager(username, requestData.OldPassword)
+	if err != nil {
+		httpHelper.ResponseFailure(w, "验证旧密码失败")
+		return
+	}
+	if !matched {
+		httpHelper.ResponseFailure(w, "旧密码不正确")
+		return
+	}
+
 	if err := dbHelper.ChangeManagerPassword(username, requestData.Password); err != nil {
 		httpHelper.ResponseFailure(w, "修改密码失败")
 		return

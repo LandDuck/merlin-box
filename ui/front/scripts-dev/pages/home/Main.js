@@ -54,44 +54,7 @@ class Main extends React.Component {
      * 修改密码
      */
     #changePassword() {
-        this.$helper.showInputLayer({
-            title: "修改登录密码",
-            content: "请输入一个新密码。",
-            onCheck: (value) => {
-                if (!value.isPassword(6, 32)) {
-                    return false;
-                }
-                return true;
-            },
-            onOk: (value) => {
-                if (!value || value.trim() === "") {
-                    this.$helper.error("密码不能为空。");
-                    return false;
-                }
-                this.$helper.showAlertLayer({
-                    title: "操作提示",
-                    content: "您确定要修改登录密码吗？",
-                    onCancel: () => {
-                        this.$helper.warning("已取消修改密码。");
-                        return true;
-                    },
-                    onOk: () => {
-                        //提交修改
-                        this.$http.sendPost({
-                            url: this.$config.apis.comm_changePassword,
-                            data: {
-                                password: value
-                            },
-                            success: () => {
-                                //刷新页面
-                                this.$helper.success("密码修改成功。");
-                            }
-                        });
-                    }
-                })
-                return false
-            }
-        })
+        this.$helper.showChangePwdLayer();
     }
 
     /**

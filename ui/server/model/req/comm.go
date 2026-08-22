@@ -28,6 +28,8 @@ type Login struct {
 
 // ChangePassword 修改密码请求结构体
 type ChangePassword struct {
+	// OldPassword 旧密码（用于验证身份）
+	OldPassword string `json:"old_password" validate:"required,min=6,max=32,passwordfmt"`
 	// Password 新密码
 	Password string `json:"password" validate:"required,min=6,max=32,passwordfmt"`
 }

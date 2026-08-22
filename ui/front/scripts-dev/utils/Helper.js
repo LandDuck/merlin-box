@@ -25,6 +25,7 @@ import 'moment/locale/zh-cn'
 import AlertDialog from "./dialog/AlertDialog";
 import InputDialog from "./dialog/InputDialog";
 import LogDialog from "./dialog/LogDialog";
+import ChangePwdDialog from "./dialog/ChangePwdDialog";
 import {message} from 'antd';
 
 moment.locale("zh-cn")
@@ -61,6 +62,18 @@ class Helper {
         });
     }
 
+
+    /**
+     * 弹出修改密码对话框
+     */
+    showChangePwdLayer() {
+        const config = {};
+        this.closeLayer(() => {
+            let element = this.getLayerOutEle();
+            const root = window.createRoot(element);
+            root.render(<ChangePwdDialog config={config}/>);
+        });
+    }
 
     /**
      * 弹一个输入框
