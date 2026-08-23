@@ -63,7 +63,7 @@ class Main extends React.Component {
      */
     render() {
         const status = <Status key={"status"}/>;
-        //const nodeList = <NodeList key={"nodeList"}/>;
+        const nodeList = <NodeList key={"nodeList"}/>;
         const baseConfig = <BaseConfig key={"baseConfig"}/>;
         const domainControl = <DomainControl key={"domainControl"}/>;
         const deviceControl = <DeviceControl key={"deviceControl"}/>;
@@ -91,7 +91,7 @@ class Main extends React.Component {
             </div>,
             status,
             baseConfig,
-            //nodeList,
+            nodeList,
             domainControl,
             ip4Control,
             ip6Control,

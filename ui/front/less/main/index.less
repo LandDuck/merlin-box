@@ -348,7 +348,7 @@
   .node-network {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
   }
 
 
@@ -378,18 +378,18 @@
 
 
   .node-list {
-    display: flex;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
 
 
   .node-card {
-    width: 286px;
-    padding: 24px;
+    padding: 12px 16px;
 
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 
     background: rgba(255, 255, 255, .08);
 
@@ -408,21 +408,28 @@
 
 
   .node-top {
+    width: 100%;
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
+
+    .tags {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
   }
 
 
   .node-icon {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    border-radius: 12px;
+    border-radius: 8px;
 
     background: rgba(255, 255, 255, .05);
 
@@ -439,8 +446,9 @@
 
 
     span {
-      width: 19px;
-      height: 19px;
+      background-size: 100% 100%;
+      width: 14px;
+      height: 14px;
       /*background: #BEC7D4;*/
       background-image: url("../../images/icon-node.svg");
       background-color: transparent;
@@ -465,29 +473,29 @@
 
 
   .node-name {
-    padding-top: 12px;
+    padding-top: 6px;
 
     color: #DCE2F7;
 
-    font-size: 18px;
-    line-height: 27px;
+    font-size: 14px;
+    line-height: 20px;
   }
 
 
   .node-ip {
     color: #BEC7D4;
 
-    font-size: 16px;
-    line-height: 24px;
+    font-size: 13px;
+    line-height: 18px;
   }
 
 
   .node-actions {
-    padding-top: 20px;
+    padding-top: 8px;
 
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
   }
 
 
@@ -530,14 +538,15 @@
 
   .node-add {
 
-    width: 286px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 
-    gap: 16px;
+    gap: 8px;
+
+    padding: 12px;
 
     background: rgba(255, 255, 255, .08);
 
@@ -548,14 +557,24 @@
 
     color: #DCE2F7;
 
-    font-size: 16px;
+    font-size: 13px;
+
+    transition: .2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, .15);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
   }
 
 
   .add-icon {
 
-    width: 48px;
-    height: 48px;
+    width: 32px;
+    height: 32px;
 
     display: flex;
     justify-content: center;
@@ -565,10 +584,11 @@
 
 
     span {
-      width: 19px;
-      height: 19px;
+      width: 14px;
+      height: 14px;
       background-image: url("../../images/icon-add.svg");
       background-color: transparent;
+      background-size: 100% 100%;
       /*background: #DCE2F7;*/
     }
   }

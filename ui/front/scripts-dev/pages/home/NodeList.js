@@ -31,6 +31,27 @@ class NodeList extends React.Component {
     }
 
     /**
+     * 第一次挂载后
+     */
+    componentDidMount() {
+
+    }
+
+    /**
+     * 组件卸载
+     */
+    componentWillUnmount() {
+
+    }
+
+    /**
+     * 弹出添加节点弹窗
+     */
+    #addNode() {
+        this.$helper.warning( '添加节点功能尚未实现，请等待后续更新。');
+    }
+
+    /**
      * 渲染方法
      * @return
      */
@@ -46,9 +67,10 @@ class NodeList extends React.Component {
                         <div className="node-icon active">
                             <span/>
                         </div>
-                        <span className="node-tag">
-                          默认
-                        </span>
+                        <div className="tags">
+                            <span className="node-tag">默认</span>
+                            <span className="node-tag">UDP专用</span>
+                        </div>
                     </div>
                     <div className="node-name">
                         Alpha-Gateway
@@ -56,9 +78,27 @@ class NodeList extends React.Component {
                     <div className="node-ip">
                         192.168.1.1
                     </div>
+                </div>
+                <div className="node-card">
+                    <div className="node-top">
+                        <div className="node-icon">
+                            <span/>
+                        </div>
+                        <div className="tags">
+                            <span className="node-tag">UDP专用</span>
+                        </div>
+                    </div>
+                    <div className="node-name">
+                        Beta-Relay
+                    </div>
+                    <div className="node-ip">
+                        192.168.1.45
+                    </div>
                     <div className="node-actions">
+                        <button className="node-action primary">
+                            设为默认
+                        </button>
                         <button className="node-action">
-                            <span className="delete-icon"/>
                             删除
                         </button>
                     </div>
@@ -84,7 +124,51 @@ class NodeList extends React.Component {
                         </button>
                     </div>
                 </div>
-                <div className="node-add">
+                <div className="node-card">
+                    <div className="node-top">
+                        <div className="node-icon">
+                            <span/>
+                        </div>
+                    </div>
+                    <div className="node-name">
+                        Beta-Relay
+                    </div>
+                    <div className="node-ip">
+                        192.168.1.45
+                    </div>
+                    <div className="node-actions">
+                        <button className="node-action primary">
+                            设为UDP专用
+                        </button>
+                        <button className="node-action">
+                            删除
+                        </button>
+                    </div>
+                </div>
+                <div className="node-card">
+                    <div className="node-top">
+                        <div className="node-icon">
+                            <span/>
+                        </div>
+                    </div>
+                    <div className="node-name">
+                        Beta-Relay
+                    </div>
+                    <div className="node-ip">
+                        192.168.1.45
+                    </div>
+                    <div className="node-actions">
+                        <button className="node-action primary">
+                            设为默认
+                        </button>
+                        <button className="node-action">
+                            删除
+                        </button>
+                    </div>
+                </div>
+                <div className="node-add" onClick={() => {
+                    this.#addNode();
+                }}>
                     <div className="add-icon">
                         <span/>
                     </div>
