@@ -51,9 +51,17 @@ class NodeList extends React.Component {
         //this.$helper.warning( '添加节点功能尚未实现，请等待后续更新。');
         this.$helper.showAddNodeDialog({
             onOk: () => {
-
+                this.#loadNodeList();
+                return true;
             }
         });
+    }
+
+    /**
+     * 加载节点列表
+     */
+    #loadNodeList() {
+
     }
 
     /**

@@ -345,6 +345,37 @@ func GetBaseConfigScriptArgs() ([]string, error) {
 	}, nil
 }
 
+// NodeTagExists 检查节点 tag 是否已存在
+func NodeTagExists(tag string) (bool, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return false, err
+	}
+	for _, raw := range file.Nodes {
+		var base struct {
+			Tag string `json:"tag"`
+		}
+		if err := json.Unmarshal(raw, &base); err == nil && base.Tag == tag {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// AppendNode 将节点原始 JSON 追加到节点列表并持久化
+func AppendNode(raw json.RawMessage) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	file.Nodes = append(file.Nodes, raw)
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}
+
 func fallbackBinaryConfig(value *int, defaultValue int) int {
 	if value == nil {
 		return defaultValue

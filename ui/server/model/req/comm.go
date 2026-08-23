@@ -65,3 +65,11 @@ type SaveDomainControlConfig struct {
 	// Blacklist 域名黑名单列表, 一行一个
 	Blacklist string `json:"blacklist"`
 }
+
+// AddNode 添加节点请求结构体
+type AddNode struct {
+	// Type 节点类型，如 naive、shadowsocks 等
+	Type string `json:"type" validate:"required"`
+	// Data 节点数据，前端序列化后的 JSON 字符串
+	Data string `json:"data" validate:"required"`
+}

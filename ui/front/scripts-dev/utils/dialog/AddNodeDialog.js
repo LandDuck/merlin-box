@@ -35,7 +35,13 @@ class AddNodeDialog extends DialogBase {
 
     #props = null;
     #config = null;
+    // 当前表单
+    #form = null;
 
+    /**
+     * 构造方法
+     * @param props
+     */
     constructor(props) {
         super(props);
         this.#props = props;
@@ -52,6 +58,39 @@ class AddNodeDialog extends DialogBase {
     }
 
     /**
+     * 提交表单数据
+     */
+    #submit() {
+        if (!this.#form) {
+            this.$helper.warning("表单未加载完成，请稍后再试。");
+            return;
+        }
+        let data = this.#form.getValue();
+        if (!data) {
+            return;
+        }
+        //console.log("提交数据:", data);
+        const jsonData = JSON.stringify(data);
+        this.$http.sendPost({
+            url: this.$config.apis.comm_addNode,
+            data: {
+                type: data.type,
+                data: jsonData
+            },
+            success: () => {
+                let result = false;
+                this.$helper.success("节点添加成功。");
+                if (this.#config.onOk) {
+                    result = this.#config.onOk();
+                }
+                if (result) {
+                    this.$helper.closeLayer(null, true, this.#config._elId);
+                }
+            }
+        });
+    }
+
+    /**
      * 渲染方法
      * @return
      */
@@ -59,31 +98,49 @@ class AddNodeDialog extends DialogBase {
         let content = null;
         switch (this.state.current) {
             case "shadowsocks":
-                content = <ShadowsocksForm config={this.#config}/>;
+                content = <ShadowsocksForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
             case "vmess":
-                content = <VmessForm config={this.#config}/>;
+                content = <VmessForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
             case "vless":
-                content = <VlessForm config={this.#config}/>;
+                content = <VlessForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
             case "trojan":
-                content = <TrojanForm config={this.#config}/>;
+                content = <TrojanForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
             case "naive":
-                content = <NaiveForm config={this.#config}/>;
+                content = <NaiveForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
             case "wireguard":
-                content = <WireguardForm config={this.#config}/>;
+                content = <WireguardForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
             case "hysteria2":
-                content = <Hysteria2Form config={this.#config}/>;
+                content = <Hysteria2Form config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
             case "tuic":
-                content = <TuicForm config={this.#config}/>;
+                content = <TuicForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
             case "anytls":
-                content = <AnytlsForm config={this.#config}/>;
+                content = <AnytlsForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
                 break;
         }
         return <div className="ns-layer add-node-layer">
@@ -139,8 +196,9 @@ class AddNodeDialog extends DialogBase {
                             e.preventDefault();
                             e.stopPropagation();
                             if (!this.$helper.allowClick("ok-btn")) {
-                                return;
+                                return
                             }
+                            this.#submit();
                         }}>确定</a>
                     </div>
                 </div>

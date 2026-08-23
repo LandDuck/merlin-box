@@ -37,6 +37,7 @@ export default {
     comm_saveDomainControlConfig: 'api/save_domain_control_config',
     comm_getBaseConfig: 'api/get_base_config',
     comm_saveBaseConfig: 'api/save_base_config',
+    comm_addNode: 'api/add_node',
 }
 
 

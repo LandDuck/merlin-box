@@ -36,5 +36,58 @@
   "domain": {
     "blocklist": "# 广告屏蔽\nad.com\ndoubleclick.net",
     "blacklist": "# 苹果相关地址 强制走代理\na1.mzstatic.com\na2.mzstatic.com\na3.mzstatic.com\na4.mzstatic.com\na5.mzstatic.com\nadcdownload.apple.com\nadcdownload.apple.com.akadns.net\namp-api-updates.apps.apple.com\namp-api.media.apple.com\napp-site-association.cdn-apple.com\nappldnld.apple.com\nappldnld.g.aaplimg.com\nappleid.cdn-apple.com\napps.apple.com\napps.mzstatic.com\nbag-cdn.itunes-apple.com.akadns.net\ncdn-cn1.apple-mapkit.com\ncdn-cn2.apple-mapkit.com\ncdn-cn3.apple-mapkit.com\ncdn-cn4.apple-mapkit.com\ncdn.apple-mapkit.com\ncdn1.apple-mapkit.com\ncdn2.apple-mapkit.com\ncdn3.apple-mapkit.com\ncdn4.apple-mapkit.com\ncds-cdn.v.aaplimg.com\ncds.apple.com\ncds.apple.com.akadns.net\ncdsassets.apple.com\ncerts.apple.com\ncl1-cdn.origin-apple.com.akadns.net\ncl1.apple.com\ncl2-cn.apple.com\ncl2.apple.com\ncl3-cdn.origin-apple.com.akadns.net\ncl3.apple.com\ncl4-cdn.origin-apple.com.akadns.net\ncl4-cn.apple.com\ncl4.apple.com\ncl5-cdn.origin-apple.com.akadns.net\ncl5.apple.com\nclientflow.apple.com\nclientflow.apple.com.akadns.net\ncn-smp-paymentservices.apple.com\nconfiguration.apple.com\nconfiguration.apple.com.akadns.net\ncrl.apple.com\ncstat.apple.com\ncstat.cdn-apple.com\ndd-cdn.origin-apple.com.akadns.net\ndejavu.apple.com\ndevimages-cdn.apple.com\ndevstreaming-cdn.apple.com\ndownload.developer.apple.com\nexperiments.apple.com\ngs-loc-cn.apple.com\ngs-loc.apple.com\ngsp10-ssl-cn.ls.apple.com\ngsp12-cn.ls.apple.com\ngsp13-cn.ls.apple.com\ngsp4-cn.ls.apple.com\ngsp4-cn.ls.apple.com.edgekey.net.globalredir.akadns.net\ngsp5-cn.ls.apple.com\ngsp85-cn-ssl.ls.apple.com\ngspe19-2-cn-ssl.ls-apple.com.akadns.net\ngspe19-2-cn-ssl.ls.apple.com\ngspe19-cn-ssl.ls.apple.com\ngspe19-cn.ls-apple.com.akadns.net\ngspe19-cn.ls.apple.com\ngspe21-ssl.ls.apple.com\ngspe35-ssl.ls.apple.com\ngspe79-cn-ssl.ls.apple.com\nguzzoni-apple-com.v.aaplimg.com\nguzzoni.apple.com\nguzzoni.smoot.apple.com\niadsdk.apple.com\nicloud-cdn.icloud.com.akadns.net\nicloud.cdn-apple.com\nimages.apple.com.edgekey.net.globalredir.akadns.net\ninit-kt.apple.com\ninit-p01md-lb.push-apple.com.akadns.net\ninit-p01md.apple.com\ninit-p01st-lb.push-apple.com.akadns.net\ninit-p01st.push.apple.com\ninit-s01st-lb.push-apple.com.akadns.net\ninit-s01st.push.apple.com\ninit.ess.apple.com\niosapps.itunes.g.aaplimg.com\nipcdn.apple.com\niphone-ld.apple.com\niphone-ld.origin-apple.com.akadns.net\nis-ssl.mzstatic.com-cn-lb.itunes-apple.com.akadns.net\nis1-ssl.mzstatic.com\nis1.mzstatic.com\nis2-ssl.mzstatic.com\nis2.mzstatic.com\nis3-ssl.mzstatic.com\nis3.mzstatic.com\nis4-ssl.mzstatic.com\nis4.mzstatic.com\nis5-ssl.mzstatic.com\nis5.mzstatic.com\nitunes-apple.com.akadns.net\nitunes.apple.com\nitunesconnect.apple.com\nmesu-cdn.apple.com.akadns.net\nmesu-china.apple.com.akadns.net\nmesu.apple.com\nml.cdn-apple.com\nmusic.apple.com\nocsp-lb.apple.com.akadns.net\nocsp.apple.com\nocsp2-lb.apple.com.akadns.net\nocsp2.apple.com\noscdn.apple.com\noscdn.origin-apple.com.akadns.net\nosxapps.itunes.g.aaplimg.com\npancake.apple.com\npancake.cdn-apple.com.akadns.net\npba0.apple.com\nprobe.siri.apple.com\nprod-support.apple-support.akadns.net\npublicassets.cdn-apple.com\nreserve-prime.apple.com\ns.mzstatic.com\nseed-sequoia.siri.apple.com\nseed-swallow.siri.apple.com\nseed.siri.apple.com\nsequoia.apple.com\nsh-pod2-smp-device.apple.com\nshazam-insights.cdn-apple.com\nsmp-device-content.apple.com\nstatic.gc.apple.com\nstocks-sparkline-lb.apple.com.akadns.net\nstocks-sparkline.apple.com\nstore.apple.com\nstore.apple.com.edgekey.net\nstore.apple.com.edgekey.net.globalredir.akadns.net\nstore.storeimages.apple.com.akadns.net\nstore.storeimages.cdn-apple.com\nsupport-china.apple-support.akadns.net\nsupport.apple.com\nswallow-apple-com.v.aaplimg.com\nswallow.apple.com\nswcatalog-cdn.apple.com.akadns.net\nswcatalog.apple.com\nswcdn.apple.com\nswcdn.g.aaplimg.com\nswdist.apple.com\nswdist.apple.com.akadns.net\nswscan-cdn.apple.com.akadns.net\nswscan.apple.com\nsylvan.apple.com\ntj-pod1-smp-device.apple.com\nupdates-http.cdn-apple.com\nupdates-http.cdn-apple.com.akadns.net\nupdates.cdn-apple.com\nvalid.apple.com\nvalid.origin-apple.com.akadns.net\nweather-data.apple.com\nweather-data.apple.com.akadns.net\nweather-map.apple.com\nweather-map2.apple.com\nweatherkit.apple.com\nwww.apple.com\nwww.apple.com.edgekey.net.globalredir.akadns.net\nxp.apple.com"
-  }
+  },
+  "nodes": [
+    {
+      "name": "test",
+      "tag": "4aba2fd1-e00a-4bdf-8f13-9f72e5c87f03",
+      "type": "naive",
+      "is_default": false,
+      "server": "1.1.1.1",
+      "server_port": 443,
+      "username": "admin",
+      "password": "admin",
+      "udp_over_tcp": false,
+      "quic": true,
+      "quic_congestion_control": "bbr2",
+      "tls": {
+        "enabled": true,
+        "server_name": "cloudflare"
+      }
+    },
+    {
+      "name": "a",
+      "tag": "18ff1020-d0fe-46c1-818e-8c13e40d1a23",
+      "type": "naive",
+      "is_default": false,
+      "server": "1.1.1.1",
+      "server_port": 2,
+      "username": "haha",
+      "password": "h",
+      "udp_over_tcp": false,
+      "quic": false,
+      "quic_congestion_control": "",
+      "tls": {
+        "enabled": true,
+        "server_name": "haha"
+      }
+    },
+    {
+      "name": "admin",
+      "tag": "83d07d58-d792-4e21-a103-b65f37d83927",
+      "type": "naive",
+      "is_default": false,
+      "server": "1.1.1.1",
+      "server_port": 1,
+      "username": "2",
+      "password": "3",
+      "udp_over_tcp": true,
+      "quic": false,
+      "quic_congestion_control": "",
+      "tls": {
+        "enabled": true,
+        "server_name": "admin"
+      }
+    }
+  ]
 }

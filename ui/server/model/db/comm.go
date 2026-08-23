@@ -18,6 +18,8 @@
 
 package db
 
+import "encoding/json"
+
 // Database 数据库结构体，包含管理员列表
 type Database struct {
 	// Managers 管理员列表
@@ -34,6 +36,8 @@ type Database struct {
 	IP6 IPControlInfo `json:"ip6"`
 	// Domain 域名控制信息
 	Domain DomainControlInfo `json:"domain"`
+	// Nodes 节点列表，每个元素为原始 JSON（支持多种节点类型）
+	Nodes []json.RawMessage `json:"nodes"`
 }
 
 // Manager 管理员结构体，包含用户名和密码
