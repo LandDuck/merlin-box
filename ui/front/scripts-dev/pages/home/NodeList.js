@@ -48,7 +48,12 @@ class NodeList extends React.Component {
      * 弹出添加节点弹窗
      */
     #addNode() {
-        this.$helper.warning( '添加节点功能尚未实现，请等待后续更新。');
+        //this.$helper.warning( '添加节点功能尚未实现，请等待后续更新。');
+        this.$helper.showAddNodeDialog({
+            onOk: () => {
+
+            }
+        });
     }
 
     /**

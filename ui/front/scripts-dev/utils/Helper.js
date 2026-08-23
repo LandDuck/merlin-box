@@ -27,6 +27,7 @@ import InputDialog from "./dialog/InputDialog";
 import LogDialog from "./dialog/LogDialog";
 import ChangePwdDialog from "./dialog/ChangePwdDialog";
 import {message} from 'antd';
+import AddNodeDialog from "./dialog/AddNodeDialog";
 
 moment.locale("zh-cn")
 
@@ -39,6 +40,27 @@ class Helper {
         //这个是为了防止按钮高频率点击
         this._mts = {};
         this._mtsMax = 500;
+    }
+
+    /**
+     * 弹出添加节点弹窗
+     * @param config
+     */
+    showAddNodeDialog(config) {
+        if (config && config.dontCloseOther) {
+            if (!config._elId) {
+                config._elId = `ns-layer-out-${this.getUUid()}`;
+            }
+            let element = this.getLayerOutEle("ns-layer-out", config._elId);
+            const root = window.createRoot(element);
+            root.render(<AddNodeDialog config={config}/>);
+            return;
+        }
+        this.closeLayer(() => {
+            let element = this.getLayerOutEle();
+            const root = window.createRoot(element);
+            root.render(<AddNodeDialog config={config}/>);
+        });
     }
 
     /**

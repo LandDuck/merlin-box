@@ -40,4 +40,86 @@
         var regObj = new RegExp(regExpStr)
         return regObj.test(this)
     }
+
+    /**
+     * 校验 IPv4
+     * @returns {boolean}
+     */
+    String.prototype.isIPv4 = function () {
+        var value = (this || "").trim()
+        var parts = value.split(".")
+        if (parts.length !== 4) {
+            return false
+        }
+        for (var i = 0; i < parts.length; i++) {
+            var part = parts[i]
+            if (!/^\d{1,3}$/.test(part)) {
+                return false
+            }
+            var num = Number(part)
+            if (num < 0 || num > 255) {
+                return false
+            }
+            if (part.length > 1 && part.charAt(0) === "0") {
+                return false
+            }
+        }
+        return true
+    }
+
+    /**
+     * 校验 IPv6
+     * @returns {boolean}
+     */
+    String.prototype.isIPv6 = function () {
+        var value = (this || "").trim()
+        return /^(([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4}|:)|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))$/.test(value)
+    }
+
+    /**
+     * 校验域名
+     * @returns {boolean}
+     */
+    String.prototype.isDomain = function () {
+        var value = (this || "").trim()
+        if (!/^[a-zA-Z0-9.-]+$/.test(value)) {
+            return false
+        }
+        if (value.length > 253 || value.indexOf(".") === 0 || value.charAt(value.length - 1) === ".") {
+            return false
+        }
+        var labels = value.split(".")
+        for (var i = 0; i < labels.length; i++) {
+            var label = labels[i]
+            if (!label || label.length > 63) {
+                return false
+            }
+            if (label.indexOf("-") === 0 || label.charAt(label.length - 1) === "-") {
+                return false
+            }
+        }
+        return true
+    }
+
+    /**
+     * 校验主机地址 (IPv4 / IPv6 / 域名)
+     * @returns {boolean}
+     */
+    String.prototype.isHost = function () {
+        var value = (this || "").trim()
+        return value.isIPv4() || value.isIPv6() || value.isDomain()
+    }
+
+    /**
+     * 校验端口范围 1 ~ 65535
+     * @returns {boolean}
+     */
+    String.prototype.isPort = function () {
+        var value = (this || "").trim()
+        if (!/^\d+$/.test(value)) {
+            return false
+        }
+        var port = Number(value)
+        return Number.isInteger(port) && port >= 1 && port <= 65535
+    }
 })()
