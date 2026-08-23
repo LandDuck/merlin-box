@@ -39,50 +39,33 @@
   },
   "nodes": [
     {
-      "is_default": false,
-      "name": "a",
-      "password": "h",
+      "is_default": true,
+      "name": "我的Naive节点",
+      "password": "admin",
       "quic": false,
       "quic_congestion_control": "",
       "server": "1.1.1.1",
-      "server_port": 2,
-      "tag": "18ff1020-d0fe-46c1-818e-8c13e40d1a23",
+      "server_port": 443,
+      "tag": "4c4b28f3-a45e-42fb-8fa0-218be350c9e9",
       "tls": {
         "enabled": true,
-        "server_name": "haha"
+        "server_name": "cloudflare.com"
       },
       "type": "naive",
       "udp_over_tcp": false,
-      "username": "haha"
+      "username": "admin"
     },
     {
-      "is_default": false,
-      "name": "admin",
-      "password": "3",
-      "quic": false,
-      "quic_congestion_control": "",
-      "server": "1.1.1.1",
-      "server_port": 1,
-      "tag": "83d07d58-d792-4e21-a103-b65f37d83927",
-      "tls": {
-        "enabled": true,
-        "server_name": "admin"
-      },
-      "type": "naive",
-      "udp_over_tcp": true,
-      "username": "2"
-    },
-    {
-      "is_default": true,
-      "method": "2022-blake3-aes-128-gcm",
-      "name": "shadowsocks",
-      "network": "",
-      "password": "443",
-      "server": "1.1.1.1",
-      "server_port": 443,
-      "tag": "845649d1-b332-49e2-8a1e-9d0f6aa8846e",
+      "name": "我的SS节点",
+      "tag": "06c852af-af2e-4089-87af-463efc54fa46",
       "type": "shadowsocks",
-      "udp_over_tcp": true
+      "is_default": false,
+      "server": "2.2.2.2",
+      "server_port": 443,
+      "method": "2022-blake3-aes-128-gcm",
+      "password": "admin",
+      "network": "",
+      "udp_over_tcp": false
     }
   ]
 }

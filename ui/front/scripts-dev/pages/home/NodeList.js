@@ -90,6 +90,7 @@ class NodeList extends React.Component {
                     data: {tag},
                     success: () => {
                         this.#loadNodeList();
+                        this.$helper.warning("已设为默认节点，重启代理后生效。");
                     }
                 });
             },

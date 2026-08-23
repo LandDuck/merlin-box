@@ -23,6 +23,50 @@
   justify-content: center;
   position: relative;
 
+  .tab-group {
+    margin-bottom: 24px;
+
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /*overflow-x: auto;*/
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 20px;
+      gap: 4px;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      a {
+        flex-shrink: 0;
+        padding: 10px 20px;
+        color: #BEC7D4;
+        font-size: 14px;
+        line-height: 24px;
+        text-decoration: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        border-radius: 4px 4px 0 0;
+        transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+        white-space: nowrap;
+
+        &:hover {
+          color: #DCE2F7;
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        &.active {
+          color: #0EA5FF;
+          border-bottom-color: #0EA5FF;
+          background: rgba(14, 165, 255, 0.06);
+        }
+      }
+    }
+  }
+
   .base-config {
     .domain-editor {
       height: auto;
@@ -403,6 +447,8 @@
 
     &.node-active {
       outline-color: rgba(151, 203, 255, .3);
+      //在背景色上也明显一些
+      background: rgba(151, 203, 255, .08);
     }
   }
 

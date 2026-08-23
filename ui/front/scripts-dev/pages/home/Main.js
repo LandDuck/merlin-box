@@ -35,6 +35,9 @@ class Main extends React.Component {
      */
     constructor(props) {
         super(props);
+        this.state = {
+            current: "base" //当前选中的 tab
+        };
     }
 
     /**
@@ -62,15 +65,39 @@ class Main extends React.Component {
      * @returns
      */
     render() {
-        const status = <Status key={"status"}/>;
-        const nodeList = <NodeList key={"nodeList"}/>;
-        const baseConfig = <BaseConfig key={"baseConfig"}/>;
-        const domainControl = <DomainControl key={"domainControl"}/>;
-        const deviceControl = <DeviceControl key={"deviceControl"}/>;
-        const ip4Control = <IPControl key={"ip4Control"} title={"IPv4 控制"} version={"ipv4"} getConfigApi={this.$config.apis.comm_getIP4ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP4ControlConfig}/>;
-        const ip6Control = <IPControl key={"ip6Control"} title={"IPv6 控制"} version={"ipv6"} getConfigApi={this.$config.apis.comm_getIP6ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP6ControlConfig}/>;
-        const copyright = <Copyright key={"copyright"}/>;
-        return [
+        //const status = <Status key={"status"}/>;
+        //const nodeList = <NodeList key={"nodeList"}/>;
+        //const baseConfig = <BaseConfig key={"baseConfig"}/>;
+        //const domainControl = <DomainControl key={"domainControl"}/>;
+        //const deviceControl = <DeviceControl key={"deviceControl"}/>;
+        //const ip4Control = <IPControl key={"ip4Control"} title={"IPv4 控制"} version={"ipv4"} getConfigApi={this.$config.apis.comm_getIP4ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP4ControlConfig}/>;
+        //const ip6Control = <IPControl key={"ip6Control"} title={"IPv6 控制"} version={"ipv6"} getConfigApi={this.$config.apis.comm_getIP6ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP6ControlConfig}/>;
+        //const copyright = <Copyright key={"copyright"}/>;
+        let content = null;
+        switch (this.state.current) {
+            case "base":
+                content = <BaseConfig key={"baseConfig"}/>;
+                break;
+            case "node":
+                content = <NodeList key={"nodeList"}/>;
+                break;
+            case "domain":
+                content = <DomainControl key={"domainControl"}/>;
+                break;
+            case "ip4":
+                content = <IPControl key={"ip4Control"} title={"IPv4 控制"} version={"ipv4"} getConfigApi={this.$config.apis.comm_getIP4ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP4ControlConfig}/>;
+                break;
+            case "ip6":
+                content = <IPControl key={"ip6Control"} title={"IPv6 控制"} version={"ipv6"} getConfigApi={this.$config.apis.comm_getIP6ControlConfig} saveConfigApi={this.$config.apis.comm_saveIP6ControlConfig}/>;
+                break;
+            case "device":
+                content = <DeviceControl key={"deviceControl"}/>;
+                break;
+            default:
+                content = <BaseConfig key={"baseConfig"}/>;
+        }
+
+        return <div className="tab-group">
             <div className="hero-header" key={"hero-header"}>
                 <h1 className="hero-title">
                     Merlin-box-UI
@@ -88,16 +115,33 @@ class Main extends React.Component {
                     e.stopPropagation();
                     this.#logout();
                 }}>退出登录</a>
-            </div>,
-            status,
-            baseConfig,
-            nodeList,
-            domainControl,
-            ip4Control,
-            ip6Control,
-            deviceControl,
-            copyright
-        ]
+            </div>
+            <div className="tab-bar">
+                <a href="javascript:void(0);" className={this.state.current === "base" ? "active" : ""} onClick={() =>
+                    this.setState({current: "base"})
+                }>基础配置</a>
+                <a href="javascript:void(0);" className={this.state.current === "node" ? "active" : ""} onClick={() =>
+                    this.setState({current: "node"})
+                }>节点管理</a>
+                <a href="javascript:void(0);" className={this.state.current === "domain" ? "active" : ""} onClick={() =>
+                    this.setState({current: "domain"})
+                }>域名控制</a>
+                <a href="javascript:void(0);" className={this.state.current === "ip4" ? "active" : ""} onClick={() =>
+                    this.setState({current: "ip4"})
+                }>IPv4 控制</a>
+                <a href="javascript:void(0);" className={this.state.current === "ip6" ? "active" : ""} onClick={() =>
+                    this.setState({current: "ip6"})
+                }>IPv6 控制</a>
+                <a href="javascript:void(0);" className={this.state.current === "device" ? "active" : ""} onClick={() =>
+                    this.setState({current: "device"})
+                }>设备控制</a>
+            </div>
+            <Status key={"status"}/>
+            <div className="tab-content">
+                {content}
+            </div>
+            <Copyright key={"copyright"}/>
+        </div>
     }
 }
 
