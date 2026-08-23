@@ -158,3 +158,42 @@ func validateShadowsocksNode(node dbModel.ShadowsocksNode) error {
 	}
 	return nil
 }
+
+// GetNodeList 获取节点列表（默认节点排第一）
+func GetNodeList(w http.ResponseWriter, r *http.Request) {
+	nodes, err := dbHelper.GetNodeList()
+	if err != nil {
+		httpHelper.ResponseFailure(w, "读取节点列表失败")
+		return
+	}
+	if nodes == nil {
+		nodes = []json.RawMessage{}
+	}
+	httpHelper.ResponseSuccess(w, nodes)
+}
+
+// DeleteNode 删除节点（按 tag）
+func DeleteNode(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[reqModel.NodeTagRequest](w, r)
+	if !ok {
+		return
+	}
+	if err := dbHelper.DeleteNode(requestData.Tag); err != nil {
+		httpHelper.ResponseFailure(w, "删除节点失败")
+		return
+	}
+	httpHelper.ResponseSuccess(w, "删除成功")
+}
+
+// SetDefaultNode 设置默认节点（按 tag）
+func SetDefaultNode(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[reqModel.NodeTagRequest](w, r)
+	if !ok {
+		return
+	}
+	if err := dbHelper.SetDefaultNode(requestData.Tag); err != nil {
+		httpHelper.ResponseFailure(w, "设置默认节点失败")
+		return
+	}
+	httpHelper.ResponseSuccess(w, "设置成功")
+}

@@ -28,13 +28,16 @@ class NodeList extends React.Component {
      */
     constructor(props) {
         super(props);
+        this.state = {
+            nodeList: []
+        };
     }
 
     /**
      * 第一次挂载后
      */
     componentDidMount() {
-
+        this.#loadNodeList();
     }
 
     /**
@@ -48,7 +51,6 @@ class NodeList extends React.Component {
      * 弹出添加节点弹窗
      */
     #addNode() {
-        //this.$helper.warning( '添加节点功能尚未实现，请等待后续更新。');
         this.$helper.showAddNodeDialog({
             onOk: () => {
                 this.#loadNodeList();
@@ -61,7 +63,89 @@ class NodeList extends React.Component {
      * 加载节点列表
      */
     #loadNodeList() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_loadNodeList,
+            success: (res) => {
+                this.setState({
+                    nodeList: res || []
+                });
+            }
+        });
+    }
 
+    /**
+     * 设为默认节点
+     * @param {string} tag
+     */
+    #setDefault(tag) {
+        this.$helper.showAlertLayer({
+            title: "操作提示",
+            content: "确认设为默认节点？",
+            onCancel: () => {
+                this.$helper.warning("已取消设为默认节点操作。");
+            },
+            onOk: () => {
+                this.$http.sendPost({
+                    url: this.$config.apis.comm_setDefaultNode,
+                    data: {tag},
+                    success: () => {
+                        this.#loadNodeList();
+                    }
+                });
+            },
+        });
+    }
+
+    /**
+     * 删除节点
+     * @param {string} tag
+     */
+    #deleteNode(tag) {
+        this.$helper.showAlertLayer({
+            title: "操作提示",
+            content: "确认删除该节点？",
+            onCancel: () => {
+                this.$helper.warning("已取消删除节点操作。");
+            },
+            onOk: () => {
+                this.$http.sendPost({
+                    url: this.$config.apis.comm_deleteNode,
+                    data: {tag},
+                    success: () => {
+                        this.$helper.success('删除成功');
+                        this.#loadNodeList();
+                    }
+                });
+            },
+        });
+    }
+
+    /**
+     * 渲染单张节点卡片
+     */
+    #renderCard(node) {
+        const isDefault = node.is_default === true;
+        return <div key={node.tag} className={`node-card${isDefault ? ' node-active' : ''}`}>
+            <div className="node-top">
+                <div className={`node-icon${isDefault ? ' active' : ''}`}>
+                    <span/>
+                </div>
+                <div className="tags">
+                    {isDefault && <span className="node-tag">默认</span>}
+                    {node.type && <span className="node-tag">{node.type}</span>}
+                </div>
+            </div>
+            <div className="node-name">{node.name}</div>
+            <div className="node-ip">{node.server}</div>
+            {!isDefault && <div className="node-actions">
+                <button className="node-action primary" onClick={() => this.#setDefault(node.tag)}>
+                    设为默认
+                </button>
+                <button className="node-action" onClick={() => this.#deleteNode(node.tag)}>
+                    删除
+                </button>
+            </div>}
+        </div>;
     }
 
     /**
@@ -75,110 +159,7 @@ class NodeList extends React.Component {
                 <h2>节点列表</h2>
             </div>
             <div className="node-list">
-                <div className="node-card node-active">
-                    <div className="node-top">
-                        <div className="node-icon active">
-                            <span/>
-                        </div>
-                        <div className="tags">
-                            <span className="node-tag">默认</span>
-                            <span className="node-tag">UDP专用</span>
-                        </div>
-                    </div>
-                    <div className="node-name">
-                        Alpha-Gateway
-                    </div>
-                    <div className="node-ip">
-                        192.168.1.1
-                    </div>
-                </div>
-                <div className="node-card">
-                    <div className="node-top">
-                        <div className="node-icon">
-                            <span/>
-                        </div>
-                        <div className="tags">
-                            <span className="node-tag">UDP专用</span>
-                        </div>
-                    </div>
-                    <div className="node-name">
-                        Beta-Relay
-                    </div>
-                    <div className="node-ip">
-                        192.168.1.45
-                    </div>
-                    <div className="node-actions">
-                        <button className="node-action primary">
-                            设为默认
-                        </button>
-                        <button className="node-action">
-                            删除
-                        </button>
-                    </div>
-                </div>
-                <div className="node-card">
-                    <div className="node-top">
-                        <div className="node-icon">
-                            <span/>
-                        </div>
-                    </div>
-                    <div className="node-name">
-                        Beta-Relay
-                    </div>
-                    <div className="node-ip">
-                        192.168.1.45
-                    </div>
-                    <div className="node-actions">
-                        <button className="node-action primary">
-                            设为默认
-                        </button>
-                        <button className="node-action">
-                            删除
-                        </button>
-                    </div>
-                </div>
-                <div className="node-card">
-                    <div className="node-top">
-                        <div className="node-icon">
-                            <span/>
-                        </div>
-                    </div>
-                    <div className="node-name">
-                        Beta-Relay
-                    </div>
-                    <div className="node-ip">
-                        192.168.1.45
-                    </div>
-                    <div className="node-actions">
-                        <button className="node-action primary">
-                            设为UDP专用
-                        </button>
-                        <button className="node-action">
-                            删除
-                        </button>
-                    </div>
-                </div>
-                <div className="node-card">
-                    <div className="node-top">
-                        <div className="node-icon">
-                            <span/>
-                        </div>
-                    </div>
-                    <div className="node-name">
-                        Beta-Relay
-                    </div>
-                    <div className="node-ip">
-                        192.168.1.45
-                    </div>
-                    <div className="node-actions">
-                        <button className="node-action primary">
-                            设为默认
-                        </button>
-                        <button className="node-action">
-                            删除
-                        </button>
-                    </div>
-                </div>
+                {this.state.nodeList.map(node => this.#renderCard(node))}
                 <div className="node-add" onClick={() => {
                     this.#addNode();
                 }}>

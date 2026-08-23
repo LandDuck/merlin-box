@@ -73,3 +73,9 @@ type AddNode struct {
 	// Data 节点数据，前端序列化后的 JSON 字符串
 	Data string `json:"data" validate:"required"`
 }
+
+// NodeTagRequest 节点 tag 请求结构体，用于删除、设为默认等单节点操作
+type NodeTagRequest struct {
+	// Tag 节点唯一标识
+	Tag string `json:"tag" validate:"required"`
+}

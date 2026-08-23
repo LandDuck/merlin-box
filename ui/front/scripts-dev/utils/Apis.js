@@ -38,6 +38,9 @@ export default {
     comm_getBaseConfig: 'api/get_base_config',
     comm_saveBaseConfig: 'api/save_base_config',
     comm_addNode: 'api/add_node',
+    comm_loadNodeList: 'api/load_node_list',
+    comm_deleteNode: 'api/delete_node',
+    comm_setDefaultNode: 'api/set_default_node',
 }
 
 

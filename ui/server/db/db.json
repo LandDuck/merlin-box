@@ -39,66 +39,49 @@
   },
   "nodes": [
     {
-      "name": "test",
-      "tag": "4aba2fd1-e00a-4bdf-8f13-9f72e5c87f03",
-      "type": "naive",
       "is_default": false,
-      "server": "1.1.1.1",
-      "server_port": 443,
-      "username": "admin",
-      "password": "admin",
-      "udp_over_tcp": false,
-      "quic": true,
-      "quic_congestion_control": "bbr2",
-      "tls": {
-        "enabled": true,
-        "server_name": "cloudflare"
-      }
-    },
-    {
       "name": "a",
-      "tag": "18ff1020-d0fe-46c1-818e-8c13e40d1a23",
-      "type": "naive",
-      "is_default": false,
-      "server": "1.1.1.1",
-      "server_port": 2,
-      "username": "haha",
       "password": "h",
-      "udp_over_tcp": false,
       "quic": false,
       "quic_congestion_control": "",
+      "server": "1.1.1.1",
+      "server_port": 2,
+      "tag": "18ff1020-d0fe-46c1-818e-8c13e40d1a23",
       "tls": {
         "enabled": true,
         "server_name": "haha"
-      }
+      },
+      "type": "naive",
+      "udp_over_tcp": false,
+      "username": "haha"
     },
     {
-      "name": "admin",
-      "tag": "83d07d58-d792-4e21-a103-b65f37d83927",
-      "type": "naive",
       "is_default": false,
-      "server": "1.1.1.1",
-      "server_port": 1,
-      "username": "2",
+      "name": "admin",
       "password": "3",
-      "udp_over_tcp": true,
       "quic": false,
       "quic_congestion_control": "",
+      "server": "1.1.1.1",
+      "server_port": 1,
+      "tag": "83d07d58-d792-4e21-a103-b65f37d83927",
       "tls": {
         "enabled": true,
         "server_name": "admin"
-      }
+      },
+      "type": "naive",
+      "udp_over_tcp": true,
+      "username": "2"
     },
     {
+      "is_default": true,
+      "method": "2022-blake3-aes-128-gcm",
       "name": "shadowsocks",
-      "tag": "845649d1-b332-49e2-8a1e-9d0f6aa8846e",
-      "type": "shadowsocks",
-      "is_default": false,
+      "network": "",
+      "password": "443",
       "server": "1.1.1.1",
       "server_port": 443,
-      "method": "2022-blake3-aes-128-gcm",
-      "password": "443",
-      "network": "",
+      "tag": "845649d1-b332-49e2-8a1e-9d0f6aa8846e",
+      "type": "shadowsocks",
       "udp_over_tcp": true
     }
   ]

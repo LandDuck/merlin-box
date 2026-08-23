@@ -22,10 +22,12 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"merlin-box-ui/global"
 	logger "merlin-box-ui/helper/log"
 	dbModel "merlin-box-ui/model/db"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -384,4 +386,89 @@ func fallbackBinaryConfig(value *int, defaultValue int) int {
 		return defaultValue
 	}
 	return *value
+}
+
+// isDefaultNode 判断原始 JSON 节点是否为默认节点
+func isDefaultNode(raw json.RawMessage) bool {
+	var n struct {
+		IsDefault bool `json:"is_default"`
+	}
+	_ = json.Unmarshal(raw, &n)
+	return n.IsDefault
+}
+
+// GetNodeList 获取节点列表，默认节点排在第一位，其余保持原始顺序
+func GetNodeList() ([]json.RawMessage, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return nil, err
+	}
+	nodes := make([]json.RawMessage, len(file.Nodes))
+	copy(nodes, file.Nodes)
+	sort.SliceStable(nodes, func(i, j int) bool {
+		return isDefaultNode(nodes[i]) && !isDefaultNode(nodes[j])
+	})
+	return nodes, nil
+}
+
+// DeleteNode 删除指定 tag 的节点
+func DeleteNode(tag string) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	newNodes := make([]json.RawMessage, 0, len(file.Nodes))
+	for _, raw := range file.Nodes {
+		var base struct {
+			Tag string `json:"tag"`
+		}
+		if err := json.Unmarshal(raw, &base); err != nil || base.Tag != tag {
+			newNodes = append(newNodes, raw)
+		}
+	}
+	file.Nodes = newNodes
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}
+
+// SetDefaultNode 将指定 tag 设为默认节点，其余节点 is_default 置为 false
+func SetDefaultNode(tag string) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	found := false
+	newNodes := make([]json.RawMessage, 0, len(file.Nodes))
+	for _, raw := range file.Nodes {
+		var node map[string]interface{}
+		if err := json.Unmarshal(raw, &node); err != nil {
+			newNodes = append(newNodes, raw)
+			continue
+		}
+		nodeTag, _ := node["tag"].(string)
+		if nodeTag == tag {
+			node["is_default"] = true
+			found = true
+		} else {
+			node["is_default"] = false
+		}
+		updated, err := json.Marshal(node)
+		if err != nil {
+			newNodes = append(newNodes, raw)
+			continue
+		}
+		newNodes = append(newNodes, updated)
+	}
+	if !found {
+		return fmt.Errorf("node not found: %s", tag)
+	}
+	file.Nodes = newNodes
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
 }
