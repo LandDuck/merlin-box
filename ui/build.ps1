@@ -20,7 +20,7 @@ cd server
 $env:GOOS = "linux"
 $env:GOARCH = "arm64"
 $env:CGO_ENABLED = "0"
-go build -o ../../bin/merlin-box .
+go build -ldflags="-s -w" -o ../../bin/merlin-box .
 
 #使用wsl在里面调用 upx --lzma --ultra-brute 压缩 ../../bin/merlin-box
 wsl upx --lzma --ultra-brute ../../bin/merlin-box

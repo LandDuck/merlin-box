@@ -522,7 +522,7 @@ build_ui() {
     # 构建服务器端
     (
       cd "$server_src_dir" || exit 1
-      GOOS=linux GOARCH="$arch" CGO_ENABLED=0 go build -o "$server_output_bin" .
+      GOOS=linux GOARCH="$arch" CGO_ENABLED=0 go build -ldflags="-s -w" -o "$server_output_bin" .
     )
     if [ $? -ne 0 ]; then
       print_error "构建 UI 服务器端失败"
