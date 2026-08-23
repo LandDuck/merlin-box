@@ -88,6 +88,18 @@
         "enabled": true,
         "server_name": "admin"
       }
+    },
+    {
+      "name": "shadowsocks",
+      "tag": "845649d1-b332-49e2-8a1e-9d0f6aa8846e",
+      "type": "shadowsocks",
+      "is_default": false,
+      "server": "1.1.1.1",
+      "server_port": 443,
+      "method": "2022-blake3-aes-128-gcm",
+      "password": "443",
+      "network": "",
+      "udp_over_tcp": true
     }
   ]
 }

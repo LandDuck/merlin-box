@@ -65,9 +65,8 @@ import React from "react";
  */
 class ShadowsocksForm extends React.Component {
 
-    //属性
-    #props = null;
-    #config = null;
+    // 唯一的ID
+    #uuid = ""
 
     //网络协议选项
     #networkOptions = [
@@ -163,8 +162,14 @@ class ShadowsocksForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.#props = props;
-        this.#config = props.config || {};
+        if (props.onRef) {
+            try {
+                props.onRef(this);
+            } catch (e) {
+                console.error("ShadowsocksForm onRef error:", e);
+            }
+        }
+        this.#uuid = this.$helper.getUUid();
         this.state = {
             name: "", // 节点名称
             server: "", // 服务器地址
@@ -178,21 +183,29 @@ class ShadowsocksForm extends React.Component {
             serverPortError: false,
             passwordError: false,
         }
-        this.#registerFormApi();
     }
 
-    #registerFormApi() {
-        if (!this.#config._formApis) {
-            this.#config._formApis = {};
+    /**
+     * 验证表单
+     * @returns {boolean} 验证结果
+     */
+    validate = () => this.#validate();
+
+    /**
+     * 获取表单值
+     * @returns {object} 表单值
+     */
+    getValue = () => {
+        if (!this.#validate()) {
+            return null;
         }
-        this.#config._formApis.shadowsocks = {
-            validate: () => this.#validate(),
-            getValue: () => this.#buildValue(this.state),
-        };
-    }
+        return this.#buildValue(this.state);
+    };
 
     #buildValue(state) {
         return {
+            tag: this.#uuid,
+            is_default: false,
             type: "shadowsocks",
             name: state.name.trim(),
             server: state.server.trim(),
@@ -231,11 +244,11 @@ class ShadowsocksForm extends React.Component {
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.nameError ? "error" : ""}`}>
                         <input type="text" placeholder="节点名称" value={this.state.name} onChange={(e) => {
-                            const name = e.target.value;
+                            this.state.name = e.target.value;
                             this.setState({
-                                name,
-                                nameError: name.length > 0 && !name.trim(),
+                                name: this.state.name
                             });
+                            this.#validate();
                         }}/>
                     </div>
                 </div>
@@ -245,11 +258,11 @@ class ShadowsocksForm extends React.Component {
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
                         <input type="text" placeholder="IP或域名" value={this.state.server} onChange={(e) => {
-                            const server = e.target.value;
+                            this.state.server = e.target.value;
                             this.setState({
-                                server,
-                                serverError: server.length > 0 && !server.trim().isHost(),
+                                server: this.state.server
                             });
+                            this.#validate();
                         }}/>
                     </div>
                 </div>
@@ -260,11 +273,11 @@ class ShadowsocksForm extends React.Component {
                     <div className={`nlc-input ${this.state.serverPortError ? "error" : ""}`}>
                         <input type="number" min="1" max="65535" placeholder="1 - 65535" value={this.state.serverPort}
                                onChange={(e) => {
-                                   const serverPort = e.target.value;
+                                   this.state.serverPort = e.target.value;
                                    this.setState({
-                                       serverPort,
-                                       serverPortError: serverPort.length > 0 && !serverPort.isPort(),
+                                       serverPort: this.state.serverPort
                                    });
+                                   this.#validate();
                                }}/>
                     </div>
                 </div>
@@ -274,11 +287,11 @@ class ShadowsocksForm extends React.Component {
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.passwordError ? "error" : ""}`}>
                         <input type="text" placeholder="请输入密码" value={this.state.password} onChange={(e) => {
-                            const password = e.target.value;
+                            this.state.password = e.target.value;
                             this.setState({
-                                password,
-                                passwordError: password.length > 0 && !password.trim(),
+                                password: this.state.password
                             });
+                            this.#validate();
                         }}/>
                     </div>
                 </div>
