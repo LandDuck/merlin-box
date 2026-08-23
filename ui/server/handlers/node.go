@@ -41,6 +41,8 @@ func AddNode(w http.ResponseWriter, r *http.Request) {
 		addNaiveNode(w, requestData.Data)
 	case "shadowsocks":
 		addShadowsocksNode(w, requestData.Data)
+	case "anytls":
+		addAnytlsNode(w, requestData.Data)
 	default:
 		httpHelper.ResponseFailure(w, "不支持的节点类型: "+requestData.Type)
 	}
@@ -155,6 +157,43 @@ func validateShadowsocksNode(node dbModel.ShadowsocksNode) error {
 	}
 	if node.Network != "" && node.Network != "tcp" && node.Network != "udp" {
 		return fmt.Errorf("网络协议不合法，可选值为空（ALL）、tcp、udp")
+	}
+	return nil
+}
+
+// addAnytlsNode 处理 Anytls 节点添加逻辑
+func addAnytlsNode(w http.ResponseWriter, data string) {
+	var node dbModel.AnytlsNode
+	if err := json.Unmarshal([]byte(data), &node); err != nil {
+		httpHelper.ResponseFailure(w, "节点数据解析失败")
+		return
+	}
+	if err := validateAnytlsNode(node); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	saveNode(w, node.Tag, node)
+}
+
+// validateAnytlsNode 校验 Anytls 节点各必填字段
+func validateAnytlsNode(node dbModel.AnytlsNode) error {
+	if strings.TrimSpace(node.Tag) == "" {
+		return fmt.Errorf("节点 tag 不能为空")
+	}
+	if strings.TrimSpace(node.Name) == "" {
+		return fmt.Errorf("节点名称不能为空")
+	}
+	if strings.TrimSpace(node.Server) == "" {
+		return fmt.Errorf("服务器地址不能为空")
+	}
+	if node.ServerPort < 1 || node.ServerPort > 65535 {
+		return fmt.Errorf("服务器端口不合法，有效范围 1-65535")
+	}
+	if strings.TrimSpace(node.Password) == "" {
+		return fmt.Errorf("密码不能为空")
+	}
+	if strings.TrimSpace(node.Tls.ServerName) == "" {
+		return fmt.Errorf("TLS Server Name 不能为空")
 	}
 	return nil
 }

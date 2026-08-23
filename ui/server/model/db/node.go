@@ -77,6 +77,14 @@ type ShadowsocksNode struct {
 	UdpOverTCP bool `json:"udp_over_tcp"`
 }
 
+// AnytlsNode 节点基础信息结构体，继承 NodeBase
+type AnytlsNode struct {
+	NodeBase
+	// Password 节点密码
+	Password string `json:"password"`
+	NodeTls
+}
+
 // Node 接口，定义节点类型方法
 type Node interface {
 	NodeType() string

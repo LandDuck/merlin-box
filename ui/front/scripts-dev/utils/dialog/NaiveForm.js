@@ -259,7 +259,7 @@ class NaiveForm extends React.Component {
                 <label>密码</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.passwordError ? "error" : ""}`}>
-                        <input type="text" placeholder="请输入密码" value={this.state.password} onChange={(e) => {
+                        <input type="password" placeholder="请输入密码" value={this.state.password} onChange={(e) => {
                             this.state.password = e.target.value;
                             this.setState({
                                 password: this.state.password

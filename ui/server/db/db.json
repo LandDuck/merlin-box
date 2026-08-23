@@ -66,6 +66,19 @@
       "password": "admin",
       "network": "",
       "udp_over_tcp": false
+    },
+    {
+      "name": "我的anytls",
+      "tag": "ae6d6624-90fb-4db0-9c26-16a17de3b195",
+      "type": "anytls",
+      "is_default": false,
+      "server": "3.3.3.3",
+      "server_port": 443,
+      "password": "admin",
+      "tls": {
+        "enabled": true,
+        "server_name": "cloudflare.com"
+      }
     }
   ]
 }
