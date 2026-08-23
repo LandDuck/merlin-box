@@ -79,6 +79,29 @@
         "enabled": true,
         "server_name": "cloudflare.com"
       }
+    },
+    {
+      "name": "我的hy2",
+      "tag": "58a090be-75e8-4d13-9326-662fc4c6f038",
+      "type": "hysteria2",
+      "is_default": false,
+      "server": "4.4.4.4",
+      "server_port": 4443,
+      "up_mbps": 100,
+      "down_mbps": 100,
+      "password": "jjjjj",
+      "network": "",
+      "obfs": {
+        "type": "salamander",
+        "password": "xxx"
+      },
+      "tls": {
+        "enabled": true,
+        "server_name": "cloudflare.com",
+        "alpn": [
+          "h3"
+        ]
+      }
     }
   ]
 }

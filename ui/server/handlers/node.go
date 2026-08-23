@@ -43,6 +43,8 @@ func AddNode(w http.ResponseWriter, r *http.Request) {
 		addShadowsocksNode(w, requestData.Data)
 	case "anytls":
 		addAnytlsNode(w, requestData.Data)
+	case "hysteria2":
+		addHysteria2Node(w, requestData.Data)
 	default:
 		httpHelper.ResponseFailure(w, "不支持的节点类型: "+requestData.Type)
 	}
@@ -188,6 +190,46 @@ func validateAnytlsNode(node dbModel.AnytlsNode) error {
 	}
 	if node.ServerPort < 1 || node.ServerPort > 65535 {
 		return fmt.Errorf("服务器端口不合法，有效范围 1-65535")
+	}
+	if strings.TrimSpace(node.Password) == "" {
+		return fmt.Errorf("密码不能为空")
+	}
+	if strings.TrimSpace(node.Tls.ServerName) == "" {
+		return fmt.Errorf("TLS Server Name 不能为空")
+	}
+	return nil
+}
+
+// addHysteria2Node 处理 Hysteria2 节点添加逻辑
+func addHysteria2Node(w http.ResponseWriter, data string) {
+	var node dbModel.Hysteria2Node
+	if err := json.Unmarshal([]byte(data), &node); err != nil {
+		httpHelper.ResponseFailure(w, "节点数据解析失败")
+		return
+	}
+	if err := validateHysteria2Node(node); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	saveNode(w, node.Tag, node)
+}
+
+// validateHysteria2Node 校验 Hysteria2 节点各必填字段
+func validateHysteria2Node(node dbModel.Hysteria2Node) error {
+	if strings.TrimSpace(node.Tag) == "" {
+		return fmt.Errorf("节点 tag 不能为空")
+	}
+	if strings.TrimSpace(node.Name) == "" {
+		return fmt.Errorf("节点名称不能为空")
+	}
+	if strings.TrimSpace(node.Server) == "" {
+		return fmt.Errorf("服务器地址不能为空")
+	}
+	if node.ServerPort < 1 || node.ServerPort > 65535 {
+		return fmt.Errorf("服务器端口不合法，有效范围 1-65535")
+	}
+	if strings.TrimSpace(node.Obfs.Password) == "" {
+		return fmt.Errorf("混淆密码不能为空")
 	}
 	if strings.TrimSpace(node.Password) == "" {
 		return fmt.Errorf("密码不能为空")

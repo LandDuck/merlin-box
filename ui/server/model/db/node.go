@@ -85,6 +85,38 @@ type AnytlsNode struct {
 	NodeTls
 }
 
+// Hysteria2Tls TLS 配置结构体
+type Hysteria2Tls struct {
+	TLSConfig
+	// Alpn ALPN 配置，是一个数组 string
+	Alpn []string `json:"alpn"`
+}
+
+// Hysteria2Obfs 混淆配置结构体
+type Hysteria2Obfs struct {
+	// Type 混淆类型
+	Type string `json:"type"`
+	// Password 混淆密码
+	Password string `json:"password"`
+}
+
+// Hysteria2Node 节点基础信息结构体，继承 NodeBase
+type Hysteria2Node struct {
+	NodeBase
+	// UpMbps 节点上行带宽限制，单位 Mbps
+	UpMbps int `json:"up_mbps"`
+	// DownMbps 节点下行带宽限制，单位 Mbps
+	DownMbps int `json:"down_mbps"`
+	// Password 节点密码
+	Password string `json:"password"`
+	// Network 节点网络类型
+	Network string `json:"network"`
+	// Obfs 混淆配置
+	Obfs Hysteria2Obfs `json:"obfs"`
+	// Tls TLS 配置
+	Tls Hysteria2Tls `json:"tls"`
+}
+
 // Node 接口，定义节点类型方法
 type Node interface {
 	NodeType() string

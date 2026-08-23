@@ -49,8 +49,8 @@ import React from "react";
  */
 class Hysteria2Form extends React.Component {
 
-    #props = null;
-    #config = null;
+    // 唯一的ID
+    #uuid = ""
 
     #networkOptions = [
         {
@@ -80,8 +80,14 @@ class Hysteria2Form extends React.Component {
 
     constructor(props) {
         super(props);
-        this.#props = props;
-        this.#config = props.config || {};
+        if (props.onRef) {
+            try {
+                props.onRef(this);
+            } catch (e) {
+                console.error("Hysteria2Form onRef error", e);
+            }
+        }
+        this.#uuid = this.$helper.getUUid();
         this.state = {
             name: "", // 节点名称
             server: "", // 服务器地址，仅支持 IPv4 / IPv6
@@ -102,29 +108,34 @@ class Hysteria2Form extends React.Component {
             obfsPasswordError: false,
             passwordError: false,
         }
-        this.#registerFormApi();
     }
 
-    #registerFormApi() {
-        if (!this.#config._formApis) {
-            this.#config._formApis = {};
+    /**
+     * 验证表单
+     * @returns {boolean} 验证结果
+     */
+    validate = () => this.#validate();
+
+    /**
+     * 获取表单值
+     * @returns {object} 表单值
+     */
+    getValue = () => {
+        if (!this.#validate()) {
+            return null;
         }
-        this.#config._formApis.hysteria2 = {
-            validate: () => this.#validate(),
-            getValue: () => this.#buildValue(this.state),
-        };
-    }
+        return this.#buildValue(this.state);
+    };
 
-    #isMbpsValid(value) {
-        if (!value || !/^\d+$/.test(value)) {
-            return false;
-        }
-        const speed = Number(value);
-        return Number.isInteger(speed) && speed >= 10 && speed <= 10000;
-    }
-
+    /**
+     * 构建表单值
+     * @param state
+     * @returns
+     */
     #buildValue(state) {
         return {
+            tag: this.#uuid,
+            is_default: false,
             type: "hysteria2",
             name: state.name.trim(),
             server: state.server.trim(),
@@ -143,6 +154,19 @@ class Hysteria2Form extends React.Component {
                 alpn: ["h3"]
             }
         };
+    }
+
+    /**
+     * 验证 Mbps 值是否有效
+     * @param value
+     * @returns {boolean}
+     */
+    #isMbpsValid(value) {
+        if (!value || !/^\d+$/.test(value)) {
+            return false;
+        }
+        const speed = Number(value);
+        return Number.isInteger(speed) && speed >= 0 && speed <= 10000;
     }
 
     #validate() {
@@ -180,11 +204,11 @@ class Hysteria2Form extends React.Component {
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.nameError ? "error" : ""}`}>
                         <input type="text" placeholder="节点名称" value={this.state.name} onChange={(e) => {
-                            const name = e.target.value;
+                            this.state.name = e.target.value;
                             this.setState({
-                                name,
-                                nameError: name.length > 0 && !name.trim(),
+                                name: this.state.name
                             });
+                            this.#validate();
                         }}/>
                     </div>
                 </div>
@@ -194,11 +218,11 @@ class Hysteria2Form extends React.Component {
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
                         <input type="text" placeholder="IPv4或IPv6" value={this.state.server} onChange={(e) => {
-                            const server = e.target.value;
+                            this.state.server = e.target.value;
                             this.setState({
-                                server,
-                                serverError: server.length > 0 && !(server.trim().isIPv4() || server.trim().isIPv6()),
+                                server: this.state.server
                             });
+                            this.#validate();
                         }}/>
                     </div>
                 </div>
@@ -208,11 +232,11 @@ class Hysteria2Form extends React.Component {
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.serverNameError ? "error" : ""}`}>
                         <input type="text" placeholder="TLS域名，如 example.com" value={this.state.serverName} onChange={(e) => {
-                            const serverName = e.target.value;
+                            this.state.serverName = e.target.value;
                             this.setState({
-                                serverName,
-                                serverNameError: serverName.length > 0 && !serverName.trim().isDomain(),
+                                serverName: this.state.serverName
                             });
+                            this.#validate();
                         }}/>
                     </div>
                 </div>
@@ -223,11 +247,11 @@ class Hysteria2Form extends React.Component {
                     <div className={`nlc-input ${this.state.serverPortError ? "error" : ""}`}>
                         <input type="number" min="1" max="65535" placeholder="1 - 65535" value={this.state.serverPort}
                                onChange={(e) => {
-                                   const serverPort = e.target.value;
+                                   this.state.serverPort = e.target.value;
                                    this.setState({
-                                       serverPort,
-                                       serverPortError: serverPort.length > 0 && !serverPort.isPort(),
+                                       serverPort: this.state.serverPort
                                    });
+                                   this.#validate();
                                }}/>
                     </div>
                 </div>
@@ -236,13 +260,13 @@ class Hysteria2Form extends React.Component {
                 <label>上行带宽</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.upMbpsError ? "error" : ""}`}>
-                        <input type="number" min="10" max="10000" placeholder="10 - 10000" value={this.state.upMbps}
+                        <input type="number" min="0" max="10000" placeholder="0 - 10000" value={this.state.upMbps}
                                onChange={(e) => {
-                                   const upMbps = e.target.value;
+                                   this.state.upMbps = e.target.value;
                                    this.setState({
-                                       upMbps,
-                                       upMbpsError: upMbps.length > 0 && !this.#isMbpsValid(upMbps),
+                                       upMbps: this.state.upMbps
                                    });
+                                   this.#validate();
                                }}/>
                     </div>
                     <div className="form-help-tag">
@@ -254,13 +278,13 @@ class Hysteria2Form extends React.Component {
                 <label>下行带宽</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.downMbpsError ? "error" : ""}`}>
-                        <input type="number" min="10" max="10000" placeholder="10 - 10000" value={this.state.downMbps}
+                        <input type="number" min="0" max="10000" placeholder="0 - 10000" value={this.state.downMbps}
                                onChange={(e) => {
-                                   const downMbps = e.target.value;
+                                   this.state.downMbps = e.target.value;
                                    this.setState({
-                                       downMbps,
-                                       downMbpsError: downMbps.length > 0 && !this.#isMbpsValid(downMbps),
+                                       downMbps: this.state.downMbps
                                    });
+                                   this.#validate();
                                }}/>
                     </div>
                     <div className="form-help-tag">
@@ -275,7 +299,9 @@ class Hysteria2Form extends React.Component {
                         value={this.state.obfsType}
                         style={{width: "100%"}}
                         onChange={(val) => {
-                            this.setState({obfsType: val});
+                            this.state.obfsType = val;
+                            this.setState({obfsType: this.state.obfsType});
+                            this.#validate();
                         }}
                         options={this.#obfsTypeOptions}
                     />
@@ -285,12 +311,12 @@ class Hysteria2Form extends React.Component {
                 <label>混淆密码</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.obfsPasswordError ? "error" : ""}`}>
-                        <input type="text" placeholder="请输入混淆密码" value={this.state.obfsPassword} onChange={(e) => {
-                            const obfsPassword = e.target.value;
+                        <input type="password" placeholder="请输入混淆密码" value={this.state.obfsPassword} onChange={(e) => {
+                            this.state.obfsPassword = e.target.value;
                             this.setState({
-                                obfsPassword,
-                                obfsPasswordError: obfsPassword.length > 0 && !obfsPassword.trim(),
+                                obfsPassword: this.state.obfsPassword
                             });
+                            this.#validate();
                         }}/>
                     </div>
                 </div>
@@ -299,12 +325,12 @@ class Hysteria2Form extends React.Component {
                 <label>认证密码</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.passwordError ? "error" : ""}`}>
-                        <input type="text" placeholder="请输入认证密码" value={this.state.password} onChange={(e) => {
-                            const password = e.target.value;
+                        <input type="password" placeholder="请输入认证密码" value={this.state.password} onChange={(e) => {
+                            this.state.password = e.target.value;
                             this.setState({
-                                password,
-                                passwordError: password.length > 0 && !password.trim(),
+                                password: this.state.password
                             });
+                            this.#validate();
                         }}/>
                     </div>
                 </div>
@@ -316,7 +342,9 @@ class Hysteria2Form extends React.Component {
                         value={this.state.network}
                         style={{width: "100%"}}
                         onChange={(val) => {
-                            this.setState({network: val});
+                            this.state.network = val;
+                            this.setState({network: this.state.network});
+                            this.#validate();
                         }}
                         options={this.#networkOptions}
                     />
