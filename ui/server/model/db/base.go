@@ -16,35 +16,10 @@
  * # along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package resp
+package db
 
-// BaseResponse 统一的响应结构体，包含状态码、消息和数据
-// T 是一个具体的业务数据，当code为0时，应该返回Data
-type BaseResponse[T any] struct {
-	// Code 状态码，0表示成功，非0表示失败
-	Code int `json:"code"`
-	// Msg 消息，通常用于描述错误信息或提示信息
-	Msg string `json:"msg"`
-	// Data 具体的业务数据，类型为泛型T
-	Data T `json:"data"`
-}
-
-// StatusResponse 系统状态响应结构体，包含请求耗时、状态码和请求路径
-type StatusResponse struct {
-	// Duration 系统运行时间，s
-	Duration int `json:"duration"`
-	// Status 状态码，0 未启动，1 正在运行
-	Status int `json:"status"`
-	// WorkingDir merlin-box 的路径
-	WorkingDir string `json:"workingDir"`
-	// DomesticDelay 国内延迟 ms
-	DomesticDelay int `json:"domesticDelay"`
-	// InternationalDelay 国际延迟 ms
-	InternationalDelay int `json:"internationalDelay"`
-}
-
-// BaseConfigFull 基础配置（含DNS）的 API 视图，用于接口请求和响应
-type BaseConfigFull struct {
+// BaseConfigInfo 基础选项配置
+type BaseConfigInfo struct {
 	// EnableIPv6 是否启用 IPv6，1 启用，0 禁用
 	EnableIPv6 int `json:"enableIPv6"`
 	// EnableUDP 是否启用 UDP，1 启用，0 禁用
@@ -53,8 +28,12 @@ type BaseConfigFull struct {
 	DisableQUIC int `json:"disableQUIC"`
 	// RouteSelfProxy 是否路由自身代理，1 启用，0 禁用
 	RouteSelfProxy int `json:"routeSelfProxy"`
-	// DnsChina 大陆 DNS，固定两个
-	DnsChina []string `json:"dnsChina"`
-	// DnsForeign 国际 DNS，固定两个
-	DnsForeign []string `json:"dnsForeign"`
+}
+
+// DNSInfo DNS 配置
+type DNSInfo struct {
+	// China 大陆 DNS 列表
+	China []string `json:"china"`
+	// Foreign 国际 DNS 列表
+	Foreign []string `json:"foreign"`
 }

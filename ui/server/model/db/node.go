@@ -116,13 +116,3 @@ type Hysteria2Node struct {
 	// Tls TLS 配置
 	Tls Hysteria2Tls `json:"tls"`
 }
-
-// Node 接口，定义节点类型方法
-type Node interface {
-	NodeType() string
-}
-
-// NodeType 方法，返回节点类型
-func (n NodeBase) NodeType() string {
-	return n.Type
-}

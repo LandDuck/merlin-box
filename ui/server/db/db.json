@@ -39,7 +39,7 @@
   },
   "nodes": [
     {
-      "is_default": true,
+      "is_default": false,
       "name": "我的Naive节点",
       "password": "admin",
       "quic": false,
@@ -56,52 +56,52 @@
       "username": "admin"
     },
     {
-      "name": "我的SS节点",
-      "tag": "06c852af-af2e-4089-87af-463efc54fa46",
-      "type": "shadowsocks",
       "is_default": false,
+      "method": "2022-blake3-aes-128-gcm",
+      "name": "我的SS节点",
+      "network": "",
+      "password": "x8Kp3V7mQ2nL9sAaBcDeFg==",
       "server": "2.2.2.2",
       "server_port": 443,
-      "method": "2022-blake3-aes-128-gcm",
-      "password": "admin",
-      "network": "",
+      "tag": "06c852af-af2e-4089-87af-463efc54fa46",
+      "type": "shadowsocks",
       "udp_over_tcp": false
     },
     {
-      "name": "我的anytls",
-      "tag": "ae6d6624-90fb-4db0-9c26-16a17de3b195",
-      "type": "anytls",
       "is_default": false,
+      "name": "我的anytls",
+      "password": "admin",
       "server": "3.3.3.3",
       "server_port": 443,
-      "password": "admin",
+      "tag": "ae6d6624-90fb-4db0-9c26-16a17de3b195",
       "tls": {
         "enabled": true,
         "server_name": "cloudflare.com"
-      }
+      },
+      "type": "anytls"
     },
     {
-      "name": "我的hy2",
-      "tag": "58a090be-75e8-4d13-9326-662fc4c6f038",
-      "type": "hysteria2",
-      "is_default": false,
-      "server": "4.4.4.4",
-      "server_port": 4443,
-      "up_mbps": 100,
       "down_mbps": 100,
-      "password": "jjjjj",
+      "is_default": true,
+      "name": "我的hy2",
       "network": "",
       "obfs": {
-        "type": "salamander",
-        "password": "xxx"
+        "password": "xxx",
+        "type": "salamander"
       },
+      "password": "jjjjj",
+      "server": "4.4.4.4",
+      "server_port": 4443,
+      "tag": "58a090be-75e8-4d13-9326-662fc4c6f038",
       "tls": {
-        "enabled": true,
-        "server_name": "cloudflare.com",
         "alpn": [
           "h3"
-        ]
-      }
+        ],
+        "enabled": true,
+        "server_name": "cloudflare.com"
+      },
+      "type": "hysteria2",
+      "up_mbps": 100
     }
   ]
 }

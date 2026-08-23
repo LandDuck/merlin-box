@@ -24,7 +24,7 @@ import (
 	dbHelper "merlin-box-ui/helper/db"
 	httpHelper "merlin-box-ui/helper/http"
 	validateHelper "merlin-box-ui/helper/validate"
-	dbModel "merlin-box-ui/model/db"
+	"merlin-box-ui/model/resp"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -43,7 +43,7 @@ func GetBaseConfig(w http.ResponseWriter, r *http.Request) {
 
 // SaveBaseConfig 保存基础配置
 func SaveBaseConfig(w http.ResponseWriter, r *http.Request) {
-	requestData, ok := validateHelper.BindAndValidate[dbModel.BaseConfigFull](w, r)
+	requestData, ok := validateHelper.BindAndValidate[resp.BaseConfigFull](w, r)
 	if !ok {
 		return
 	}
@@ -73,7 +73,7 @@ func SaveBaseConfig(w http.ResponseWriter, r *http.Request) {
 	httpHelper.ResponseSuccess(w, "保存成功")
 }
 
-func updateSmartDNSConfig(config dbModel.BaseConfigFull) error {
+func updateSmartDNSConfig(config resp.BaseConfigFull) error {
 	if len(config.DnsChina) != 2 || len(config.DnsForeign) != 2 {
 		return fmt.Errorf("invalid dns count")
 	}
@@ -98,7 +98,7 @@ func updateSmartDNSConfig(config dbModel.BaseConfigFull) error {
 	return os.WriteFile(confPath, []byte(replaced), 0o644)
 }
 
-func buildSmartDNSBlock(config dbModel.BaseConfigFull) string {
+func buildSmartDNSBlock(config resp.BaseConfigFull) string {
 	var builder strings.Builder
 	builder.WriteString("# china dns 1\n")
 	builder.WriteString("server ")

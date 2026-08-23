@@ -21,12 +21,16 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"merlin-box-ui/global"
 	dbHelper "merlin-box-ui/helper/db"
 	httpHelper "merlin-box-ui/helper/http"
 	validateHelper "merlin-box-ui/helper/validate"
 	dbModel "merlin-box-ui/model/db"
 	reqModel "merlin-box-ui/model/req"
+	"merlin-box-ui/model/singbox"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -268,6 +272,7 @@ func DeleteNode(w http.ResponseWriter, r *http.Request) {
 
 // SetDefaultNode 设置默认节点（按 tag）
 func SetDefaultNode(w http.ResponseWriter, r *http.Request) {
+
 	requestData, ok := validateHelper.BindAndValidate[reqModel.NodeTagRequest](w, r)
 	if !ok {
 		return
@@ -276,5 +281,179 @@ func SetDefaultNode(w http.ResponseWriter, r *http.Request) {
 		httpHelper.ResponseFailure(w, "设置默认节点失败")
 		return
 	}
+
+	//读取
+	nodeRaw, err := dbHelper.GetNodeByTag(requestData.Tag) //
+	if err != nil {
+		httpHelper.ResponseFailure(w, "获取节点失败")
+		return
+	}
+
+	//解析并转换为 singbox 配置
+	configJson, err := parseNode(nodeRaw, requestData.Tag)
+	if err != nil {
+		httpHelper.ResponseFailure(w, "解析节点失败")
+		return
+	}
+
+	//写入 singbox 配置文件
+	confPath := filepath.Join(global.ConfDir, "config.json")
+	if err := os.WriteFile(confPath, []byte(configJson), 0644); err != nil {
+		httpHelper.ResponseFailure(w, "写入配置文件失败")
+		return
+	}
+
 	httpHelper.ResponseSuccess(w, "设置成功")
+}
+
+// parseNode 根据节点配置信息解析并生成 singbox 配置 JSON 字符串
+func parseNode(data json.RawMessage, tag string) (string, error) {
+
+	//解析类型
+	var nodeType struct {
+		Type string `json:"type"`
+	}
+	if err := json.Unmarshal(data, &nodeType); err != nil {
+		return "{}", err
+	}
+
+	//组织config
+	config := singbox.Config{
+		Log: singbox.LogConfig{
+			Disabled:  true,
+			Level:     "error",
+			Output:    "logs/singbox-bin.log",
+			Timestamp: true,
+		},
+		Inbounds: []singbox.Inbound{
+			{
+				Type:       "socks",
+				Tag:        "socks-in",
+				Listen:     "::",
+				ListenPort: 65001,
+			},
+			{
+				Type:       "tproxy",
+				Tag:        "tproxy-in",
+				Listen:     "::",
+				ListenPort: 65002,
+			},
+			{
+				Type:       "redirect",
+				Tag:        "redirect-in",
+				Listen:     "::",
+				ListenPort: 65003,
+			},
+		},
+		Outbounds: []any{},
+		Route: singbox.RouteConfig{
+			Rules: []any{},
+			Final: tag,
+		},
+	}
+
+	//按不同类型处理
+	switch nodeType.Type {
+	case "naive":
+		node := &dbModel.NaiveNode{}
+		if err := json.Unmarshal(data, node); err != nil {
+			return "{}", err
+		}
+		outbound := naiveNodeToOutbound(*node)
+		config.Outbounds = append(config.Outbounds, outbound)
+
+	case "hysteria2":
+		node := &dbModel.Hysteria2Node{}
+		if err := json.Unmarshal(data, node); err != nil {
+			return "{}", err
+		}
+		outbound := hysteria2NodeToOutbound(*node)
+		config.Outbounds = append(config.Outbounds, outbound)
+	case "shadowsocks":
+		node := &dbModel.ShadowsocksNode{}
+		if err := json.Unmarshal(data, node); err != nil {
+			return "{}", err
+		}
+		outbound := shadowsocksNodeToOutbound(*node)
+		config.Outbounds = append(config.Outbounds, outbound)
+	case "anytls":
+		node := &dbModel.AnytlsNode{}
+		if err := json.Unmarshal(data, node); err != nil {
+			return "{}", err
+		}
+		outbound := anytlsNodeToOutbound(*node)
+		config.Outbounds = append(config.Outbounds, outbound)
+
+	default:
+		return "{}", fmt.Errorf("unsupported node type: %s", nodeType.Type)
+	}
+
+	//转换为 JSON 字符串
+	data, err := json.Marshal(config)
+	if err != nil {
+		return "{}", err
+	}
+
+	return string(data), nil
+}
+
+// naiveNodeToOutbound 将 Naive 节点转换为 Singbox 出站配置
+func naiveNodeToOutbound(n dbModel.NaiveNode) singbox.NaiveOutbound {
+	return singbox.NaiveOutbound{
+		Type:        n.Type,
+		Server:      n.Server,
+		ServerPort:  n.ServerPort,
+		Username:    n.Username,
+		Password:    n.Password,
+		Quic:        n.Quic,
+		UdpOverTCP:  n.UdpOverTCP,
+		TLS:         n.Tls,
+		Tag:         n.Tag,
+		RoutingMark: 169,
+	}
+}
+
+// shadowsocksNodeToOutbound 将 Shadowsocks 节点转换为 Singbox 出站配置
+func shadowsocksNodeToOutbound(n dbModel.ShadowsocksNode) singbox.ShadowsocksOutbound {
+	return singbox.ShadowsocksOutbound{
+		Type:        n.Type,
+		Server:      n.Server,
+		ServerPort:  n.ServerPort,
+		Method:      n.Method,
+		Password:    n.Password,
+		Network:     n.Network,
+		UdpOverTCP:  n.UdpOverTCP,
+		Tag:         n.Tag,
+		RoutingMark: 169,
+	}
+}
+
+// hysteria2NodeToOutbound 将 Hysteria2 节点转换为 Singbox 出站配置
+func hysteria2NodeToOutbound(n dbModel.Hysteria2Node) singbox.Hysteria2Outbound {
+	return singbox.Hysteria2Outbound{
+		Type:        n.Type,
+		Server:      n.Server,
+		ServerPort:  n.ServerPort,
+		Password:    n.Password,
+		UpMbps:      n.UpMbps,
+		DownMbps:    n.DownMbps,
+		Network:     n.Network,
+		Obfs:        n.Obfs,
+		Tls:         n.Tls,
+		Tag:         n.Tag,
+		RoutingMark: 169,
+	}
+}
+
+// anytlsNodeToOutbound 将 Anytls 节点转换为 Singbox 出站配置
+func anytlsNodeToOutbound(n dbModel.AnytlsNode) singbox.AnytlsOutbound {
+	return singbox.AnytlsOutbound{
+		Type:        n.Type,
+		Server:      n.Server,
+		ServerPort:  n.ServerPort,
+		Password:    n.Password,
+		Tls:         n.Tls,
+		Tag:         n.Tag,
+		RoutingMark: 169,
+	}
 }

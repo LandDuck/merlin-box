@@ -40,14 +40,6 @@ type Database struct {
 	Nodes []json.RawMessage `json:"nodes"`
 }
 
-// Manager 管理员结构体，包含用户名和密码
-type Manager struct {
-	// Username 用户名 只能是字母和数字的组合，长度为5-16位
-	Username string `json:"username"`
-	// Password 密码 一个MD5加密后的字符串(小写) 32位
-	Password string `json:"password"`
-}
-
 // DeviceInfo 设备信息结构体，包含设备名称和版本号
 type DeviceInfo struct {
 	// Blacklist 黑名单 MAC 地址, 一行一个
@@ -70,40 +62,4 @@ type DomainControlInfo struct {
 	Blocklist string `json:"blocklist"`
 	// Blacklist 域名黑名单列表, 一行一个
 	Blacklist string `json:"blacklist"`
-}
-
-// BaseConfigInfo 基础选项配置
-type BaseConfigInfo struct {
-	// EnableIPv6 是否启用 IPv6，1 启用，0 禁用
-	EnableIPv6 int `json:"enableIPv6"`
-	// EnableUDP 是否启用 UDP，1 启用，0 禁用
-	EnableUDP int `json:"enableUDP"`
-	// DisableQUIC 是否禁用 QUIC，1 禁用，0 不禁用
-	DisableQUIC int `json:"disableQUIC"`
-	// RouteSelfProxy 是否路由自身代理，1 启用，0 禁用
-	RouteSelfProxy int `json:"routeSelfProxy"`
-}
-
-// DNSInfo DNS 配置
-type DNSInfo struct {
-	// China 大陆 DNS 列表
-	China []string `json:"china"`
-	// Foreign 国际 DNS 列表
-	Foreign []string `json:"foreign"`
-}
-
-// BaseConfigFull 基础配置（含DNS）的 API 视图，用于接口请求和响应
-type BaseConfigFull struct {
-	// EnableIPv6 是否启用 IPv6，1 启用，0 禁用
-	EnableIPv6 int `json:"enableIPv6"`
-	// EnableUDP 是否启用 UDP，1 启用，0 禁用
-	EnableUDP int `json:"enableUDP"`
-	// DisableQUIC 是否禁用 QUIC，1 禁用，0 不禁用
-	DisableQUIC int `json:"disableQUIC"`
-	// RouteSelfProxy 是否路由自身代理，1 启用，0 禁用
-	RouteSelfProxy int `json:"routeSelfProxy"`
-	// DnsChina 大陆 DNS，固定两个
-	DnsChina []string `json:"dnsChina"`
-	// DnsForeign 国际 DNS，固定两个
-	DnsForeign []string `json:"dnsForeign"`
 }

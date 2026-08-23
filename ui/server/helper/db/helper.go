@@ -26,6 +26,7 @@ import (
 	"merlin-box-ui/global"
 	logger "merlin-box-ui/helper/log"
 	dbModel "merlin-box-ui/model/db"
+	"merlin-box-ui/model/resp"
 	"os"
 	"sort"
 	"strconv"
@@ -269,12 +270,12 @@ func SaveDomainControlConfig(domainInfo dbModel.DomainControlInfo) error {
 }
 
 // GetBaseConfig 获取基础配置（含DNS）
-func GetBaseConfig() (dbModel.BaseConfigFull, error) {
+func GetBaseConfig() (resp.BaseConfigFull, error) {
 	file, err := ReadFile()
 	if err != nil {
-		return dbModel.BaseConfigFull{}, err
+		return resp.BaseConfigFull{}, err
 	}
-	return dbModel.BaseConfigFull{
+	return resp.BaseConfigFull{
 		EnableIPv6:     file.BaseConfig.EnableIPv6,
 		EnableUDP:      file.BaseConfig.EnableUDP,
 		DisableQUIC:    file.BaseConfig.DisableQUIC,
@@ -285,7 +286,7 @@ func GetBaseConfig() (dbModel.BaseConfigFull, error) {
 }
 
 // SaveBaseConfig 保存基础配置（含DNS）
-func SaveBaseConfig(config dbModel.BaseConfigFull) error {
+func SaveBaseConfig(config resp.BaseConfigFull) error {
 	file, err := ReadFile()
 	if err != nil {
 		return err
@@ -471,4 +472,21 @@ func SetDefaultNode(tag string) error {
 		return err
 	}
 	return os.WriteFile(global.DbPath, content, 0o644)
+}
+
+// GetNodeByTag 根据 tag 获取节点原始 JSON
+func GetNodeByTag(tag string) (json.RawMessage, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return nil, err
+	}
+	for _, raw := range file.Nodes {
+		var base struct {
+			Tag string `json:"tag"`
+		}
+		if err := json.Unmarshal(raw, &base); err == nil && base.Tag == tag {
+			return raw, nil
+		}
+	}
+	return nil, fmt.Errorf("node not found: %s", tag)
 }
