@@ -134,6 +134,16 @@ if { [ "$FROM" = "wan_event" ] && [ "$P1" = "0" ] && [ "$P2" = "connected" ]; } 
         ./merlin-box.sh restart >> "$LOGFILE" 2>&1
         EXIT_CODE=$?
         log_msg "merlin-box 重启命令执行完毕 (退出码: $EXIT_CODE)"
+
+        #检测 bin 目录下是否存在 merlin-box 文件，如果存在, 使用 ./merlin-box.sh server 启动 WEBUI 服务
+        if [ -f "$MD_ROOT_DIR/bin/merlin-box" ]; then
+            log_msg "检测到 bin 目录下存在 merlin-box 文件，准备启动 WEBUI 服务..."
+            ./merlin-box.sh server >> "$LOGFILE" 2>&1
+            EXIT_CODE=$?
+            log_msg "WEBUI 服务启动命令执行完毕 (退出码: $EXIT_CODE)"
+        else
+            log_msg "未检测到 bin 目录下的 merlin-box 文件，跳过 WEBUI 服务启动。"
+        fi
     else
         log_msg "错误: 无法进入目录 $MD_ROOT_DIR，启动中断！"
     fi
