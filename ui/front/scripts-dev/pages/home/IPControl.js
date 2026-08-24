@@ -171,10 +171,8 @@ class IPControl extends React.Component {
                 <h2>{panelName}</h2>
             </div>
             <div className="device-hint">
-                <ol>
-                    <li>🚀 白名单 IP 会强制直连，不经过代理；⛔ 黑名单 IP 会强制走代理，且黑名单优先。</li>
-                    <li>📝 支持使用 # 注释，允许空行；每行一个 IP，也可在 IP 后追加 # 注释。</li>
-                </ol>
+                <div>🚀 白名单 IP 会强制直连，不经过代理；⛔ 黑名单 IP 会强制走代理，且黑名单优先。</div>
+                <div>📝 支持使用 # 注释，允许空行；每行一个 IP，也可在 IP 后追加 # 注释。</div>
             </div>
             <div className="device-config">
                 <div className="device-group">

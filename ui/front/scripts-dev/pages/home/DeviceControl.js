@@ -153,11 +153,9 @@ class DeviceControl extends React.Component {
                 <h2>设备控制</h2>
             </div>
             <div className="device-hint">
-                <ol>
-                    <li>🚀 配置白名单设备后，只有白名单设备可以走代理；⛔ 黑名单设备无论如何都不走代理，且黑名单优先。</li>
-                    <li>📝 支持使用 # 注释，允许空行；每行一个 MAC 地址，也可在 MAC 后追加 # 注释。</li>
-                    <li>⚠️ 只要白名单中有内容，就会启用白名单功能，此时如果里面没有有效MAC地址，会导致所有设备都不会走代理。</li>
-                </ol>
+                <div>🚀 配置白名单设备后，只有白名单设备可以走代理；⛔ 黑名单设备无论如何都不走代理，且黑名单优先。</div>
+                <div>📝 支持使用 # 注释，允许空行；每行一个 MAC 地址，也可在 MAC 后追加 # 注释。</div>
+                <div>⚠️ 只要白名单中有内容，就会启用白名单功能，此时如果里面没有有效MAC地址，会导致所有设备都不会走代理。</div>
             </div>
             <div className="device-config">
                 <div className="device-group">
