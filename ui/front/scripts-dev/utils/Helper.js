@@ -16,21 +16,16 @@
  * # along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import './extend/string.js'
-import MD5 from 'md5'
-import urlParse from 'url-parse'
-import query from 'query-string'
-import moment from 'moment'
-import copy from 'copy-text-to-clipboard';
-import 'moment/locale/zh-cn'
 import AlertDialog from "./dialog/AlertDialog";
 import InputDialog from "./dialog/InputDialog";
 import LogDialog from "./dialog/LogDialog";
 import ChangePwdDialog from "./dialog/ChangePwdDialog";
-import {message} from 'antd';
 import AddNodeDialog from "./dialog/AddNodeDialog";
+import {message} from 'antd';
 
-moment.locale("zh-cn")
-
+/**
+ * 全局工具类
+ */
 class Helper {
 
     /**
@@ -220,24 +215,6 @@ class Helper {
         }
     }
 
-
-    /**
-     * copyText
-     * @param text
-     */
-    copyText(text) {
-        copy(text);
-    }
-
-    /**
-     * md5
-     * @param str
-     * @returns {*}
-     */
-    md5(str) {
-        return MD5(str)
-    }
-
     /**
      *
      */
@@ -267,64 +244,10 @@ class Helper {
     }
 
     /**
-     * 时间差 ms
-     * @param time1 大
-     * @param time2  小
-     * @returns {string}
+     * getParams
      */
-    datetimeDiff(time1, time2) {
-        return moment(time1).diff(moment(time2));
-    }
-
-
-    /**
-     * 将一个传入的 秒, 转换为 xx 天 xx小时 xx分钟 xx秒
-     * 注意, 不足的情况下不显示前面的单位
-     * @param seconds
-     * @returns {string}
-     */
-    formatDuration(seconds) {
-        let duration = moment.duration(seconds, 'seconds');
-        let days = duration.days();
-        let hours = duration.hours();
-        let minutes = duration.minutes();
-        let secs = duration.seconds();
-
-        let result = '';
-        if (days > 0) {
-            result += days + '天';
-        }
-        if (hours > 0 || result) {
-            result += hours + '小时';
-        }
-        if (minutes > 0 || result) {
-            result += minutes + '分钟';
-        }
-        result += secs + '秒';
-
-        return result;
-    }
-
-    /**
-     * http://momentjs.cn/docs/#/get-set/
-     * formatDateTime
-     * @param time
-     * @param fmt
-     */
-    formatDateTime(time, fmt) {
-        if (!fmt) {
-            fmt = "YYYY-MM-DD HH:mm"
-        }
-        let m = null;
-        if (typeof (time) === "number") {
-            m = moment(time * 1000);
-        } else {
-            m = moment(time);
-        }
-        if (m.year() === moment("1970-01-01 08:00:00").year()) {
-            return "";
-        }
-        return m.format(fmt);
+    getParams() {
+        return $("meta[name='params']").attr("content");
     }
 
     /**
@@ -342,20 +265,46 @@ class Helper {
     }
 
     /**
-     * getQueryValues
-     */
-    getQueryValues(name) {
-        if (name) {
-            return query.parse(location.search)[name];
-        }
-        return query.parse(location.search);
-    }
-
-    /**
      * copyObject
      */
     copyObject(obj) {
         return JSON.parse(JSON.stringify(obj));
+    }
+
+    /**
+     * getTimestamp
+     * @returns {number}
+     */
+    getTimestamp() {
+        return new Date().getTime();
+    }
+
+    /**
+     * 将一个传入的 秒, 转换为 xx 天 xx小时 xx分钟 xx秒
+     * 注意, 不足的情况下不显示前面的单位
+     * @param seconds
+     * @returns {string}
+     */
+    formatDuration(seconds) {
+        //不使用moment.js, 直接计算
+        let days = Math.floor(seconds / (24 * 3600));
+        let hours = Math.floor((seconds % (24 * 3600)) / 3600);
+        let minutes = Math.floor((seconds % 3600) / 60);
+        let secs = seconds % 60;
+
+        let result = '';
+        if (days > 0) {
+            result += days + '天';
+        }
+        if (hours > 0 || result) {
+            result += hours + '小时';
+        }
+        if (minutes > 0 || result) {
+            result += minutes + '分钟';
+        }
+        result += secs + '秒';
+
+        return result;
     }
 
     /**
@@ -400,21 +349,6 @@ class Helper {
      */
     loading(msg) {
         message.loading(msg);
-    }
-
-    /**
-     * getTimestamp
-     * @returns {number}
-     */
-    getTimestamp() {
-        return new Date().getTime();
-    }
-
-    /**
-     * getParams
-     */
-    getParams() {
-        return $("meta[name='params']").attr("content");
     }
 
     /**
@@ -490,32 +424,6 @@ class Helper {
     }
 
     /**
-     * 获取当前年份
-     */
-    getCurrentYear() {
-        return new Date().getFullYear()
-    }
-
-    /**
-     *
-     * @param url
-     */
-    urlContent(url) {
-        let base = this.getBasePath();
-        url = url.replace("~/", base);
-        return url;
-    }
-
-    /**
-     *
-     * @param s
-     * @returns {string}
-     */
-    urlEncode(s) {
-        return encodeURIComponent(s);
-    }
-
-    /**
      * scrollTo
      */
     scrollTo(hash, count) {
@@ -535,17 +443,6 @@ class Helper {
         }
     }
 
-    /**
-     *  urlParse
-     * @param url
-     * @returns {Url}
-     */
-    parseUrl(url) {
-        if (!url) {
-            url = window.location.href;
-        }
-        return urlParse(url, null, true);
-    }
 
     /**
      * allowClick
@@ -558,20 +455,6 @@ class Helper {
         }
         this._mts[name] = t;
         return true;
-    }
-
-    /**
-     * showUnknownError
-     */
-    showUnknownError() {
-        this.toast("发生未知错误")
-    }
-
-    /**
-     * getCurrentHost
-     */
-    getCurrentHost() {
-        return this.parseUrl(window.location.href).host;
     }
 
     /**
@@ -605,6 +488,40 @@ class Helper {
             }, 70);
         }
     }
+
+    /**
+     * 获取当前年份
+     */
+    getCurrentYear() {
+        return new Date().getFullYear()
+    }
+
+    /**
+     *
+     * @param url
+     */
+    urlContent(url) {
+        let base = this.getBasePath();
+        url = url.replace("~/", base);
+        return url;
+    }
+
+    /**
+     *
+     * @param s
+     * @returns {string}
+     */
+    urlEncode(s) {
+        return encodeURIComponent(s);
+    }
+
+    /**
+     * showUnknownError
+     */
+    showUnknownError() {
+        this.toast("发生未知错误")
+    }
+
 }
 
 export default Helper

@@ -22,6 +22,7 @@ import Cookies from 'js-cookie'
  * Cookies工具类
  */
 class CookiesUtil {
+
     /**
      * @description 存储 cookie 值
      * @param {String} name cookie name
@@ -44,13 +45,6 @@ class CookiesUtil {
     get(name = 'default') {
         let key = "mlb_" + name;
         return Cookies.get(key)
-    }
-
-    /**
-     * @description 拿到 cookie 全部的值
-     */
-    getAll() {
-        return Cookies.get()
     }
 
     /**

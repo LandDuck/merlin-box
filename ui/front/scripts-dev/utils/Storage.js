@@ -41,46 +41,6 @@ class Storage {
     }
 
     /**
-     * getFromSession
-     */
-    getFromSession(key) {
-        try {
-            return JSON.parse(sessionStorage.getItem(this.mergeKey(key)))
-        } catch (e) {
-            let val = sessionStorage.getItem(this.mergeKey(key));
-            if (!val || val === "") {
-                return null;
-            }
-            return val
-        }
-    }
-
-    /**
-     *
-     * @param key
-     * @param value
-     */
-    setToSession(key, value) {
-        if (!value) {
-            sessionStorage[this.mergeKey(key)] = ""
-        }
-        if (typeof value === 'string') {
-            sessionStorage[this.mergeKey(key)] = value
-        }
-        if (typeof value === 'object') {
-            sessionStorage[this.mergeKey(key)] = JSON.stringify(value)
-        }
-    }
-
-    /**
-     * remove from session storage
-     * @param key
-     */
-    removeFromSession(key) {
-        sessionStorage.removeItem(this.mergeKey(key));
-    }
-
-    /**
      * 设置一个值到本地存储
      * */
     set(key, value) {
