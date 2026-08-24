@@ -243,11 +243,11 @@ merlin-box/
 
 # 🖥️ Applicable Environments and Device Notes
 
-- ✅ Tested successful models: RT-BE86U, RT-AC86U.
-- ✅ In theory, higher-spec, newer models (arm64) can use it directly.
-- ⏳ More other models are not yet covered due to limited devices. You can download sing-box and smartdns of the corresponding architecture to replace and try.
-- 💾 The full version of sing-box has a large footprint. If the router's jffs space is limited, it is recommended to mount a USB drive.
-- 📂 You can place the project in any directory on the USB drive and run the script.
+- ✅ Tested Models: RT-BE86U, RT-AC86U.
+- ✅ Architecture Support: Pre-built packages are provided for ARM64 (64-bit) and ARM (32-bit). Download the appropriate package from the Release page.
+- ⏳ More Models: Due to limited access to hardware, additional models have not yet been tested. In theory, any ASUSWRT-Merlin router with an ARM64 or ARM (32-bit) CPU architecture should be able to run Merlin-box. If you encounter any issues, please report them in Issues.
+- 💾 Storage: Some routers have limited JFFS storage. Although the binary has been compressed, you may still run out of space. It is recommended to place the program on a USB drive or other external storage.
+- 📂 Installation Directory: Merlin-box can run from any directory, but /jffs/merlin-box is recommended.
 
 ---
 
@@ -255,8 +255,8 @@ merlin-box/
 
 ## 📦 Prepare Files
 
-1. Upload this project to the router (either jffs or USB mounted directory)
-2. Prepare executable files and place them in (the project includes ones that run on RT-BE86U, RT-AC86U):
+1. Download the package matching your router's CPU architecture from the Release page, then upload the project files to your router. It is recommended to place them in /jffs/merlin-box.
+2. Optional: This project provides ARM64 (64-bit) and ARM (32-bit) versions. If the included binaries are not compatible with your router's CPU architecture, you can try downloading the appropriate binaries from the sing-box and SmartDNS repositories and replacing the corresponding files in the project.
     - `bin/sing-box`
     - `bin/smartdns`
 3. Grant execute permissions (example):
