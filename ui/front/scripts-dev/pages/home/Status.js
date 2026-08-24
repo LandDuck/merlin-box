@@ -254,13 +254,31 @@ class Status extends React.Component {
                         启动代理
                     </button> : [
                         <button className="btn-secondary" key={"stop"} onClick={(e) => {
-                            this.#stop();
+                            this.$helper.showAlertLayer({
+                                title: "操作提示",
+                                content: "确定要停止代理吗？",
+                                onCancel: () => {
+                                    this.$helper.warning("已取消停止代理");
+                                },
+                                onOk: () => {
+                                    this.#stop();
+                                }
+                            });
                         }}>
                             <span className="icon-stop"/>
                             停止代理
                         </button>,
                         <button className="btn-secondary" key={"reboot"} onClick={(e) => {
-                            this.#restart();
+                            this.$helper.showAlertLayer({
+                                title: "操作提示",
+                                content: "确定要重启代理吗？",
+                                onCancel: () => {
+                                    this.$helper.warning("已取消重启代理");
+                                },
+                                onOk: () => {
+                                    this.#restart();
+                                }
+                            });
                         }}>
                             <span className="icon-reboot"/>
                             重启代理
