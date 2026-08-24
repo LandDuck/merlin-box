@@ -82,7 +82,7 @@
     },
     {
       "down_mbps": 100,
-      "is_default": true,
+      "is_default": false,
       "name": "我的hy2",
       "network": "",
       "obfs": {
@@ -102,6 +102,20 @@
       },
       "type": "hysteria2",
       "up_mbps": 100
+    },
+    {
+      "is_default": true,
+      "name": "mytrojan",
+      "network": "",
+      "password": "8JCsPssfgS8tiRwiMlhARg==",
+      "server": "1.1.1.1",
+      "server_port": 8888,
+      "tag": "7da5f446-f6e3-4c8e-97cb-359c0af93656",
+      "tls": {
+        "enabled": true,
+        "server_name": "cloudflare.com"
+      },
+      "type": "trojan"
     }
   ]
 }

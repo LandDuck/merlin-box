@@ -72,3 +72,15 @@ type AnytlsOutbound struct {
 	Tag         string       `json:"tag"`
 	RoutingMark int          `json:"routing_mark"`
 }
+
+// TrojanOutbound 出站配置结构体
+type TrojanOutbound struct {
+	Type        string       `json:"type"`
+	Server      string       `json:"server"`
+	ServerPort  int          `json:"server_port"`
+	Password    string       `json:"password"`
+	Tls         db.TLSConfig `json:"tls"`
+	Network     string       `json:"network,omitempty"`
+	Tag         string       `json:"tag"`
+	RoutingMark int          `json:"routing_mark"`
+}

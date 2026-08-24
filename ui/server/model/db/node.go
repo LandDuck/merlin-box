@@ -116,3 +116,13 @@ type Hysteria2Node struct {
 	// Tls TLS 配置
 	Tls Hysteria2Tls `json:"tls"`
 }
+
+// TrojanNode 节点基础信息结构体，继承 NodeBase
+type TrojanNode struct {
+	NodeBase
+	// Password 节点密码
+	Password string `json:"password"`
+	// Network 节点网络类型
+	Network string `json:"network"`
+	NodeTls
+}
