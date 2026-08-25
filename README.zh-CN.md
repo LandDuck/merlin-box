@@ -270,7 +270,7 @@ chmod +x scripts/dnsmasq.postconf
 ```
 
 ---
-### ▶️启动 UI 并初始化配置（WEB UI）
+## ▶️启动 UI 并初始化配置（WEB UI）
 
 1. **启动 WEB UI Server**
 
