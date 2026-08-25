@@ -272,7 +272,7 @@ chmod +x scripts/dnsmasq.postconf
 
 ---
 
-### Start UI and Initialize Configuration (WEB UI)
+### ▶️Start UI and Initialize Configuration (WEB UI)
 
 1. **Start the WEB UI Server**
 
