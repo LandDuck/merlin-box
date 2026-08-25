@@ -27,7 +27,7 @@ import React from "react";
  *   "tag": "trojan-out",
  *
  *   "server": "127.0.0.1", //普通 input  必须输入  ip4或ip6或域名
- *    "server_name" : "example.com",        //普通 input  必须输入 域名.   这个不是标准属性, 最终会填入 tls.server_name
+ *   "server_name" : "example.com",        //普通 input  必须输入 域名.   这个不是标准属性, 最终会填入 tls.server_name
  *   "server_port": 1080,   //普通 input 只能输入数字  1->65535
  *   "password": "8JCsPssfgS8tiRwiMlhARg==", // 普通 input  必须输入
  *   "network": "tcp",        //tcp or udp, default all  //使用antd.Select  ALL=""/TCP="tcp"/UDP="udp"
