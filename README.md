@@ -272,7 +272,48 @@ chmod +x scripts/dnsmasq.postconf
 
 ---
 
-## 🔧 Modify Configuration
+### Start UI and Initialize Configuration (WEB UI)
+
+1. **Start the WEB UI Server**
+
+   ```bash
+   ./merlin-box.sh server
+   ```
+
+2. **Access the WEB UI**
+
+   Open the following address in your browser:
+
+   `http://ROUTER_IP:8080`
+
+3. **Log in to the WEB UI**
+
+   Use the default credentials:
+
+  * Username: `admin`
+  * Password: `merlinbox`
+
+4. **Configure Proxy Nodes**
+
+   Go to **Node Management**, add your proxy nodes, and set the node you want to use as the **default node**.
+
+5. **Configure Other Settings**
+
+   Adjust the following settings according to your needs:
+
+  * DNS upstream servers
+  * IP whitelist / blacklist
+  * Domain blacklist
+  * Other routing and proxy settings
+
+6. **Start the Proxy**
+
+   Once the configuration is complete, start the proxy service.
+
+
+---
+
+## 🔧 Modify Configuration (Script Mode Manual)
 
 ### 1. Modify `conf/config.json` (sing-box configuration)
 
