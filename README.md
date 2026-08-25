@@ -289,15 +289,20 @@ chmod +x scripts/dnsmasq.postconf
 - `res/ip4-whitelist.txt`
 - `res/ip6-whitelist.txt`
 
-### 4. Ad blocking/domain blocking (blackhole)
+### 4. If you need to force proxy for specific IPs, you can create and maintain (optional):
+
+- `res/ip4-blacklist.txt`
+- `res/ip6-blacklist.txt`
+
+### 5. Ad blocking/domain blocking (blackhole)
 
 - `res/site-blocklist.txt`
 
-### 5. Force proxy domain (blacklist)
+### 6. Force proxy domain (blacklist)
 
 - `res/site-blacklist.txt` This project includes Apple-related domains in this file, which helps solve many problems accessing foreign Apple services. Friends accessing China region should modify this file themselves.
 
-### 6. Device blacklist and whitelist (optional)
+### 7. Device blacklist and whitelist (optional)
 
 - `res/device_blacklist.txt`: Worried about neighbors leeching and accidentally entering the Lost Forest🌳? Configure neighbors' device MAC addresses in this file.
 - `res/device_whitelist.txt`: Using a whitelist can prevent unauthorized guests from accidentally entering the Lost Forest🌳. Configure common device MAC addresses in this file.

@@ -288,15 +288,20 @@ chmod +x scripts/dnsmasq.postconf
 - `res/ip4-whitelist.txt`
 - `res/ip6-whitelist.txt`
 
-### 4. 广告拦击/屏蔽域名 (黑洞)
+### 4. 如需强制代理 IP，可创建并维护 (可选)：
+
+- `res/ip4-blacklist.txt`
+- `res/ip6-blacklist.txt`
+
+### 5. 广告拦击/屏蔽域名 (黑洞)
 
 - `res/site-blocklist.txt`
 
-### 5. 强制走代理域名 (黑名单)
+### 6. 强制走代理域名 (黑名单)
 
 - `res/site-blacklist.txt` 本项目此文件中收集了 Apple 相关域名，能解决访问外区苹果服务的很多问题，访问国区的小伙伴自行修改此文件。
 
-### 6. 设备黑白名单 (可选)
+### 7. 设备黑白名单 (可选)
 
 - `res/device_blacklist.txt`：怕邻居蹭网误入迷失深林🌳，在此文件中配置邻居设备的 MAC 地址即可。
 - `res/device_whitelist.txt`：使用白名单可以防止未授权的来宾用户误入迷失深林🌳，在此文件中配置常用设备 MAC 地址即可。
