@@ -20,6 +20,7 @@ import React from "react";
 
 /**
  * VmessForm
+ * https://sing-box.sagernet.org/zh/configuration/outbound/vmess/
  * {
  *   "type": "vmess",
  *   "tag": "vmess-out",
