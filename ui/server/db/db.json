@@ -113,6 +113,28 @@
         "enabled": false,
         "server_name": ""
       }
+    },
+    {
+      "name": "my_vless",
+      "tag": "cc0f5faf-5a48-4f9f-89d4-0a4cdefb0715",
+      "type": "vless",
+      "is_default": false,
+      "server": "2.2.2.2",
+      "server_port": 100,
+      "uuid": "24b80b95-0925-4a5d-b139-4b42f5f2fbf0",
+      "flow": "xtls-rprx-vision",
+      "network": "udp",
+      "transport": {
+        "type": "quic",
+        "path": "",
+        "host": "",
+        "method": "",
+        "service_name": ""
+      },
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com"
+      }
     }
   ]
 }

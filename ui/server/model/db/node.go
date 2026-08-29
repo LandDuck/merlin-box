@@ -160,3 +160,16 @@ type VmessNode struct {
 	NodeTransport
 	NodeTls
 }
+
+// VlessNode 节点基础信息结构体，继承 NodeBase
+type VlessNode struct {
+	NodeBase
+	// UUID 节点 UUID
+	UUID string `json:"uuid"`
+	// Flow 节点流量控制
+	Flow string `json:"flow"`
+	// Network 节点网络类型
+	Network string `json:"network"`
+	NodeTransport
+	NodeTls
+}
