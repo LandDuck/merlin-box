@@ -135,6 +135,27 @@
         "enabled": true,
         "server_name": "www.cloudflare.com"
       }
+    },
+    {
+      "name": "my_trojan",
+      "tag": "19357880-6380-4f31-abcf-46c8669cb6bb",
+      "type": "trojan",
+      "is_default": false,
+      "server": "3.3.3.3",
+      "server_port": 90,
+      "password": "admin",
+      "network": "",
+      "transport": {
+        "type": "quic",
+        "path": "",
+        "host": "",
+        "method": "",
+        "service_name": ""
+      },
+      "tls": {
+        "enabled": true,
+        "server_name": "www.google.co"
+      }
     }
   ]
 }

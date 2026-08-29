@@ -143,6 +143,7 @@ type TrojanNode struct {
 	Password string `json:"password"`
 	// Network 节点网络类型
 	Network string `json:"network"`
+	NodeTransport
 	NodeTls
 }
 
