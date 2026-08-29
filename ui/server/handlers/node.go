@@ -76,6 +76,17 @@ func saveNode(w http.ResponseWriter, tag string, node any) {
 		httpHelper.ResponseFailure(w, "添加节点失败")
 		return
 	}
+
+	//验证是否只有一个 节点
+	nodes, err := dbHelper.GetNodeList()
+	if err == nil {
+		// 如果只有一个节点，设置为默认节点
+		if len(nodes) == 1 {
+			if err := dbHelper.SetDefaultNode(tag); err != nil {
+			}
+		}
+	}
+
 	httpHelper.ResponseSuccess(w, "添加成功")
 }
 

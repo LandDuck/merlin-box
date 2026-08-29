@@ -39,83 +39,34 @@
   },
   "nodes": [
     {
-      "is_default": false,
-      "name": "我的Naive节点",
-      "password": "admin",
-      "quic": false,
-      "quic_congestion_control": "",
+      "is_default": true,
+      "name": "my_anytls",
+      "password": "123456",
       "server": "1.1.1.1",
-      "server_port": 443,
-      "tag": "4c4b28f3-a45e-42fb-8fa0-218be350c9e9",
+      "server_port": 80,
+      "tag": "f4349271-c96a-4fac-9728-34fb8aa39273",
       "tls": {
         "enabled": true,
-        "server_name": "cloudflare.com"
-      },
-      "type": "naive",
-      "udp_over_tcp": false,
-      "username": "admin"
-    },
-    {
-      "is_default": false,
-      "method": "2022-blake3-aes-128-gcm",
-      "name": "我的SS节点",
-      "network": "",
-      "password": "x8Kp3V7mQ2nL9sAaBcDeFg==",
-      "server": "2.2.2.2",
-      "server_port": 443,
-      "tag": "06c852af-af2e-4089-87af-463efc54fa46",
-      "type": "shadowsocks",
-      "udp_over_tcp": false
-    },
-    {
-      "is_default": false,
-      "name": "我的anytls",
-      "password": "admin",
-      "server": "3.3.3.3",
-      "server_port": 443,
-      "tag": "ae6d6624-90fb-4db0-9c26-16a17de3b195",
-      "tls": {
-        "enabled": true,
-        "server_name": "cloudflare.com"
+        "server_name": "www.cloudflare.com"
       },
       "type": "anytls"
     },
     {
-      "down_mbps": 100,
+      "name": "my_naive",
+      "tag": "461ed691-2127-409b-ac68-527c8a2309df",
+      "type": "naive",
       "is_default": false,
-      "name": "我的hy2",
-      "network": "",
-      "obfs": {
-        "password": "xxx",
-        "type": "salamander"
-      },
-      "password": "jjjjj",
-      "server": "4.4.4.4",
-      "server_port": 4443,
-      "tag": "58a090be-75e8-4d13-9326-662fc4c6f038",
-      "tls": {
-        "alpn": [
-          "h3"
-        ],
-        "enabled": true,
-        "server_name": "cloudflare.com"
-      },
-      "type": "hysteria2",
-      "up_mbps": 100
-    },
-    {
-      "is_default": true,
-      "name": "mytrojan",
-      "network": "",
-      "password": "8JCsPssfgS8tiRwiMlhARg==",
-      "server": "1.1.1.1",
-      "server_port": 8888,
-      "tag": "7da5f446-f6e3-4c8e-97cb-359c0af93656",
+      "server": "1.2.2.2",
+      "server_port": 80,
+      "username": "admin",
+      "password": "admin",
+      "udp_over_tcp": false,
+      "quic": false,
+      "quic_congestion_control": "",
       "tls": {
         "enabled": true,
-        "server_name": "cloudflare.com"
-      },
-      "type": "trojan"
+        "server_name": "www.cloudflare.com"
+      }
     }
   ]
 }
