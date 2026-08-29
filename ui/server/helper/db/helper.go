@@ -161,10 +161,31 @@ func saveIPConfig(file *dbModel.Database, kind string, ipInfo dbModel.IPControlI
 
 // syncConfigFile 同步配置文件到 res 目录
 func syncConfigFile(path string, content string) error {
+	var doNotDeleteFiles = []string{
+		"site-blocklist.txt",
+		"site-blacklist.txt",
+	}
 	if strings.TrimSpace(content) == "" {
+
+		//判断 path 在 doNotDeleteFiles 列表中是否存在
+		exists := false
+		for _, f := range doNotDeleteFiles {
+			if strings.HasSuffix(path, f) {
+				exists = true
+				break
+			}
+		}
+
+		if exists {
+			//如果在 doNotDeleteFiles 列表中，不删除文件, 直接写入空内容
+			return os.WriteFile(path, []byte(content), 0o644)
+		}
+
+		//删除
 		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
 			return err
 		}
+
 		return nil
 	}
 	return os.WriteFile(path, []byte(content), 0o644)
