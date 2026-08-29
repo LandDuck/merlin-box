@@ -48,6 +48,25 @@ type NodeTls struct {
 	Tls TLSConfig `json:"tls"`
 }
 
+// TransportConfig 节点传输配置结构体
+type TransportConfig struct {
+	// Type 传输类型
+	Type string `json:"type"`
+	// Path 传输路径
+	Path string `json:"path"`
+	// Host 传输主机
+	Host string `json:"host"`
+	// Method 传输方法
+	Method string `json:"method"`
+	// ServiceName 传输服务名称
+	ServiceName string `json:"service_name"`
+}
+
+// TransportConfig 节点传输配置结构体
+type NodeTransport struct {
+	Transport TransportConfig `json:"transport"`
+}
+
 // NaiveNode 节点基础信息结构体，继承 NodeBase
 type NaiveNode struct {
 	NodeBase
@@ -124,5 +143,20 @@ type TrojanNode struct {
 	Password string `json:"password"`
 	// Network 节点网络类型
 	Network string `json:"network"`
+	NodeTls
+}
+
+// VmessNode 节点基础信息结构体，继承 NodeBase
+type VmessNode struct {
+	NodeBase
+	// UUID 节点 UUID
+	UUID string `json:"uuid"`
+	// AlterID 节点 AlterID
+	AlterID int `json:"alter_id"`
+	// Security 节点加密方式
+	Security string `json:"security"`
+	// Network 节点网络类型
+	Network string `json:"network"`
+	NodeTransport
 	NodeTls
 }
