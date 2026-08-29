@@ -142,23 +142,6 @@ func SaveDeviceControlConfig(deviceInfo dbModel.DeviceInfo) error {
 	return os.WriteFile(global.DbPath, content, 0o644)
 }
 
-// getIPConfig 获取 IP 控制配置
-func getIPConfig(file dbModel.Database, kind string) dbModel.IPControlInfo {
-	if kind == "ip4" {
-		return file.IP4
-	}
-	return file.IP6
-}
-
-// saveIPConfig 保存 IP 控制配置
-func saveIPConfig(file *dbModel.Database, kind string, ipInfo dbModel.IPControlInfo) {
-	if kind == "ip4" {
-		file.IP4 = ipInfo
-		return
-	}
-	file.IP6 = ipInfo
-}
-
 // syncConfigFile 同步配置文件到 res 目录
 func syncConfigFile(path string, content string) error {
 	var doNotDeleteFiles = []string{
