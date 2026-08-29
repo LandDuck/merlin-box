@@ -11,7 +11,7 @@
                 "type": "hosts",
                 "tag": "hosts-dns",
                 "predefined": {
-                    "xxx.xxx.net": "xxx.xxx.xxx.xxx or xxxx:xxxx:..."
+                    "www.hahaha.com": "127.0.0.1"
                 }
             }
         ]
