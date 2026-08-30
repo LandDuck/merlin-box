@@ -47,7 +47,7 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             echo "检测到 sing-box 文件已更新，开始提交..."
             git add .
-            git commit -m "chore(auto): 自动构建 sing-box"
+            git commit -m "update sing-box"
             git push
           else
             echo "sing-box 文件无变化，无需提交。"
