@@ -55,6 +55,8 @@ func AddNode(w http.ResponseWriter, r *http.Request) {
 		addVmessNode(w, requestData.Data)
 	case "vless":
 		addVlessNode(w, requestData.Data)
+	case "tuic":
+		addTuicNode(w, requestData.Data)
 	default:
 		httpHelper.ResponseFailure(w, "不支持的节点类型: "+requestData.Type)
 	}
@@ -362,6 +364,46 @@ func validateVlessNode(node dbModel.VlessNode) error {
 	}
 	if strings.TrimSpace(node.UUID) == "" {
 		return fmt.Errorf("UUID 不能为空")
+	}
+	return nil
+}
+
+// addTuicNode 处理 Tuic 节点添加逻辑
+func addTuicNode(w http.ResponseWriter, data string) {
+	var node dbModel.TuicNode
+	if err := json.Unmarshal([]byte(data), &node); err != nil {
+		httpHelper.ResponseFailure(w, "节点数据解析失败")
+		return
+	}
+	if err := validateTuicNode(node); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	saveNode(w, node.Tag, node)
+}
+
+// validateTuicNode 校验 Tuic 节点各必填字段
+func validateTuicNode(node dbModel.TuicNode) error {
+	if strings.TrimSpace(node.Tag) == "" {
+		return fmt.Errorf("节点 tag 不能为空")
+	}
+	if strings.TrimSpace(node.Name) == "" {
+		return fmt.Errorf("节点名称不能为空")
+	}
+	if strings.TrimSpace(node.Server) == "" {
+		return fmt.Errorf("服务器地址不能为空")
+	}
+	if node.ServerPort < 1 || node.ServerPort > 65535 {
+		return fmt.Errorf("服务器端口不合法，有效范围 1-65535")
+	}
+	if strings.TrimSpace(node.UUID) == "" {
+		return fmt.Errorf("UUID 不能为空")
+	}
+	if strings.TrimSpace(node.Password) == "" {
+		return fmt.Errorf("密码不能为空")
+	}
+	if strings.TrimSpace(node.Tls.ServerName) == "" {
+		return fmt.Errorf("TLS Server Name 不能为空")
 	}
 	return nil
 }

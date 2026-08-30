@@ -156,6 +156,23 @@
         "enabled": true,
         "server_name": "www.google.co"
       }
+    },
+    {
+      "name": "my_tuic",
+      "tag": "d20fc914-0445-49d0-8671-15afb0ccd9ee",
+      "type": "tuic",
+      "is_default": false,
+      "server": "1.1.1.1",
+      "server_port": 100,
+      "uuid": "e903cae2-f384-45a9-bc33-376f719c9129",
+      "password": "123456",
+      "congestion_control": "cubic",
+      "udp_relay_mode": "native",
+      "network": "",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com"
+      }
     }
   ]
 }

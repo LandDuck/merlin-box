@@ -174,3 +174,19 @@ type VlessNode struct {
 	NodeTransport
 	NodeTls
 }
+
+// TuicNode 节点基础信息结构体，继承 NodeBase
+type TuicNode struct {
+	NodeBase
+	// UUID 节点 UUID
+	UUID string `json:"uuid"`
+	// Password 节点密码
+	Password string `json:"password"`
+	// CongestionControl 节点拥塞控制
+	CongestionControl string `json:"congestion_control"`
+	// UdpRelayMode 节点 UDP 中继模式
+	UdpRelayMode string `json:"udp_relay_mode"`
+	// Network 节点网络类型
+	Network string `json:"network"`
+	NodeTls
+}
