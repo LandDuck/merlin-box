@@ -36,7 +36,7 @@ class Config {
             apiUrl = "https://edutest.retail.tencent.com/webapi/";//测试地址
         }*/
         this.data = {
-            version: "1.0.5",
+            version: "1.0.6",
             apiUrl: apiUrlByCurrentUrl
         }
     }
