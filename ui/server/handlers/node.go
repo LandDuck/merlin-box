@@ -525,7 +525,6 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 		}
 		outbound := naiveNodeToOutbound(*node)
 		config.Outbounds = append(config.Outbounds, outbound)
-
 	case "hysteria2":
 		node := &dbModel.Hysteria2Node{}
 		if err := json.Unmarshal(data, node); err != nil {
@@ -553,6 +552,27 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := trojanNodeToOutbound(*node)
+		config.Outbounds = append(config.Outbounds, outbound)
+	case "vmess":
+		node := &dbModel.VmessNode{}
+		if err := json.Unmarshal(data, node); err != nil {
+			return "{}", err
+		}
+		outbound := vmessNodeToOutbound(*node)
+		config.Outbounds = append(config.Outbounds, outbound)
+	case "vless":
+		node := &dbModel.VlessNode{}
+		if err := json.Unmarshal(data, node); err != nil {
+			return "{}", err
+		}
+		outbound := vlessNodeToOutbound(*node)
+		config.Outbounds = append(config.Outbounds, outbound)
+	case "tuic":
+		node := &dbModel.TuicNode{}
+		if err := json.Unmarshal(data, node); err != nil {
+			return "{}", err
+		}
+		outbound := tuicNodeToOutbound(*node)
 		config.Outbounds = append(config.Outbounds, outbound)
 
 	default:
@@ -631,10 +651,87 @@ func anytlsNodeToOutbound(n dbModel.AnytlsNode) singbox.AnytlsOutbound {
 
 // trojanNodeToOutbound 将 Trojan 节点转换为 Singbox 出站配置
 func trojanNodeToOutbound(n dbModel.TrojanNode) singbox.TrojanOutbound {
+
+	var transport *dbModel.TransportConfig = nil
+	if n.Transport.Type != "" {
+		transport = &n.Transport
+	}
+
 	return singbox.TrojanOutbound{
 		Type:        n.Type,
 		Server:      n.Server,
 		ServerPort:  n.ServerPort,
+		Password:    n.Password,
+		Network:     n.Network,
+		Tls:         n.Tls,
+		Transport:   transport,
+		Tag:         n.Tag,
+		RoutingMark: 169,
+	}
+}
+
+// vmessNodeToOutbound 将 Vmess 节点转换为 Singbox 出站配置
+func vmessNodeToOutbound(n dbModel.VmessNode) singbox.VmessOutbound {
+
+	var tls *dbModel.TLSConfig = nil
+	if n.Tls.Enabled {
+		tls = &n.Tls
+	}
+
+	var transport *dbModel.TransportConfig = nil
+	if n.Transport.Type != "" {
+		transport = &n.Transport
+	}
+
+	return singbox.VmessOutbound{
+		Type:        n.Type,
+		Server:      n.Server,
+		ServerPort:  n.ServerPort,
+		UUID:        n.UUID,
+		AlterID:     n.AlterID,
+		Security:    n.Security,
+		Network:     n.Network,
+		Tls:         tls,
+		Transport:   transport,
+		Tag:         n.Tag,
+		RoutingMark: 169,
+	}
+}
+
+// vlessNodeToOutbound 将 Vless 节点转换为 Singbox 出站配置
+func vlessNodeToOutbound(n dbModel.VlessNode) singbox.VlessOutbound {
+
+	var tls *dbModel.TLSConfig = nil
+	if n.Tls.Enabled {
+		tls = &n.Tls
+	}
+
+	var transport *dbModel.TransportConfig = nil
+	if n.Transport.Type != "" {
+		transport = &n.Transport
+	}
+
+	return singbox.VlessOutbound{
+		Type:        n.Type,
+		Server:      n.Server,
+		ServerPort:  n.ServerPort,
+		UUID:        n.UUID,
+		Flow:        n.Flow,
+		Network:     n.Network,
+		Tls:         tls,
+		Transport:   transport,
+		Tag:         n.Tag,
+		RoutingMark: 169,
+	}
+}
+
+// tuicNodeToOutbound 将 Tuic 节点转换为 Singbox 出站配置
+func tuicNodeToOutbound(n dbModel.TuicNode) singbox.TuicOutbound {
+	return singbox.TuicOutbound{
+		Type:        n.Type,
+		Server:      n.Server,
+		ServerPort:  n.ServerPort,
+		UUID:        n.UUID,
 		Password:    n.Password,
 		Network:     n.Network,
 		Tls:         n.Tls,

@@ -1,88 +1,47 @@
 {
-    "log": {
-        "disabled": true,
-        "level": "error",
-        "output": "logs/singbox-bin.log",
-        "timestamp": true
+  "log": {
+    "disabled": true,
+    "level": "error",
+    "output": "logs/singbox-bin.log",
+    "timestamp": true
+  },
+  "inbounds": [
+    {
+      "type": "socks",
+      "tag": "socks-in",
+      "listen": "::",
+      "listen_port": 65001
     },
-    "dns": {
-        "servers": [
-            {
-                "type": "hosts",
-                "tag": "hosts-dns",
-                "predefined": {
-                    "www.hahaha.com": "127.0.0.1"
-                }
-            }
-        ]
+    {
+      "type": "tproxy",
+      "tag": "tproxy-in",
+      "listen": "::",
+      "listen_port": 65002
     },
-    "inbounds": [
-        {
-            "type": "socks",
-            "tag": "socks-in",
-            "listen": "::",
-            "listen_port": 65001
-        },
-        {
-            "type": "tproxy",
-            "tag": "tproxy-in",
-            "listen": "::",
-            "listen_port": 65002
-        },
-        {
-            "type": "redirect",
-            "tag": "redirect-in",
-            "listen": "::",
-            "listen_port": 65003
-        }
-    ],
-    "outbounds": [
-        //NaiveProxy
-        {
-            "type": "naive",
-            "server": "xxx.xxx.net",
-            "server_port": 443,
-            "username": "user",
-            "password": "pwd",
-            //某些地区TCP（HTTP2）模式长时间连接可能会被限速，可用quic（HTTP3）模式解决但是quic模式速度慢。
-            //如果存在限速问题且有高速要求，建议使用hysteria2模式。
-            //"quic": true,
-            "tls": {
-                "enabled": true,
-                "server_name": "xxx.xxx.net"
-            },
-            "domain_resolver": {
-                "server": "hosts-dns"
-            },
-            "tag": "naive-01",
-            "routing_mark": 169
-        },
-        //Hysteria2
-        {
-            "type": "hysteria2",
-            "server": "xxx.xxx.net",
-            "server_port": 443,
-            "obfs": {
-                "type": "salamander",
-                "password": "password"
-            },
-            "password": "password",
-            "tls": {
-                "enabled": true,
-                "server_name": "xxx.xxx.net",
-                "alpn": [
-                    "h3"
-                ]
-            },
-            "domain_resolver": {
-                "server": "hosts-dns"
-            },
-            "tag": "hysteria2-01",
-            "routing_mark": 169
-        }
-    ],
-    "route": {
-        "rules": [],
-        "final": "naive-01"
+    {
+      "type": "redirect",
+      "tag": "redirect-in",
+      "listen": "::",
+      "listen_port": 65003
     }
+  ],
+  "outbounds": [
+    {
+      "type": "tuic",
+      "server": "1.1.1.1",
+      "server_port": 100,
+      "uuid": "e903cae2-f384-45a9-bc33-376f719c9129",
+      "password": "123456",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com"
+      },
+      "tag": "d20fc914-0445-49d0-8671-15afb0ccd9ee",
+      "routing_mark": 169
+    }
+  ],
+  "route": {
+    "rules": [],
+    "final": "d20fc914-0445-49d0-8671-15afb0ccd9ee"
+  }
 }

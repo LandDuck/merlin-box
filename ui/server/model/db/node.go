@@ -53,13 +53,13 @@ type TransportConfig struct {
 	// Type 传输类型
 	Type string `json:"type"`
 	// Path 传输路径
-	Path string `json:"path"`
+	Path string `json:"path,omitempty"`
 	// Host 传输主机
-	Host string `json:"host"`
+	Host string `json:"host,omitempty"`
 	// Method 传输方法
-	Method string `json:"method"`
+	Method string `json:"method,omitempty"`
 	// ServiceName 传输服务名称
-	ServiceName string `json:"service_name"`
+	ServiceName string `json:"service_name,omitempty"`
 }
 
 // TransportConfig 节点传输配置结构体

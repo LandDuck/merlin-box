@@ -39,7 +39,7 @@
   },
   "nodes": [
     {
-      "is_default": true,
+      "is_default": false,
       "name": "my_anytls",
       "password": "123456",
       "server": "1.1.1.1",
@@ -52,127 +52,127 @@
       "type": "anytls"
     },
     {
-      "name": "my_naive",
-      "tag": "461ed691-2127-409b-ac68-527c8a2309df",
-      "type": "naive",
       "is_default": false,
-      "server": "1.2.2.2",
-      "server_port": 80,
-      "username": "admin",
+      "name": "my_naive",
       "password": "admin",
-      "udp_over_tcp": false,
       "quic": false,
       "quic_congestion_control": "",
+      "server": "1.2.2.2",
+      "server_port": 80,
+      "tag": "461ed691-2127-409b-ac68-527c8a2309df",
       "tls": {
         "enabled": true,
         "server_name": "www.cloudflare.com"
-      }
+      },
+      "type": "naive",
+      "udp_over_tcp": false,
+      "username": "admin"
     },
     {
-      "name": "my_vmess",
-      "tag": "6a9303e2-6f70-4632-8497-a6132d844138",
-      "type": "vmess",
+      "alter_id": 0,
       "is_default": false,
+      "name": "my_vmess",
+      "network": "",
+      "security": "aes-128-gcm",
       "server": "1.3.3.3",
       "server_port": 80,
-      "uuid": "24b80b95-0925-4a5d-b139-4b42f5f2fbf0",
-      "alter_id": 0,
-      "security": "aes-128-gcm",
-      "network": "",
-      "transport": {
-        "type": "",
-        "path": "",
-        "host": "",
-        "method": "",
-        "service_name": ""
-      },
+      "tag": "6a9303e2-6f70-4632-8497-a6132d844138",
       "tls": {
         "enabled": false,
         "server_name": ""
-      }
+      },
+      "transport": {
+        "host": "",
+        "method": "",
+        "path": "",
+        "service_name": "",
+        "type": ""
+      },
+      "type": "vmess",
+      "uuid": "24b80b95-0925-4a5d-b139-4b42f5f2fbf0"
     },
     {
-      "name": "my_vmess",
-      "tag": "9e7ca3cd-bcfb-443e-94dd-42ac152e1276",
-      "type": "vmess",
+      "alter_id": 0,
       "is_default": false,
+      "name": "my_vmess",
+      "network": "",
+      "security": "auto",
       "server": "1.1.1.1",
       "server_port": 50,
-      "uuid": "24b80b95-0925-4a5d-b139-4b42f5f2fbf0",
-      "alter_id": 0,
-      "security": "auto",
-      "network": "",
-      "transport": {
-        "type": "http",
-        "path": "/",
-        "host": "www.google.com",
-        "method": "GET",
-        "service_name": ""
-      },
+      "tag": "9e7ca3cd-bcfb-443e-94dd-42ac152e1276",
       "tls": {
         "enabled": false,
         "server_name": ""
-      }
+      },
+      "transport": {
+        "host": "www.google.com",
+        "method": "GET",
+        "path": "/",
+        "service_name": "",
+        "type": "http"
+      },
+      "type": "vmess",
+      "uuid": "24b80b95-0925-4a5d-b139-4b42f5f2fbf0"
     },
     {
-      "name": "my_vless",
-      "tag": "cc0f5faf-5a48-4f9f-89d4-0a4cdefb0715",
-      "type": "vless",
+      "flow": "xtls-rprx-vision",
       "is_default": false,
+      "name": "my_vless",
+      "network": "udp",
       "server": "2.2.2.2",
       "server_port": 100,
-      "uuid": "24b80b95-0925-4a5d-b139-4b42f5f2fbf0",
-      "flow": "xtls-rprx-vision",
-      "network": "udp",
-      "transport": {
-        "type": "quic",
-        "path": "",
-        "host": "",
-        "method": "",
-        "service_name": ""
-      },
+      "tag": "cc0f5faf-5a48-4f9f-89d4-0a4cdefb0715",
       "tls": {
         "enabled": true,
         "server_name": "www.cloudflare.com"
-      }
-    },
-    {
-      "name": "my_trojan",
-      "tag": "19357880-6380-4f31-abcf-46c8669cb6bb",
-      "type": "trojan",
-      "is_default": false,
-      "server": "3.3.3.3",
-      "server_port": 90,
-      "password": "admin",
-      "network": "",
+      },
       "transport": {
-        "type": "quic",
-        "path": "",
         "host": "",
         "method": "",
-        "service_name": ""
+        "path": "",
+        "service_name": "",
+        "type": "quic"
       },
+      "type": "vless",
+      "uuid": "24b80b95-0925-4a5d-b139-4b42f5f2fbf0"
+    },
+    {
+      "is_default": false,
+      "name": "my_trojan",
+      "network": "",
+      "password": "admin",
+      "server": "3.3.3.3",
+      "server_port": 90,
+      "tag": "19357880-6380-4f31-abcf-46c8669cb6bb",
       "tls": {
         "enabled": true,
         "server_name": "www.google.co"
-      }
+      },
+      "transport": {
+        "host": "",
+        "method": "",
+        "path": "",
+        "service_name": "",
+        "type": "quic"
+      },
+      "type": "trojan"
     },
     {
+      "congestion_control": "cubic",
+      "is_default": true,
       "name": "my_tuic",
-      "tag": "d20fc914-0445-49d0-8671-15afb0ccd9ee",
-      "type": "tuic",
-      "is_default": false,
+      "network": "",
+      "password": "123456",
       "server": "1.1.1.1",
       "server_port": 100,
-      "uuid": "e903cae2-f384-45a9-bc33-376f719c9129",
-      "password": "123456",
-      "congestion_control": "cubic",
-      "udp_relay_mode": "native",
-      "network": "",
+      "tag": "d20fc914-0445-49d0-8671-15afb0ccd9ee",
       "tls": {
         "enabled": true,
         "server_name": "www.cloudflare.com"
-      }
+      },
+      "type": "tuic",
+      "udp_relay_mode": "native",
+      "uuid": "e903cae2-f384-45a9-bc33-376f719c9129"
     }
   ]
 }

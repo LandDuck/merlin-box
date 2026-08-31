@@ -75,12 +75,55 @@ type AnytlsOutbound struct {
 
 // TrojanOutbound 出站配置结构体
 type TrojanOutbound struct {
+	Type        string              `json:"type"`
+	Server      string              `json:"server"`
+	ServerPort  int                 `json:"server_port"`
+	Password    string              `json:"password"`
+	Tls         db.TLSConfig        `json:"tls"`
+	Network     string              `json:"network,omitempty"`
+	Tag         string              `json:"tag"`
+	RoutingMark int                 `json:"routing_mark"`
+	Transport   *db.TransportConfig `json:"transport,omitempty"`
+}
+
+// VmessOutbound 出站配置结构体
+type VmessOutbound struct {
+	Type        string              `json:"type"`
+	Server      string              `json:"server"`
+	ServerPort  int                 `json:"server_port"`
+	UUID        string              `json:"uuid"`
+	AlterID     int                 `json:"alter_id,omitempty"`
+	Security    string              `json:"security,omitempty"`
+	Network     string              `json:"network,omitempty"`
+	Tls         *db.TLSConfig       `json:"tls,omitempty"`
+	Tag         string              `json:"tag"`
+	RoutingMark int                 `json:"routing_mark"`
+	Transport   *db.TransportConfig `json:"transport,omitempty"`
+}
+
+// VlessOutbound 出站配置结构体
+type VlessOutbound struct {
+	Type        string              `json:"type"`
+	Server      string              `json:"server"`
+	ServerPort  int                 `json:"server_port"`
+	UUID        string              `json:"uuid"`
+	Flow        string              `json:"flow,omitempty"`
+	Network     string              `json:"network,omitempty"`
+	Tls         *db.TLSConfig       `json:"tls,omitempty"`
+	Tag         string              `json:"tag"`
+	RoutingMark int                 `json:"routing_mark"`
+	Transport   *db.TransportConfig `json:"transport,omitempty"`
+}
+
+// TuicOutbound 出站配置结构体
+type TuicOutbound struct {
 	Type        string       `json:"type"`
 	Server      string       `json:"server"`
 	ServerPort  int          `json:"server_port"`
+	UUID        string       `json:"uuid"`
 	Password    string       `json:"password"`
-	Tls         db.TLSConfig `json:"tls"`
 	Network     string       `json:"network,omitempty"`
+	Tls         db.TLSConfig `json:"tls"`
 	Tag         string       `json:"tag"`
 	RoutingMark int          `json:"routing_mark"`
 }
