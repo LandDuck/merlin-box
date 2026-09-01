@@ -91,9 +91,9 @@ show_help() {
   $SCRIPT_NAME <command> [args]
 
 命令:
-  start        启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]
+  start        启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
   stop         停止服务
-  restart      重启服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]
+  restart      重启服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
   server       启动WEBUI服务，可选参数: [port]
   stop_server  停止WEBUI服务
   install      设置 merlin-box 开机自启
@@ -116,11 +116,12 @@ test 子命令:
   print        测试彩色打印输出
   debug        测试调试函数
 
-start 参数说明 (默认值: 1 1 0 0):
+start 参数说明 (默认值: 1 1 0 0 1):
   enable_ipv6            是否启用 IPv6 (0/1)
   disable_quic_from_lan  是否屏蔽 LAN 侧 QUIC (0/1)
   enable_udp             是否启用 UDP 代理 (0/1)
   enable_oneself_proxy   是否启用路由自身代理 (0/1)
+  tcp_fast_open          TCP Fast Open 值 (0/1/2/3)
 
 选项:
   -h, --help    显示帮助信息
@@ -145,7 +146,7 @@ start() {
 
   #如果未在路由器中执行, 直接return并给出警告
   if ! is_running_on_router; then
-      print_warning "⚠️ 当前环境非路由器，无法启动 merlin-box。$1 $2 $3 $4"
+      print_warning "⚠️ 当前环境非路由器，无法启动 merlin-box。$1 $2 $3 $4 $5"
       return 1
   fi
 
@@ -153,6 +154,7 @@ start() {
   local start_disable_quic_from_lan="${2:-$MB_DISABLE_QUIC_FROM_LAN}"
   local start_enable_udp="${3:-$MB_ENABLE_UDP}"
   local start_enable_oneself_proxy="${4:-$MB_ENABLE_ONESELF_PROXY}"
+  local tcp_fast_open="${5:-1}"
 
   case "$start_enable_ipv6" in
     0|1) ;;
@@ -211,6 +213,9 @@ start() {
     sleep 2
   fi
 
+  # set_tcp_fast_open
+  set_tcp_fast_open "$tcp_fast_open"
+
 	# 清理iptables规则
 	reset_iptables
   # 启动singbox socks:65001  tproxy:65002 redirect:65003
@@ -240,6 +245,8 @@ stop() {
 
 	print_line "stop merlin-box"
 
+	reset_tcp_fast_open
+
 	stop_singbox
 	stop_smartdns
 	clear_iptables
@@ -260,12 +267,12 @@ restart() {
 
   #如果未在路由器中执行, 直接return并给出警告
   if ! is_running_on_router; then
-      print_warning "⚠️ 当前环境非路由器，无法重启 merlin-box。$1 $2 $3 $4"
+      print_warning "⚠️ 当前环境非路由器，无法重启 merlin-box。$1 $2 $3 $4 $5"
       #print_warning "⚠️ 当前环境非路由器，无法重启 merlin-box。"
       return 1
   fi
 
-  print_line "restart merlin-box $1 $2 $3 $4"
+  print_line "restart merlin-box $1 $2 $3 $4 $5"
 
   stop_singbox
   stop_smartdns
@@ -275,7 +282,7 @@ restart() {
     rm -f "$PID_FILE"
   fi
   sleep 2
-  start "$1" "$2" "$3" "$4"
+  start "$1" "$2" "$3" "$4" "$5"
 }
 
 #=========================================
@@ -432,12 +439,12 @@ main() {
       esac
       ;;
 		start)
-      if [ "$#" -gt 5 ]; then
-        print_error "错误: start 最多支持 4 个可选参数，当前传入: $(($# - 1))"
-        print_normal "用法: $SCRIPT_NAME start [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]"
+      if [ "$#" -gt 6 ]; then
+        print_error "错误: start 最多支持 5 个可选参数，当前传入: $(($# - 1))"
+        print_normal "用法: $SCRIPT_NAME start [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]"
         exit 1
       fi
-			start "$2" "$3" "$4" "$5"
+			start "$2" "$3" "$4" "$5" "$6"
 			;;
 		stop)
 			stop
@@ -511,12 +518,12 @@ main() {
       esac
       ;;
 	  restart)
-	    if [ "$#" -gt 5 ]; then
-        print_error "错误: restart 最多支持 4 个可选参数，当前传入: $(($# - 1))"
-        print_normal "用法: $SCRIPT_NAME restart [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy]"
+	    if [ "$#" -gt 6 ]; then
+        print_error "错误: restart 最多支持 5 个可选参数，当前传入: $(($# - 1))"
+        print_normal "用法: $SCRIPT_NAME restart [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]"
         exit 1
       fi
-			restart "$2" "$3" "$4" "$5"
+			restart "$2" "$3" "$4" "$5" "$6"
 			;;
 		-h|--help)
 			show_help
