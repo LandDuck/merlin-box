@@ -73,7 +73,7 @@ func saveNode(w http.ResponseWriter, tag string, node any) {
 		httpHelper.ResponseFailure(w, "节点 tag 已存在，请勿重复添加")
 		return
 	}
-	raw, err := json.Marshal(node)
+	raw, err := json.MarshalIndent(node, "", "  ")
 	if err != nil {
 		httpHelper.ResponseFailure(w, "节点数据序列化失败")
 		return
@@ -597,7 +597,7 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 	}
 
 	//转换为 JSON 字符串
-	data, err := json.Marshal(config)
+	data, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
 		return "{}", err
 	}

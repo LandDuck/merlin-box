@@ -460,7 +460,7 @@ func SetDefaultNode(tag string) error {
 		} else {
 			node["is_default"] = false
 		}
-		updated, err := json.Marshal(node)
+		updated, err := json.MarshalIndent(node, "", "  ")
 		if err != nil {
 			newNodes = append(newNodes, raw)
 			continue
