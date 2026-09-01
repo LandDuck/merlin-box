@@ -123,7 +123,7 @@ This project aims to clearly separate responsibilities:
       <td>UI</td>
       <td>✅ Supported</td>
       <td>
-        All features except node management have been implemented.
+        WEB UI is started using ./merlin-box.sh server.
       </td>
     </tr>
     <tr>

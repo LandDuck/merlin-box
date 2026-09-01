@@ -122,7 +122,7 @@
       <td>UI</td>
       <td>✅ 已支持</td>
       <td>
-        已经实现除节点管理以外的所有功能。
+        执行 ./merlin-box.sh server 启动WEB UI。
       </td>
     </tr>
     <tr>
