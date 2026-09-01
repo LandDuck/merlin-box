@@ -25,7 +25,6 @@ export default {
     comm_stop: 'api/stop',
     comm_restart: 'api/restart',
     comm_start: 'api/start',
-    comm_service_log: 'api/service_log',
     comm_showDhcpClientList: 'api/show_dhcp_client_list',
     comm_getDeviceControlConfig: 'api/get_device_control_config',
     comm_saveDeviceControlConfig: 'api/save_device_control_config',

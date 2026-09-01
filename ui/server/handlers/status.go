@@ -92,7 +92,6 @@ func runServiceScriptAsync(action string, args ...string) error {
 		return fmt.Errorf("另一个服务操作正在执行中，请稍后再试")
 	}
 
-	global.SetServiceLog("")
 	global.SetServiceRunning(true)
 
 	go func() {
@@ -213,11 +212,6 @@ func Restart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpHelper.ResponseSuccess[any](w, nil)
-}
-
-// GetServiceLog 返回最近一次脚本执行日志
-func GetServiceLog(w http.ResponseWriter, r *http.Request) {
-	httpHelper.ResponseSuccess(w, global.GetServiceLog())
 }
 
 // ShowDhcpClientList 返回 DHCP 客户端列表

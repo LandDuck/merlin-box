@@ -27,32 +27,8 @@ import (
 
 var serviceLogMu sync.RWMutex
 
-// ServiceLog 保存最近一次 merlin-box 脚本执行输出
-var ServiceLog string
-
 // ServiceRunning 标记当前是否有脚本在执行
 var ServiceRunning bool
-
-// SetServiceLog 设置最新脚本输出日志
-func SetServiceLog(log string) {
-	serviceLogMu.Lock()
-	defer serviceLogMu.Unlock()
-	ServiceLog = log
-}
-
-// AppendServiceLog 追加脚本输出日志
-func AppendServiceLog(log string) {
-	serviceLogMu.Lock()
-	defer serviceLogMu.Unlock()
-	ServiceLog += log
-}
-
-// GetServiceLog 获取最新脚本输出日志
-func GetServiceLog() string {
-	serviceLogMu.RLock()
-	defer serviceLogMu.RUnlock()
-	return ServiceLog
-}
 
 // SetServiceRunning 设置脚本运行状态
 func SetServiceRunning(running bool) {
@@ -66,6 +42,55 @@ func IsServiceRunning() bool {
 	serviceLogMu.RLock()
 	defer serviceLogMu.RUnlock()
 	return ServiceRunning
+}
+
+// LogHub 管理所有 WebSocket 日志订阅者
+type logHub struct {
+	mu          sync.RWMutex
+	subscribers map[chan string]struct{}
+}
+
+var LogHub = &logHub{
+	subscribers: make(map[chan string]struct{}),
+}
+
+// Subscribe 注册一个订阅频道，返回接收日志的只读 channel
+func (h *logHub) Subscribe() <-chan string {
+	ch := make(chan string, 256)
+	h.mu.Lock()
+	h.subscribers[ch] = struct{}{}
+	h.mu.Unlock()
+	return ch
+}
+
+// Unsubscribe 取消订阅并关闭 channel
+func (h *logHub) Unsubscribe(ch <-chan string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	for k := range h.subscribers {
+		if k == ch {
+			delete(h.subscribers, k)
+			close(k)
+			return
+		}
+	}
+}
+
+// Broadcast 向所有订阅者广播一条日志
+func (h *logHub) Broadcast(line string) {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	for ch := range h.subscribers {
+		select {
+		case ch <- line:
+		default:
+		}
+	}
+}
+
+// AppendServiceLog 追加脚本输出日志并广播给所有 WebSocket 客户端
+func AppendServiceLog(line string) {
+	LogHub.Broadcast(line)
 }
 
 // EnvDev 开发环境

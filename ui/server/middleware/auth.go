@@ -37,6 +37,10 @@ func Auth(next http.Handler) http.Handler {
 		if strings.HasPrefix(token, "Bearer ") {
 			token = strings.TrimSpace(strings.TrimPrefix(token, "Bearer "))
 		}
+		// WebSocket 握手时浏览器无法设置自定义 Header，从 query param 中读取
+		if token == "" {
+			token = strings.TrimSpace(r.URL.Query().Get("token"))
+		}
 
 		if !global.ValidateAndRefreshAuthToken(token) {
 			//w.WriteHeader(http.StatusUnauthorized)

@@ -73,7 +73,7 @@ func startHTTPServer(port int) {
 	router.Post("/api/start", handlers.Start)
 	router.Post("/api/stop", handlers.Stop)
 	router.Post("/api/restart", handlers.Restart)
-	router.Post("/api/service_log", handlers.GetServiceLog)
+	router.Get("/api/ws/log", handlers.LogWS)
 	router.Post("/api/show_dhcp_client_list", handlers.ShowDhcpClientList)
 	router.Post("/api/add_node", handlers.AddNode)
 	router.Post("/api/load_node_list", handlers.GetNodeList)

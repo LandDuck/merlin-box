@@ -25,14 +25,11 @@ class Status extends React.Component {
     //定义一个setTimeout的定时器
     #timer = null;
 
-    //定义一个获取日志的定时器
-    #getLogTimer = null;
+    //WebSocket 实例
+    #ws = null;
 
-    //定义一个日志变量
+    //日志变量（传给弹层的 getter 用）
     #log = "";
-
-    //定义一个日志计数器
-    #logCount = 0;
 
     /**
      * 构造方法
@@ -54,6 +51,7 @@ class Status extends React.Component {
      */
     componentDidMount() {
         this.#refreshStatus();
+        this.#connectWS();
     }
 
     /**
@@ -61,6 +59,45 @@ class Status extends React.Component {
      */
     componentWillUnmount() {
         this.#stopTimer();
+        this.#closeWS();
+    }
+
+    /**
+     * 建立 WebSocket 连接
+     */
+    #connectWS() {
+        const token = this.$storage.get(this.$storage.keys.token) || '';
+        const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+        const url = `${protocol}://${location.host}/api/ws/log?token=${encodeURIComponent(token)}`;
+        const ws = new WebSocket(url);
+
+        ws.onmessage = (event) => {
+            const line = (event.data || "")
+                .replace(/\x1b\[[0-9;]*m/g, "")
+                .replace(/\r\n|\r|\n/g, "<br/>");
+            this.#log += line;
+        };
+
+        ws.onerror = (e) => {
+            console.error("WebSocket error:", e);
+        };
+        ws.onclose = (e) => {
+            console.log("WebSocket closed:", e);
+        };
+        ws.onopen = (e) => {
+            console.log("WebSocket connected:", e);
+        };
+        this.#ws = ws;
+    }
+
+    /**
+     * 关闭 WebSocket 连接
+     */
+    #closeWS() {
+        if (this.#ws) {
+            this.#ws.close();
+            this.#ws = null;
+        }
     }
 
     /**
@@ -105,107 +142,45 @@ class Status extends React.Component {
     }
 
     /**
+     * 执行操作并展示日志弹层
+     * @param {string} apiUrl  后台接口
+     * @param {string} title   弹层标题
+     */
+    #runAction(apiUrl, title) {
+        this.#log = "";
+        this.$http.sendPost({
+            url: apiUrl,
+            success: () => {
+                this.$helper.showLogLayer({
+                    title,
+                    okText: "关闭",
+                    onOk: () => {
+                    },
+                    content: () => this.#log
+                });
+            }
+        });
+    }
+
+    /**
      * 停止代理
      */
     #stop() {
-        clearInterval(this.#getLogTimer);
-        this.$http.sendPost({
-            url: this.$config.apis.comm_stop,
-            success: () => {
-                //this.$helper.success("代理已停止");
-                this.#getLog()
-                this.$helper.showLogLayer({
-                    title: "正在停止代理",
-                    okText: "关闭",
-                    onOk: () => {
-                        clearInterval(this.#getLogTimer);
-                        //this.#refreshStatus();
-                    },
-                    content: () => {
-                        return this.#log;
-                    }
-                })
-            }
-        });
+        this.#runAction(this.$config.apis.comm_stop, "正在停止代理");
     }
 
     /**
      * 启动代理
      */
     #start() {
-        clearInterval(this.#getLogTimer);
-        this.$http.sendPost({
-            url: this.$config.apis.comm_start,
-            success: () => {
-                //this.$helper.success("代理已启动");
-                this.#getLog()
-                this.$helper.showLogLayer({
-                    title: "正在启动代理",
-                    okText: "关闭",
-                    onOk: () => {
-                        clearInterval(this.#getLogTimer);
-                        //this.#refreshStatus();
-                    },
-                    content: () => {
-                        return this.#log;
-                    }
-                })
-            }
-        });
+        this.#runAction(this.$config.apis.comm_start, "正在启动代理");
     }
 
     /**
      * 重启代理
      */
     #restart() {
-        clearInterval(this.#getLogTimer);
-        this.$http.sendPost({
-            url: this.$config.apis.comm_restart,
-            success: () => {
-                //this.$helper.success("代理已重启");
-                this.#getLog()
-                this.$helper.showLogLayer({
-                    title: "正在重启代理",
-                    okText: "关闭",
-                    onOk: () => {
-                        clearInterval(this.#getLogTimer);
-                        //this.#refreshStatus();
-                    },
-                    content: () => {
-                        return this.#log;
-                    }
-                })
-            }
-        });
-    }
-
-    /**
-     * 获取日志
-     */
-    #getLog() {
-        this.#logCount = 0;
-        this.#log = "";
-        clearInterval(this.#getLogTimer);
-        this.#getLogTimer = setInterval(() => {
-            this.$http.sendPost({
-                url: this.$config.apis.comm_service_log,
-                success: (log) => {
-                    //const serverLog = log.replaceAll("\n", "<br/>");
-                    const serverLog = (log || "")
-                        .replace(/\x1b\[[0-9;]*m/g, "")
-                        .replace(/\r\n|\r|\n/g, "<br/>");
-                    if (serverLog !== this.#log) {
-                        this.#log = serverLog;
-                    } else {
-                        this.#logCount++;
-                    }
-                }
-            });
-            if (this.#logCount > 8) {
-                clearInterval(this.#getLogTimer);
-                this.#getLogTimer = null;
-            }
-        }, 700);
+        this.#runAction(this.$config.apis.comm_restart, "正在重启代理");
     }
 
     /**
