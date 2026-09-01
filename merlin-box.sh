@@ -310,10 +310,10 @@ install() {
   local boot_script="${CUR_DIR}/start_merlin_box.sh"
   # wan状态改变时触发的脚本路径
   local merlin_wan_event="/jffs/scripts/wan-event"
-  local merlin_wan_event_cifs="/cifs2/scripts/wan-event"
+  local merlin_wan_event_cifs="/cifs2/scripts/wan-event" # 此脚本用于安装了 USB2JFFS v2.2.0 的路由，因jffs目录被迁移，有可能在未挂载时不执行，原版merlin应该没有这个。
   # u盘挂载完成后触发的脚本路径
   local merlin_wan_start="/jffs/scripts/wan-start"
-  local merlin_wan_start_cifs="/cifs2/scripts/wan-start"
+  local merlin_wan_start_cifs="/cifs2/scripts/wan-start" # 此脚本用于安装了 USB2JFFS v2.2.0 的路由，因jffs目录被迁移，有可能在未挂载时不执行，原版merlin应该没有这个。
 
   print_normal "修改脚本中的 MD_ROOT_DIR 为当前目录"
 
@@ -333,8 +333,8 @@ install() {
   fi
   if [ ! -f "${merlin_wan_event_cifs}" ]; then
     print_normal "创建 merlin wan-event 脚本 on cifs"
-    echo "#!/bin/sh" > "${merlin_wan_event_cifs}"
-    chmod +x "${merlin_wan_event_cifs}"
+    echo "#!/bin/sh" > "${merlin_wan_event_cifs}" 2>/dev/null
+    chmod +x "${merlin_wan_event_cifs}" 2>/dev/null
   fi
   # 检查并开启梅林固件的 wan-start
   if [ ! -f "${merlin_wan_start}" ]; then
@@ -344,22 +344,22 @@ install() {
   fi
   if [ ! -f "${merlin_wan_start_cifs}" ]; then
     print_normal "创建 merlin wan-start 脚本 on cifs"
-    echo "#!/bin/sh" > "${merlin_wan_start_cifs}"
-    chmod +x "${merlin_wan_start_cifs}"
+    echo "#!/bin/sh" > "${merlin_wan_start_cifs}" 2>/dev/null
+    chmod +x "${merlin_wan_start_cifs}" 2>/dev/null
   fi
 
   print_normal "将启动脚本添加到 merlin wan-event 和 wan-start 中"
 
   # 将脚本放入 wan-event 和 wan-start（先清理旧的历史写入）
   sed -i "\|${boot_script}|d" "${merlin_wan_event}"
-  sed -i "\|${boot_script}|d" "${merlin_wan_event_cifs}"
+  sed -i "\|${boot_script}|d" "${merlin_wan_event_cifs}" 2>/dev/null
   sed -i "\|${boot_script}|d" "${merlin_wan_start}"
-  sed -i "\|${boot_script}|d" "${merlin_wan_start_cifs}"
+  sed -i "\|${boot_script}|d" "${merlin_wan_start_cifs}" 2>/dev/null
   # 将 $1 $2 作为参数传递给 boot_script，并在后台异步执行
   echo "${boot_script} wan_event \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event}"
-  echo "${boot_script} wan_event \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event_cifs}"
+  echo "${boot_script} wan_event \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event_cifs}" 2>/dev/null
   echo "${boot_script} wan_start \"\$1\" >/dev/null 2>&1 &" >> "${merlin_wan_start}"
-  echo "${boot_script} wan_start \"\$1\" >/dev/null 2>&1 &" >> "${merlin_wan_start_cifs}"
+  echo "${boot_script} wan_start \"\$1\" >/dev/null 2>&1 &" >> "${merlin_wan_start_cifs}" 2>/dev/null
 
   print_success "merlin-box启动脚本已设置完成，wan-event 和 wan-start 已配置。"
 }
@@ -383,7 +383,7 @@ uninstall() {
   fi
   if [ -f "${merlin_wan_event_cifs}" ]; then
     print_normal "从 merlin wan-event on cifs 中删除启动脚本行"
-    sed -i "\|${boot_script}|d" "${merlin_wan_event_cifs}"
+    sed -i "\|${boot_script}|d" "${merlin_wan_event_cifs}" 2>/dev/null
   fi
   # 从 /jffs/scripts/wan-start 中删除启动脚本行
   if [ -f "${merlin_wan_start}" ]; then
@@ -392,7 +392,7 @@ uninstall() {
   fi
   if [ -f "${merlin_wan_start_cifs}" ]; then
     print_normal "从 merlin wan-start on cifs 中删除启动脚本行"
-    sed -i "\|${boot_script}|d" "${merlin_wan_start_cifs}"
+    sed -i "\|${boot_script}|d" "${merlin_wan_start_cifs}" 2>/dev/null
   fi
 
   print_line "merlin-box开机自启已卸载完成"
