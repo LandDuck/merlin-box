@@ -1,8 +1,0 @@
-验证进程检测的问题,  像是 ' ❌ dnsmasq重启失败，请检查你的dnsmasq配置'
-
-
-还有tmp无法写入log的问题
-进一步排查后发现/tmp/merlin-box-boot.log这个目录写不进去这个log，自己创建了一个log后，启动log如下：
-
-[2026-09-01 05:20:17] 收到触发事件: FROM=wan_event, P1=0, P2=stopping
-[2026-09-01 05:20:17] 收到触发事件: FROM=wan_event, P1=0, P2=disconnected
