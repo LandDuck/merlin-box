@@ -89,7 +89,24 @@ func saveNode(w http.ResponseWriter, tag string, node any) {
 		// 如果只有一个节点，设置为默认节点
 		if len(nodes) == 1 {
 			if err := dbHelper.SetDefaultNode(tag); err != nil {
+				httpHelper.ResponseFailure(w, "设置默认节点失败")
+				return
 			}
+
+			//解析并转换为 singbox 配置
+			configJson, err := parseNode(raw, tag)
+			if err != nil {
+				httpHelper.ResponseFailure(w, "解析节点失败")
+				return
+			}
+
+			//写入 singbox 配置文件
+			confPath := filepath.Join(global.ConfDir, "config.json")
+			if err := os.WriteFile(confPath, []byte(configJson), 0644); err != nil {
+				httpHelper.ResponseFailure(w, "写入配置文件失败")
+				return
+			}
+
 		}
 	}
 

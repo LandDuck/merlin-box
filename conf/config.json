@@ -27,21 +27,20 @@
   ],
   "outbounds": [
     {
-      "type": "tuic",
+      "type": "anytls",
       "server": "1.1.1.1",
-      "server_port": 100,
-      "uuid": "e903cae2-f384-45a9-bc33-376f719c9129",
-      "password": "123456",
+      "server_port": 80,
+      "password": "888888",
       "tls": {
         "enabled": true,
-        "server_name": "www.cloudflare.com"
+        "server_name": "www.cloufflare.com"
       },
-      "tag": "d20fc914-0445-49d0-8671-15afb0ccd9ee",
+      "tag": "637efc73-0ce1-4580-8b0a-b5ec787e6644",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "d20fc914-0445-49d0-8671-15afb0ccd9ee"
+    "final": "637efc73-0ce1-4580-8b0a-b5ec787e6644"
   }
 }
