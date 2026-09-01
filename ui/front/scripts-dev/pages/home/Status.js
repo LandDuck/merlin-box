@@ -184,6 +184,13 @@ class Status extends React.Component {
     }
 
     /**
+     * 更新规则
+     */
+    #updateRules() {
+        this.#runAction(this.$config.apis.comm_updateRules, "正在更新规则");
+    }
+
+    /**
      * 渲染方法
      * @return
      */
@@ -257,7 +264,23 @@ class Status extends React.Component {
                         }}>
                             <span className="icon-reboot"/>
                             重启代理
+                        </button>,
+                        <button className="btn-secondary" key={"update-rules"} onClick={(e) => {
+                            this.$helper.showAlertLayer({
+                                title: "操作提示",
+                                content: "确定要更新规则吗？",
+                                onCancel: () => {
+                                    this.$helper.warning("已取消更新规则");
+                                },
+                                onOk: () => {
+                                    this.#updateRules();
+                                }
+                            });
+                        }}>
+                            <span className="icon-update"/>
+                            更新规则
                         </button>
+
                     ]
                 }
             </div>

@@ -57,6 +57,13 @@ update_rules() {
   # 检测是否在路由器中, 在的话直接下载本项目的规则文件到 res 目录
   if is_running_on_router; then
     print_normal "检测到在路由器中运行，直接下载规则文件到 res 目录"
+
+    # 需要检测是否存在 PID_FILE 文件，如果不存在，证明没有运行，不能更新规则文件
+    if [ ! -f "$PID_FILE" ]; then
+      print_error "未检测到 PID 文件，merlin-box 可能未运行，请先启动 merlin-box 后再更新规则文件"
+      exit 1
+    fi
+
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip6.txt
     # https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-site.txt

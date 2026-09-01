@@ -214,6 +214,15 @@ func Restart(w http.ResponseWriter, r *http.Request) {
 	httpHelper.ResponseSuccess[any](w, nil)
 }
 
+// UpdateRules 更新规则文件，并异步返回脚本输出日志
+func UpdateRules(w http.ResponseWriter, r *http.Request) {
+	if err := runServiceScriptAsync("tool", "update_rules"); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	httpHelper.ResponseSuccess[any](w, nil)
+}
+
 // ShowDhcpClientList 返回 DHCP 客户端列表
 func ShowDhcpClientList(w http.ResponseWriter, r *http.Request) {
 	output, err := runServiceScript("tool", "show_devices")

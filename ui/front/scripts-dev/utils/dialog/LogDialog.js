@@ -66,6 +66,9 @@ class LogDialog extends DialogBase {
                 if (content !== this.state.content) {
                     this.setState({
                         content: content
+                    }, () => {
+                        const contentContainer = $("#log-content").closest(".content");
+                        contentContainer.scrollTop(contentContainer[0].scrollHeight);
                     });
                 }
             }, 500);
@@ -88,7 +91,7 @@ class LogDialog extends DialogBase {
                         {this.#config.title}
                     </div>
                     <div className="content">
-                        <div className="nlc-content" dangerouslySetInnerHTML={
+                        <div className="nlc-content" id="log-content" dangerouslySetInnerHTML={
                             {__html: this.state.content}
                         }>
                         </div>
