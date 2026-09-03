@@ -9,7 +9,8 @@
     "enableIPv6": 1,
     "enableUDP": 0,
     "disableQUIC": 1,
-    "routeSelfProxy": 0
+    "routeSelfProxy": 0,
+    "tcpFastOpen": 0
   },
   "dns": {
     "china": [
