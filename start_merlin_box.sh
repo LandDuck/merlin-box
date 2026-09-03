@@ -35,6 +35,19 @@ readonly FROM="${1:-wan_start}"
 readonly P1="${2:-0}"
 readonly P2="${3:-connected}"
 
+########################################
+# 从 JSON 文件中获取指定键的值，如果不存在则返回默认值
+########################################
+get_json_value() {
+    key="$1"
+    default="$2"
+    file="$3"
+
+    value=$(grep "\"$key\"" "$file" | head -n 1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:],]*$//')
+
+    [ -n "$value" ] && echo "$value" || echo "$default"
+}
+
 #######################################
 # 日志记录函数
 #######################################
@@ -131,9 +144,23 @@ if { [ "$FROM" = "wan_event" ] && [ "$P1" = "0" ] && [ "$P2" = "connected" ]; } 
 
     if cd "$MD_ROOT_DIR"; then
         log_msg "已进入目录: $MD_ROOT_DIR，开始执行 ./merlin-box.sh restart"
-        ./merlin-box.sh restart >> "$LOGFILE" 2>&1
-        EXIT_CODE=$?
-        log_msg "merlin-box 重启命令执行完毕 (退出码: $EXIT_CODE)"
+
+        # 判断当前目录下 db/db.json 文件是否存在，存在的话，先读配置，不存在直接执行重启命令
+        if [ -f "$MD_ROOT_DIR/db/db.json" ]; then
+          enableIPv6=$(get_json_value "enableIPv6" 1 "$MD_ROOT_DIR/db/db.json")
+          enableUDP=$(get_json_value "enableUDP" 0 "$MD_ROOT_DIR/db/db.json")
+          disableQUIC=$(get_json_value "disableQUIC" 1 "$MD_ROOT_DIR/db/db.json")
+          routeSelfProxy=$(get_json_value "routeSelfProxy" 0 "$MD_ROOT_DIR/db/db.json")
+          #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
+          ./merlin-box.sh restart "$enableIPv6" "$disableQUIC" "$enableUDP" "$routeSelfProxy" >> "$LOGFILE" 2>&1
+          EXIT_CODE=$?
+          log_msg "merlin-box 重启命令执行完毕 (退出码: $EXIT_CODE)"
+        else
+          log_msg "未检测到 db/db.json 文件，跳过配置读取，直接执行重启命令..."
+          ./merlin-box.sh restart >> "$LOGFILE" 2>&1
+          EXIT_CODE=$?
+          log_msg "merlin-box 重启命令执行完毕 (退出码: $EXIT_CODE)"
+        fi
 
         #检测 bin 目录下是否存在 merlin-box 文件，如果存在, 使用 ./merlin-box.sh server 启动 WEBUI 服务
         if [ -f "$MD_ROOT_DIR/bin/merlin-box" ]; then
@@ -144,6 +171,7 @@ if { [ "$FROM" = "wan_event" ] && [ "$P1" = "0" ] && [ "$P2" = "connected" ]; } 
         else
             log_msg "未检测到 bin 目录下的 merlin-box 文件，跳过 WEBUI 服务启动。"
         fi
+
     else
         log_msg "错误: 无法进入目录 $MD_ROOT_DIR，启动中断！"
     fi

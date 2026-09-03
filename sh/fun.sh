@@ -1163,3 +1163,16 @@ reset_tcp_fast_open() {
         print_warning "⚠️ 当前系统不支持 TCP Fast Open。"
     fi
 }
+
+########################################
+# 从 JSON 文件中获取指定键的值，如果不存在则返回默认值
+########################################
+get_json_value() {
+    key="$1"
+    default="$2"
+    file="$3"
+
+    value=$(grep "\"$key\"" "$file" | head -n 1 | sed 's/.*:[[:space:]]*//' | sed 's/[[:space:],]*$//')
+
+    [ -n "$value" ] && echo "$value" || echo "$default"
+}

@@ -292,6 +292,18 @@ test_debug() {
 	#clear_iptables
 	#start_singbox
 	#start_smartdns
+
+  #config_file="${CUR_DIR}/db/db.json"
+  #enableIPv6=$(get_json_value "enableIPv6" 1 "$config_file")
+  #enableUDP=$(get_json_value "enableUDP" 0 "$config_file")
+  #disableQUIC=$(get_json_value "disableQUIC" 1 "$config_file")
+  #routeSelfProxy=$(get_json_value "routeSelfProxy" 0 "$config_file")
+
+  #echo "enableIPv6: $enableIPv6"
+  #echo "enableUDP: $enableUDP"
+  #echo "disableQUIC: $disableQUIC"
+  #echo "routeSelfProxy: $routeSelfProxy"
+
 	:
 }
 
