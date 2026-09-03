@@ -26,6 +26,7 @@ import WireguardForm from "./WireguardForm";
 import Hysteria2Form from "./Hysteria2Form";
 import TuicForm from "./TuicForm";
 import AnytlsForm from "./AnytlsForm";
+import SnellForm from "./SnellForm";
 
 /**
  * AddNodeDialog 添加节点弹窗，包含各种节点的输入框， tab 切换，节点类型选择，节点参数输入等，
@@ -142,6 +143,11 @@ class AddNodeDialog extends DialogBase {
                     this.#form = obj;
                 }}/>;
                 break;
+            case "snell":
+                content = <SnellForm config={this.#config} onRef={(obj) => {
+                    this.#form = obj;
+                }}/>;
+                break;
         }
         return <div className="ns-layer add-node-layer">
             <div className={`nlc ${this.state.show ? 'show' : ''}`}>
@@ -176,6 +182,9 @@ class AddNodeDialog extends DialogBase {
                             <a href="javascript:void(0);" className={this.state.current === "anytls" ? "active" : ""} onClick={() =>
                                 this.setState({current: "anytls"})
                             }>Anytls</a>
+                            <a href="javascript:void(0);" className={this.state.current === "snell" ? "active" : ""} onClick={() =>
+                                this.setState({current: "snell"})
+                            }>Snell</a>
                         </div>
                         <div className="tab-content">
                             {
