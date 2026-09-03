@@ -718,9 +718,23 @@ func vmessNodeToOutbound(n dbModel.VmessNode) singbox.VmessOutbound {
 // vlessNodeToOutbound 将 Vless 节点转换为 Singbox 出站配置
 func vlessNodeToOutbound(n dbModel.VlessNode) singbox.VlessOutbound {
 
-	var tls *dbModel.TLSConfig = nil
+	var tls *singbox.TLSConfigWithReality
+
 	if n.Tls.Enabled {
-		tls = &n.Tls
+		var reality *dbModel.RealityConfig = nil
+		var utls *singbox.UTLSConfig = nil
+		if n.Tls.Reality.Enabled {
+			reality = &n.Tls.Reality
+			utls = &singbox.UTLSConfig{
+				Enabled:     true,
+				Fingerprint: "chrome",
+			}
+		}
+		tls = &singbox.TLSConfigWithReality{
+			TLSConfig: n.Tls.TLSConfig,
+			Reality:   reality,
+			Utls:      utls,
+		}
 	}
 
 	var transport *dbModel.TransportConfig = nil

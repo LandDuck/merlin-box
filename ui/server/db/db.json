@@ -39,7 +39,7 @@
   },
   "nodes": [
     {
-      "is_default": true,
+      "is_default": false,
       "name": "my_anytls",
       "password": "888888",
       "server": "1.1.1.1",
@@ -50,6 +50,52 @@
         "server_name": "www.cloufflare.com"
       },
       "type": "anytls"
+    },
+    {
+      "flow": "xtls-rprx-vision",
+      "is_default": true,
+      "name": "my_vless",
+      "network": "",
+      "server": "1.1.1.1",
+      "server_port": 8888,
+      "tag": "5c3f1b5f-1002-4d37-80bc-7295c3462b44",
+      "tls": {
+        "enabled": true,
+        "reality": {
+          "enabled": true,
+          "public_key": "jNXHt1yRo0vDuchQlIP6Z0ZvjT3KtzVI-T4E7RoLJS0",
+          "short_id": "0123456789abcdef"
+        },
+        "server_name": "www.cloudflare.com"
+      },
+      "transport": {
+        "type": ""
+      },
+      "type": "vless",
+      "uuid": "04763738-9dd4-4d2d-a8ac-a2b52a26df66"
+    },
+    {
+      "flow": "",
+      "is_default": false,
+      "name": "my_vless2",
+      "network": "",
+      "server": "1.1.1.1",
+      "server_port": 9999,
+      "tag": "1dbb9d3f-96be-47dc-8ae2-9505a4fe2f20",
+      "tls": {
+        "enabled": true,
+        "reality": {
+          "enabled": false,
+          "public_key": "",
+          "short_id": ""
+        },
+        "server_name": "www.cloudflare.com"
+      },
+      "transport": {
+        "type": ""
+      },
+      "type": "vless",
+      "uuid": "04763738-9dd4-4d2d-a8ac-a2b52a26df66"
     }
   ]
 }

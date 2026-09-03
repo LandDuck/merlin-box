@@ -64,6 +64,13 @@ import React from "react";
  *   transport.host = "xxx.xxx.net"          //普通 input 默认 空
  *   transport.path = "/"                    //普通 input 默认 /
  *
+ *
+ *   "reality": {
+ *     "enabled": false,
+ *     "public_key": "jNXHt1yRo0vDuchQlIP6Z0ZvjT3KtzVI-T4E7RoLJS0",
+ *     "short_id": "0123456789abcdef"
+ *   }          //这个在  tls中。 tls.reality   使用antd.Switch  默认关闭,  开启后显示两个 input
+ *
  *   ... // 拨号字段
  * }
  */
@@ -125,11 +132,16 @@ class VlessForm extends React.Component {
             transportPath: "/",      // HTTP / WebSocket / HTTPUpgrade Path
             transportMethod: "GET",  // HTTP Method
             transportServiceName: "",// gRPC Service Name
+            realityEnabled: false, // TLS Reality 开关
+            realityPublicKey: "", // TLS Reality 公钥
+            realityShortId: "", // TLS Reality short_id
 
             nameError: false,
             serverError: false,
             serverPortError: false,
             uuidError: false,
+            realityPublicKeyError: false,
+            realityShortIdError: false,
         }
     }
 
@@ -194,6 +206,23 @@ class VlessForm extends React.Component {
                 break;
         }
 
+        const tls = hasTls
+            ? {
+                enabled: true,
+                server_name: state.serverName.trim()
+            }
+            : {
+                enabled: false
+            };
+
+        if (hasTls && state.realityEnabled) {
+            tls.reality = {
+                enabled: true,
+                public_key: state.realityPublicKey.trim(),
+                short_id: state.realityShortId.trim(),
+            };
+        }
+
         return {
             tag: this.#uuid,
             is_default: false,
@@ -204,14 +233,7 @@ class VlessForm extends React.Component {
             uuid: state.uuid.trim(),
             flow: state.flow,
             network: state.network,
-            tls: hasTls
-                ? {
-                    enabled: true,
-                    server_name: state.serverName.trim()
-                }
-                : {
-                    enabled: false
-                },
+            tls,
             transport,
         };
     }
@@ -230,7 +252,10 @@ class VlessForm extends React.Component {
             name,
             server,
             serverPort,
-            uuid
+            uuid,
+            realityEnabled,
+            realityPublicKey,
+            realityShortId,
         } = this.state;
 
         const nameError = !name || !name.trim();
@@ -249,18 +274,24 @@ class VlessForm extends React.Component {
 
         const uuidError =
             !this.#isUuidValid(uuid);
+        const realityPublicKeyError = realityEnabled && (!realityPublicKey || !realityPublicKey.trim());
+        const realityShortIdError = realityEnabled && (!realityShortId || !realityShortId.trim());
 
         this.setState({
             nameError,
             serverError,
             serverPortError,
-            uuidError
+            uuidError,
+            realityPublicKeyError,
+            realityShortIdError
         });
 
         return !nameError &&
             !serverError &&
             !serverPortError &&
-            !uuidError;
+            !uuidError &&
+            !realityPublicKeyError &&
+            !realityShortIdError;
     }
 
     /**
@@ -609,6 +640,68 @@ class VlessForm extends React.Component {
                         />
                     </div>
                 </div>
+
+                <div className="form-item">
+                    <label>Reality</label>
+                    <div className="form-field">
+                        <div className="nlc-empty">
+                            <antd.Switch
+                                checked={this.state.realityEnabled}
+                                onChange={(val) => {
+                                    this.state.realityEnabled = val;
+                                    this.setState({
+                                        realityEnabled: this.state.realityEnabled
+                                    });
+                                    this.#validate();
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {this.state.realityEnabled && (
+                    <div className="form-item">
+                        <label>public_key</label>
+                        <div className="form-field">
+                            <div className={`nlc-input ${this.state.realityPublicKeyError ? "error" : ""}`}>
+                                <input
+                                    type="text"
+                                    placeholder="Reality public_key"
+                                    value={this.state.realityPublicKey}
+                                    onChange={(e) => {
+                                        this.state.realityPublicKey = e.target.value;
+                                        this.setState({
+                                            realityPublicKey: this.state.realityPublicKey
+                                        });
+                                        this.#validate();
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {this.state.realityEnabled && (
+                    <div className="form-item">
+                        <label>short_id</label>
+                        <div className="form-field">
+                            <div className={`nlc-input ${this.state.realityShortIdError ? "error" : ""}`}>
+                                <input
+                                    type="text"
+                                    placeholder="Reality short_id"
+                                    value={this.state.realityShortId}
+                                    onChange={(e) => {
+                                        this.state.realityShortId = e.target.value;
+                                        this.setState({
+                                            realityShortId: this.state.realityShortId
+                                        });
+                                        this.#validate();
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* ==================== 传输协议 ==================== */}
 

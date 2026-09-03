@@ -42,6 +42,22 @@ type TLSConfig struct {
 	ServerName string `json:"server_name"`
 }
 
+// RealityConfig 节点 Reality 配置结构体
+type RealityConfig struct {
+	// Enabled 是否启用 Reality，true 启用，false 禁用
+	Enabled bool `json:"enabled"`
+	// PublicKey Reality 公钥
+	PublicKey string `json:"public_key"`
+	// ShortId Reality 短 ID
+	ShortId string `json:"short_id"`
+}
+
+// TLSConfigWithReality 节点 TLS + Reality 配置结构体
+type TLSConfigWithReality struct {
+	TLSConfig
+	Reality RealityConfig `json:"reality"`
+}
+
 // NodeTls 节点 TLS 配置结构体
 type NodeTls struct {
 	// Tls TLS 配置
@@ -172,7 +188,8 @@ type VlessNode struct {
 	// Network 节点网络类型
 	Network string `json:"network"`
 	NodeTransport
-	NodeTls
+	// Tls TLS 配置
+	Tls TLSConfigWithReality `json:"tls"`
 }
 
 // TuicNode 节点基础信息结构体，继承 NodeBase

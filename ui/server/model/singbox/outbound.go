@@ -101,18 +101,31 @@ type VmessOutbound struct {
 	Transport   *db.TransportConfig `json:"transport,omitempty"`
 }
 
+// TLSConfigWithReality 节点 TLS + Reality 配置结构体，Reality 可选
+type TLSConfigWithReality struct {
+	db.TLSConfig
+	Utls    *UTLSConfig       `json:"utls,omitempty"`
+	Reality *db.RealityConfig `json:"reality,omitempty"`
+}
+
+// UTLSConfig UTLS 配置结构体
+type UTLSConfig struct {
+	Enabled     bool   `json:"enabled"`
+	Fingerprint string `json:"fingerprint"`
+}
+
 // VlessOutbound 出站配置结构体
 type VlessOutbound struct {
-	Type        string              `json:"type"`
-	Server      string              `json:"server"`
-	ServerPort  int                 `json:"server_port"`
-	UUID        string              `json:"uuid"`
-	Flow        string              `json:"flow,omitempty"`
-	Network     string              `json:"network,omitempty"`
-	Tls         *db.TLSConfig       `json:"tls,omitempty"`
-	Tag         string              `json:"tag"`
-	RoutingMark int                 `json:"routing_mark"`
-	Transport   *db.TransportConfig `json:"transport,omitempty"`
+	Type        string                `json:"type"`
+	Server      string                `json:"server"`
+	ServerPort  int                   `json:"server_port"`
+	UUID        string                `json:"uuid"`
+	Flow        string                `json:"flow,omitempty"`
+	Network     string                `json:"network,omitempty"`
+	Tls         *TLSConfigWithReality `json:"tls,omitempty"`
+	Tag         string                `json:"tag"`
+	RoutingMark int                   `json:"routing_mark"`
+	Transport   *db.TransportConfig   `json:"transport,omitempty"`
 }
 
 // TuicOutbound 出站配置结构体
