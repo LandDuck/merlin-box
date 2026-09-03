@@ -692,7 +692,7 @@ package() {
 
   mkdir -p "$package_dir"
   tar -czf "${package_dir}/${package_name}" -C "${CUR_DIR}" --exclude='conf/logs' bin conf db res scripts sh wwwroot *.sh LICENSE *.md
-  tar -czf "${package_dir}/${package_name_noui}" --exclude='bin/merlin-box' --exclude='conf/logs' -C "${CUR_DIR}" bin conf db res scripts sh *.sh LICENSE *.md
+  tar -czf "${package_dir}/${package_name_noui}" --exclude='bin/merlin-box' --exclude='conf/logs' -C "${CUR_DIR}" bin conf res scripts sh *.sh LICENSE *.md
 
   print_success "✅ 打包完成: ${package_dir}/${package_name} 和 ${package_dir}/${package_name_noui}"
 
