@@ -94,8 +94,7 @@ show_help() {
   start        启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
   stop         停止服务
   restart      重启服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
-  server       启动WEBUI服务，可选参数: [port]
-  stop_server  停止WEBUI服务
+  server       启动WEBUI服务，子命令：start/stop/restart 默认start，可选参数: [port]
   install      设置 merlin-box 开机自启
   uninstall    卸载 merlin-box 开机自启
   tool         工具命令
@@ -450,10 +449,20 @@ main() {
 			stop
 			;;
 	  server)
-	    start_server "$2"
-      ;;
-    stop_server)
-      stop_server
+	    case "$2" in
+	      start)
+          start_server "$3"
+          ;;
+        stop)
+          stop_server
+          ;;
+        restart)
+          start_server "$3"
+          ;;
+        *)
+          start_server "$2"
+          ;;
+      esac
       ;;
     tool)
       case "$2" in

@@ -618,6 +618,8 @@ start_server(){
 
   stop_server
 
+  print_line "starting server"
+
   local server_bin="${CUR_DIR}/bin/merlin-box"
   if [ ! -f "$server_bin" ]; then
     print_error "merlin-box 可执行文件不存在，请先构建 UI"
