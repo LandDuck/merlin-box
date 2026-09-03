@@ -113,6 +113,21 @@ class BaseConfig extends React.Component {
         }
     ]
 
+    #tcpFastOpenOptions = [
+        {
+            "value": 0,
+            "label": "关闭"
+        },
+        {
+            "value": 1,
+            "label": "仅客户端"
+        },
+        {
+            "value": 3,
+            "label": "客户端+服务端"
+        }
+    ]
+
     /**
      * 构造方法
      * @param props
@@ -126,6 +141,7 @@ class BaseConfig extends React.Component {
             enableUDP: 0,
             disableQUIC: 1,
             routeSelfProxy: 0,
+            tcpFastOpen: 0, //0:关闭，1:仅客户端 3:客户端+服务端
 
             dnsChina1: "223.5.5.5",
             dnsChina2: "119.28.28.28",
@@ -154,6 +170,7 @@ class BaseConfig extends React.Component {
                     enableUDP: data.enableUDP ?? 0,
                     disableQUIC: data.disableQUIC ?? 1,
                     routeSelfProxy: data.routeSelfProxy ?? 0,
+                    tcpFastOpen: data.tcpFastOpen ?? 0,
                     dnsChina1: (data.dnsChina && data.dnsChina[0]) || "223.5.5.5",
                     dnsChina2: (data.dnsChina && data.dnsChina[1]) || "119.28.28.28",
                     dnsForeign1: (data.dnsForeign && data.dnsForeign[0]) || "https://cloudflare-dns.com/dns-query",
@@ -187,6 +204,7 @@ class BaseConfig extends React.Component {
                 enableUDP: s.enableUDP,
                 disableQUIC: s.disableQUIC,
                 routeSelfProxy: s.routeSelfProxy,
+                tcpFastOpen: s.tcpFastOpen,
                 dnsChina: [s.dnsChina1, s.dnsChina2],
                 dnsForeign: [s.dnsForeign1, s.dnsForeign2]
             },
@@ -265,6 +283,22 @@ class BaseConfig extends React.Component {
                                     this.setState({routeSelfProxy: val});
                                     this.#saveWith({routeSelfProxy: val});
                                 }}
+                            />
+                        </div>
+                    </div>
+                    <div className="item">
+                        <div className="item-name">
+                            Tcp Fast Open
+                        </div>
+                        <div className="item-comp">
+                            <antd.Select
+                                value={this.state.tcpFastOpen}
+                                style={{width: 150}}
+                                onChange={(val) => {
+                                    this.setState({tcpFastOpen: val});
+                                    this.#saveWith({tcpFastOpen: val});
+                                }}
+                                options={this.#tcpFastOpenOptions}
                             />
                         </div>
                     </div>

@@ -28,6 +28,8 @@ type BaseConfigInfo struct {
 	DisableQUIC int `json:"disableQUIC"`
 	// RouteSelfProxy 是否路由自身代理，1 启用，0 禁用
 	RouteSelfProxy int `json:"routeSelfProxy"`
+	// TcpFastOpen 是否启用 TCP Fast Open，0 禁用，1 仅启用客户端，3 启用客户端和服务端
+	TcpFastOpen int `json:"tcpFastOpen"`
 }
 
 // DNSInfo DNS 配置

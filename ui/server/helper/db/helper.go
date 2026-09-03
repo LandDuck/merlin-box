@@ -286,6 +286,7 @@ func GetBaseConfig() (resp.BaseConfigFull, error) {
 		RouteSelfProxy: file.BaseConfig.RouteSelfProxy,
 		DnsChina:       file.DNS.China,
 		DnsForeign:     file.DNS.Foreign,
+		TcpFastOpen:    file.BaseConfig.TcpFastOpen,
 	}, nil
 }
 
@@ -300,6 +301,7 @@ func SaveBaseConfig(config resp.BaseConfigFull) error {
 		EnableUDP:      config.EnableUDP,
 		DisableQUIC:    config.DisableQUIC,
 		RouteSelfProxy: config.RouteSelfProxy,
+		TcpFastOpen:    config.TcpFastOpen,
 	}
 	file.DNS = dbModel.DNSInfo{
 		China:   config.DnsChina,

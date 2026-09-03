@@ -57,4 +57,6 @@ type BaseConfigFull struct {
 	DnsChina []string `json:"dnsChina"`
 	// DnsForeign 国际 DNS，固定两个
 	DnsForeign []string `json:"dnsForeign"`
+	// TcpFastOpen 是否启用 TCP Fast Open，0 禁用，1 仅启用客户端，3 启用客户端和服务端
+	TcpFastOpen int `json:"tcpFastOpen"`
 }
