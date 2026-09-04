@@ -19,6 +19,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"merlin-box-ui/global"
 	dbHelper "merlin-box-ui/helper/db"
@@ -63,6 +64,20 @@ func SaveBaseConfig(w http.ResponseWriter, r *http.Request) {
 	if err := dbHelper.SaveBaseConfig(requestData); err != nil {
 		httpHelper.ResponseFailure(w, "保存基础配置失败")
 		return
+	}
+
+	defaultNode, err := dbHelper.GetDefaultNode()
+	if err == nil {
+		var nodeTagInfo struct {
+			Tag string `json:"tag"`
+		}
+		if err := json.Unmarshal(defaultNode, &nodeTagInfo); err == nil {
+			configJson, err := parseNode(defaultNode, nodeTagInfo.Tag)
+			if err == nil {
+				confPath := filepath.Join(global.ConfDir, "config.json")
+				_ = os.WriteFile(confPath, []byte(configJson), 0644)
+			}
+		}
 	}
 
 	if err := updateSmartDNSConfig(requestData); err != nil {

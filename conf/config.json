@@ -27,19 +27,21 @@
   ],
   "outbounds": [
     {
-      "type": "snell",
+      "type": "vless",
       "server": "1.1.1.1",
-      "server_port": 80,
-      "version": 6,
-      "psk": "132465",
-      "userkey": "User Key",
-      "reuse": false,
-      "tag": "bb553692-e411-42db-91c1-7a0ccf8b2509",
+      "server_port": 9999,
+      "uuid": "04763738-9dd4-4d2d-a8ac-a2b52a26df66",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com"
+      },
+      "tcp_fast_open": false,
+      "tag": "1dbb9d3f-96be-47dc-8ae2-9505a4fe2f20",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "bb553692-e411-42db-91c1-7a0ccf8b2509"
+    "final": "1dbb9d3f-96be-47dc-8ae2-9505a4fe2f20"
   }
 }

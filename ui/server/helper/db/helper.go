@@ -320,6 +320,7 @@ const (
 	defaultDisableQUIC    = 1
 	defaultEnableUDP      = 0
 	defaultRouteSelfProxy = 0
+	defaultTcpFastOpen    = 0
 )
 
 // GetBaseConfigScriptArgs 获取 start/restart 使用的基础配置脚本参数
@@ -335,6 +336,7 @@ func GetBaseConfigScriptArgs() ([]string, error) {
 			EnableUDP      *int `json:"enableUDP"`
 			DisableQUIC    *int `json:"disableQUIC"`
 			RouteSelfProxy *int `json:"routeSelfProxy"`
+			TcpFastOpen    *int `json:"tcpFastOpen"`
 		} `json:"baseConfig"`
 	}
 	if err := json.Unmarshal(content, &file); err != nil {
@@ -345,12 +347,14 @@ func GetBaseConfigScriptArgs() ([]string, error) {
 	disableQUIC := fallbackBinaryConfig(file.BaseConfig.DisableQUIC, defaultDisableQUIC)
 	enableUDP := fallbackBinaryConfig(file.BaseConfig.EnableUDP, defaultEnableUDP)
 	routeSelfProxy := fallbackBinaryConfig(file.BaseConfig.RouteSelfProxy, defaultRouteSelfProxy)
+	tcpFastOpen := fallbackBinaryConfig(file.BaseConfig.TcpFastOpen, defaultTcpFastOpen)
 
 	return []string{
 		strconv.Itoa(enableIPv6),
 		strconv.Itoa(disableQUIC),
 		strconv.Itoa(enableUDP),
 		strconv.Itoa(routeSelfProxy),
+		strconv.Itoa(tcpFastOpen),
 	}, nil
 }
 
@@ -495,4 +499,18 @@ func GetNodeByTag(tag string) (json.RawMessage, error) {
 		}
 	}
 	return nil, fmt.Errorf("node not found: %s", tag)
+}
+
+// GetDefaultNode 获取默认节点原始 JSON
+func GetDefaultNode() (json.RawMessage, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return nil, err
+	}
+	for _, raw := range file.Nodes {
+		if isDefaultNode(raw) {
+			return raw, nil
+		}
+	}
+	return nil, fmt.Errorf("default node not found")
 }

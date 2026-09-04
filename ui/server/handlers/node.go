@@ -94,21 +94,12 @@ func saveNode(w http.ResponseWriter, tag string, node any) {
 				httpHelper.ResponseFailure(w, "设置默认节点失败")
 				return
 			}
-
-			//解析并转换为 singbox 配置
 			configJson, err := parseNode(raw, tag)
-			if err != nil {
-				httpHelper.ResponseFailure(w, "解析节点失败")
-				return
+			if err == nil {
+				//写入 singbox 配置文件
+				confPath := filepath.Join(global.ConfDir, "config.json")
+				_ = os.WriteFile(confPath, []byte(configJson), 0644)
 			}
-
-			//写入 singbox 配置文件
-			confPath := filepath.Join(global.ConfDir, "config.json")
-			if err := os.WriteFile(confPath, []byte(configJson), 0644); err != nil {
-				httpHelper.ResponseFailure(w, "写入配置文件失败")
-				return
-			}
-
 		}
 	}
 
@@ -572,6 +563,11 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 		},
 	}
 
+	baseConfig, baseConfigErr := dbHelper.GetBaseConfig()
+	if baseConfigErr != nil {
+		return "{}", baseConfigErr
+	}
+
 	//按不同类型处理
 	switch nodeType.Type {
 	case "naive":
@@ -580,6 +576,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := naiveNodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	case "hysteria2":
 		node := &dbModel.Hysteria2Node{}
@@ -587,6 +586,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := hysteria2NodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	case "shadowsocks":
 		node := &dbModel.ShadowsocksNode{}
@@ -594,6 +596,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := shadowsocksNodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	case "anytls":
 		node := &dbModel.AnytlsNode{}
@@ -601,6 +606,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := anytlsNodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	case "trojan":
 		node := &dbModel.TrojanNode{}
@@ -608,6 +616,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := trojanNodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	case "vmess":
 		node := &dbModel.VmessNode{}
@@ -615,6 +626,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := vmessNodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	case "vless":
 		node := &dbModel.VlessNode{}
@@ -622,6 +636,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := vlessNodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	case "tuic":
 		node := &dbModel.TuicNode{}
@@ -629,6 +646,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := tuicNodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	case "snell":
 		node := &dbModel.SnellNode{}
@@ -636,6 +656,9 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			return "{}", err
 		}
 		outbound := snellNodeToOutbound(*node)
+		if baseConfig.TcpFastOpen > 0 {
+			outbound.TcpFastOpen = true
+		}
 		config.Outbounds = append(config.Outbounds, outbound)
 	default:
 		return "{}", fmt.Errorf("unsupported node type: %s", nodeType.Type)

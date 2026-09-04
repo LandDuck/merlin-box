@@ -30,6 +30,7 @@ type NaiveOutbound struct {
 	Quic        bool         `json:"quic"`
 	UdpOverTCP  bool         `json:"udp_over_tcp"`
 	TLS         db.TLSConfig `json:"tls"`
+	TcpFastOpen bool         `json:"tcp_fast_open"`
 	Tag         string       `json:"tag"`
 	RoutingMark int          `json:"routing_mark"`
 }
@@ -43,6 +44,7 @@ type ShadowsocksOutbound struct {
 	Password    string `json:"password"`
 	Network     string `json:"network,omitempty"`
 	UdpOverTCP  bool   `json:"udp_over_tcp"`
+	TcpFastOpen bool   `json:"tcp_fast_open"`
 	Tag         string `json:"tag"`
 	RoutingMark int    `json:"routing_mark"`
 }
@@ -58,6 +60,7 @@ type Hysteria2Outbound struct {
 	Network     string           `json:"network,omitempty"`
 	Obfs        db.Hysteria2Obfs `json:"obfs"`
 	Tls         db.Hysteria2Tls  `json:"tls"`
+	TcpFastOpen bool             `json:"tcp_fast_open"`
 	Tag         string           `json:"tag"`
 	RoutingMark int              `json:"routing_mark"`
 }
@@ -69,6 +72,7 @@ type AnytlsOutbound struct {
 	ServerPort  int          `json:"server_port"`
 	Password    string       `json:"password"`
 	Tls         db.TLSConfig `json:"tls"`
+	TcpFastOpen bool         `json:"tcp_fast_open"`
 	Tag         string       `json:"tag"`
 	RoutingMark int          `json:"routing_mark"`
 }
@@ -81,6 +85,7 @@ type TrojanOutbound struct {
 	Password    string              `json:"password"`
 	Tls         db.TLSConfig        `json:"tls"`
 	Network     string              `json:"network,omitempty"`
+	TcpFastOpen bool                `json:"tcp_fast_open"`
 	Tag         string              `json:"tag"`
 	RoutingMark int                 `json:"routing_mark"`
 	Transport   *db.TransportConfig `json:"transport,omitempty"`
@@ -96,6 +101,7 @@ type VmessOutbound struct {
 	Security    string              `json:"security,omitempty"`
 	Network     string              `json:"network,omitempty"`
 	Tls         *db.TLSConfig       `json:"tls,omitempty"`
+	TcpFastOpen bool                `json:"tcp_fast_open"`
 	Tag         string              `json:"tag"`
 	RoutingMark int                 `json:"routing_mark"`
 	Transport   *db.TransportConfig `json:"transport,omitempty"`
@@ -123,6 +129,7 @@ type VlessOutbound struct {
 	Flow        string                `json:"flow,omitempty"`
 	Network     string                `json:"network,omitempty"`
 	Tls         *TLSConfigWithReality `json:"tls,omitempty"`
+	TcpFastOpen bool                  `json:"tcp_fast_open"`
 	Tag         string                `json:"tag"`
 	RoutingMark int                   `json:"routing_mark"`
 	Transport   *db.TransportConfig   `json:"transport,omitempty"`
@@ -137,6 +144,7 @@ type TuicOutbound struct {
 	Password    string       `json:"password"`
 	Network     string       `json:"network,omitempty"`
 	Tls         db.TLSConfig `json:"tls"`
+	TcpFastOpen bool         `json:"tcp_fast_open"`
 	Tag         string       `json:"tag"`
 	RoutingMark int          `json:"routing_mark"`
 }
@@ -154,6 +162,7 @@ type SnellOutbound struct {
 	ObfsMode    string `json:"obfs_mode,omitempty"`
 	ObfsHost    string `json:"obfs_host,omitempty"`
 	Network     string `json:"network,omitempty"`
+	TcpFastOpen bool   `json:"tcp_fast_open"`
 	Tag         string `json:"tag"`
 	RoutingMark int    `json:"routing_mark"`
 }

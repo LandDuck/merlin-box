@@ -116,16 +116,16 @@ class BaseConfig extends React.Component {
     #tcpFastOpenOptions = [
         {
             "value": 0,
-            "label": "关闭"
+            "label": "关闭(0)"
         },
         {
             "value": 1,
-            "label": "仅客户端"
-        },
+            "label": "启用(1)"
+        }/*,
         {
             "value": 3,
             "label": "客户端+服务端"
-        }
+        }*/
     ]
 
     /**

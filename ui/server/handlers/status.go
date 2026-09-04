@@ -29,6 +29,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -150,7 +151,7 @@ func runServiceScriptAsync(action string, args ...string) error {
 		}()
 
 		if err := <-finished; err != nil {
-			global.AppendServiceLog("[error] 执行 " + action + " 失败: " + err.Error() + "\n")
+			global.AppendServiceLog("[error] 执行 " + action + " 失败: " + err.Error() + "\n" + strings.Join(args, " "))
 		}
 	}()
 
@@ -200,7 +201,7 @@ func Stop(w http.ResponseWriter, r *http.Request) {
 
 // Restart 重启 merlin-box 服务，并异步返回脚本输出日志
 func Restart(w http.ResponseWriter, r *http.Request) {
-	//restart 1 1 0 0 #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
+	//restart 1 1 0 0 0 #显式参数重启：IPv6 QUIC拦截 UDP 自身代理 TcpFastOpen
 	//读取db.json， 将 baseConfig 中的 值读过来，如果没有相关的值，使用上面的默认值
 	args, err := dbHelper.GetBaseConfigScriptArgs()
 	if err != nil {

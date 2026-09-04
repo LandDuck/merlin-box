@@ -10,7 +10,7 @@
     "enableUDP": 0,
     "disableQUIC": 1,
     "routeSelfProxy": 0,
-    "tcpFastOpen": 1
+    "tcpFastOpen": 0
   },
   "dns": {
     "china": [
@@ -77,7 +77,7 @@
     },
     {
       "flow": "",
-      "is_default": false,
+      "is_default": true,
       "name": "my_vless2",
       "network": "",
       "server": "1.1.1.1",
@@ -99,7 +99,7 @@
       "uuid": "04763738-9dd4-4d2d-a8ac-a2b52a26df66"
     },
     {
-      "is_default": true,
+      "is_default": false,
       "mode": "",
       "name": "my_snell",
       "network": "",
