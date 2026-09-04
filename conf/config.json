@@ -27,20 +27,19 @@
   ],
   "outbounds": [
     {
-      "type": "anytls",
+      "type": "snell",
       "server": "1.1.1.1",
       "server_port": 80,
-      "password": "888888",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.cloufflare.com"
-      },
-      "tag": "637efc73-0ce1-4580-8b0a-b5ec787e6644",
+      "version": 6,
+      "psk": "132465",
+      "userkey": "User Key",
+      "reuse": false,
+      "tag": "bb553692-e411-42db-91c1-7a0ccf8b2509",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "637efc73-0ce1-4580-8b0a-b5ec787e6644"
+    "final": "bb553692-e411-42db-91c1-7a0ccf8b2509"
   }
 }

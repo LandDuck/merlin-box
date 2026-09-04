@@ -140,3 +140,20 @@ type TuicOutbound struct {
 	Tag         string       `json:"tag"`
 	RoutingMark int          `json:"routing_mark"`
 }
+
+// SnellOutbound 出站配置结构体
+type SnellOutbound struct {
+	Type        string `json:"type"`
+	Server      string `json:"server"`
+	ServerPort  int    `json:"server_port"`
+	Version     int    `json:"version"`
+	Psk         string `json:"psk,omitempty"`
+	UserKey     string `json:"userkey,omitempty"`
+	Reuse       bool   `json:"reuse"`
+	Mode        string `json:"mode,omitempty"`
+	ObfsMode    string `json:"obfs_mode,omitempty"`
+	ObfsHost    string `json:"obfs_host,omitempty"`
+	Network     string `json:"network,omitempty"`
+	Tag         string `json:"tag"`
+	RoutingMark int    `json:"routing_mark"`
+}

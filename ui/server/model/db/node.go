@@ -207,3 +207,24 @@ type TuicNode struct {
 	Network string `json:"network"`
 	NodeTls
 }
+
+// SnellNode 节点基础信息结构体，继承 NodeBase
+type SnellNode struct {
+	NodeBase
+	// Version 协议版本 4 or 6
+	Version int `json:"version"`
+	// Psk 节点预共享密钥
+	Psk string `json:"psk"`
+	// UserKey 用户密钥，用于向多用户服务器进行认证。
+	UserKey string `json:"userkey"`
+	// Reuse 启用连接复用
+	Reuse bool `json:"reuse"`
+	// Network 启用的网络协议
+	Network string `json:"network"`
+	// Mode 流量整形模式，default unshaped unsafe-raw 之一。 仅版本 6
+	Mode string `json:"mode"`
+	// ObfsMode 混淆模式 仅版本 4 none http 之一。
+	ObfsMode string `json:"obfs_mode"`
+	// ObfsHost 仅版本 4  obfs_mode 为 http 时发送的 HTTP Host 头。
+	ObfsHost string `json:"obfs_host"`
+}

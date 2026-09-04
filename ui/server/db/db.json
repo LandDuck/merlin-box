@@ -54,7 +54,7 @@
     },
     {
       "flow": "xtls-rprx-vision",
-      "is_default": true,
+      "is_default": false,
       "name": "my_vless",
       "network": "",
       "server": "1.1.1.1",
@@ -97,6 +97,22 @@
       },
       "type": "vless",
       "uuid": "04763738-9dd4-4d2d-a8ac-a2b52a26df66"
+    },
+    {
+      "is_default": true,
+      "mode": "",
+      "name": "my_snell",
+      "network": "",
+      "obfs_host": "",
+      "obfs_mode": "",
+      "psk": "132465",
+      "reuse": false,
+      "server": "1.1.1.1",
+      "server_port": 80,
+      "tag": "bb553692-e411-42db-91c1-7a0ccf8b2509",
+      "type": "snell",
+      "userkey": "User Key",
+      "version": 6
     }
   ]
 }

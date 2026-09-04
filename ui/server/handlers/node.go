@@ -57,6 +57,8 @@ func AddNode(w http.ResponseWriter, r *http.Request) {
 		addVlessNode(w, requestData.Data)
 	case "tuic":
 		addTuicNode(w, requestData.Data)
+	case "snell":
+		addSnellNode(w, requestData.Data)
 	default:
 		httpHelper.ResponseFailure(w, "不支持的节点类型: "+requestData.Type)
 	}
@@ -425,6 +427,43 @@ func validateTuicNode(node dbModel.TuicNode) error {
 	return nil
 }
 
+// addSnellNode 处理 Snell 节点添加逻辑
+func addSnellNode(w http.ResponseWriter, data string) {
+	var node dbModel.SnellNode
+	if err := json.Unmarshal([]byte(data), &node); err != nil {
+		httpHelper.ResponseFailure(w, "节点数据解析失败")
+		return
+	}
+	if err := validateSnellNode(node); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	saveNode(w, node.Tag, node)
+}
+
+// validateSnellNode 校验 Snell 节点各必填字段
+func validateSnellNode(node dbModel.SnellNode) error {
+	if strings.TrimSpace(node.Tag) == "" {
+		return fmt.Errorf("节点 tag 不能为空")
+	}
+	if strings.TrimSpace(node.Name) == "" {
+		return fmt.Errorf("节点名称不能为空")
+	}
+	if strings.TrimSpace(node.Server) == "" {
+		return fmt.Errorf("服务器地址不能为空")
+	}
+	if node.ServerPort < 1 || node.ServerPort > 65535 {
+		return fmt.Errorf("服务器端口不合法，有效范围 1-65535")
+	}
+	if node.Version != 4 && node.Version != 6 {
+		return fmt.Errorf("版本不合法，仅支持 4 或 6")
+	}
+	if strings.TrimSpace(node.Psk) == "" {
+		return fmt.Errorf("预共享密钥不能为空")
+	}
+	return nil
+}
+
 // GetNodeList 获取节点列表（默认节点排第一）
 func GetNodeList(w http.ResponseWriter, r *http.Request) {
 	nodes, err := dbHelper.GetNodeList()
@@ -591,7 +630,13 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 		}
 		outbound := tuicNodeToOutbound(*node)
 		config.Outbounds = append(config.Outbounds, outbound)
-
+	case "snell":
+		node := &dbModel.SnellNode{}
+		if err := json.Unmarshal(data, node); err != nil {
+			return "{}", err
+		}
+		outbound := snellNodeToOutbound(*node)
+		config.Outbounds = append(config.Outbounds, outbound)
 	default:
 		return "{}", fmt.Errorf("unsupported node type: %s", nodeType.Type)
 	}
@@ -766,6 +811,25 @@ func tuicNodeToOutbound(n dbModel.TuicNode) singbox.TuicOutbound {
 		Password:    n.Password,
 		Network:     n.Network,
 		Tls:         n.Tls,
+		Tag:         n.Tag,
+		RoutingMark: 169,
+	}
+}
+
+// snellNodeToOutbound 将 Snell 节点转换为 Singbox 出站配置
+func snellNodeToOutbound(n dbModel.SnellNode) singbox.SnellOutbound {
+	return singbox.SnellOutbound{
+		Type:        n.Type,
+		Server:      n.Server,
+		ServerPort:  n.ServerPort,
+		Psk:         n.Psk,
+		Version:     n.Version,
+		UserKey:     n.UserKey,
+		Reuse:       n.Reuse,
+		Network:     n.Network,
+		Mode:        n.Mode,
+		ObfsMode:    n.ObfsMode,
+		ObfsHost:    n.ObfsHost,
 		Tag:         n.Tag,
 		RoutingMark: 169,
 	}
