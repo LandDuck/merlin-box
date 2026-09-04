@@ -356,19 +356,19 @@ chmod +x scripts/dnsmasq.postconf
 Main entry command:
 
 ```bash
-./merlin-box.sh start                      #Start service (defaults: 1 1 0 0)
-./merlin-box.sh start 1 1 0 0              #Start with explicit params: IPv6 QUIC-block UDP oneself-proxy
+./merlin-box.sh start                      #Start service (defaults: 1 1 0 0 1)
+./merlin-box.sh start 1 1 0 0 1            #Start with explicit params: IPv6 QUIC-block UDP oneself-proxy TcpFastOpen
 ./merlin-box.sh stop                       #Stop service
 ./merlin-box.sh restart                    #Restart service
-./merlin-box.sh restart 1 1 0 0            #Restart with explicit params: IPv6 QUIC-block UDP oneself-proxy
+./merlin-box.sh restart 1 1 0 0 1          #Restart with explicit params: IPv6 QUIC-block UDP oneself-proxy TcpFastOpen
 ./merlin-box.sh server                     #Start WEB UI server, default port is 8080, can specify port on startup: ./merlin-box.sh server 8081. Supports subcommands start/stop/restart, default is start. ./merlin-box.sh server start 8081
 ./merlin-box.sh -h                         #Show help information
 ./merlin-box.sh -v                         #Show version information
 ```
 
 - ▶️ `start`: Clean old rules -> Start sing-box -> Start smartdns -> Restart dnsmasq
-- `start` parameters (all optional, each value is `0` or `1`, default is `1 1 0 0`):
-  - `enable_ipv6` `disable_quic_from_lan` `enable_udp` `enable_oneself_proxy`
+- `start` parameters (all optional, each value is `0` or `1`, default is `1 1 0 0 1`):
+  - `enable_ipv6` `disable_quic_from_lan` `enable_udp` `enable_oneself_proxy` `enable_tcp_fast_open`
 - ⏹️ `stop`: Stop sing-box/smartdns -> Clean iptables/ip6tables/ip rule/ipset -> Restart dnsmasq
 
 Installation and uninstallation (boot startup):

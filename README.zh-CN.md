@@ -353,19 +353,19 @@ chmod +x scripts/dnsmasq.postconf
 主入口命令：
 
 ```bash
-./merlin-box.sh start                      #启动服务（默认参数: 1 1 0 0）
-./merlin-box.sh start 1 1 0 0              #显式参数启动：IPv6 QUIC拦截 UDP 自身代理
+./merlin-box.sh start                      #启动服务（默认参数: 1 1 0 0 1）
+./merlin-box.sh start 1 1 0 0 1            #显式参数启动：IPv6 QUIC拦截 UDP 自身代理 TcpFastOpen
 ./merlin-box.sh stop                       #停止服务
 ./merlin-box.sh restart                    #重启服务
-./merlin-box.sh restart 1 1 0 0            #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
+./merlin-box.sh restart 1 1 0 0 1          #显式参数重启：IPv6 QUIC拦截 UDP 自身代理 TcpFastOpen
 ./merlin-box.sh server                     #启动 WEB UI server，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081 。支持子命令 start/stop/restart，默认为 start。./merlin-box.sh server start 8081
 ./merlin-box.sh -h                         #显示帮助信息
 ./merlin-box.sh -v                         #显示版本信息
 ```
 
 - ▶️`start`：清理旧规则 -> 启动 sing-box -> 启动 smartdns -> 重启 dnsmasq
-- `start` 参数（均可选，每个参数值为 `0` 或 `1`，默认值 `1 1 0 0`）：
-  - `enable_ipv6` `disable_quic_from_lan` `enable_udp` `enable_oneself_proxy`
+- `start` 参数（均可选，每个参数值为 `0` 或 `1`，默认值 `1 1 0 0 1`）：
+  - `enable_ipv6` `disable_quic_from_lan` `enable_udp` `enable_oneself_proxy` `enable_tcp_fast_open`
 - ⏹️ `stop`：停止 sing-box/smartdns -> 清理 iptables/ip6tables/ip rule/ipset -> 重启 dnsmasq
 
 安装与卸载（开机启动）：
