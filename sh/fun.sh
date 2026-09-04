@@ -1136,18 +1136,23 @@ is_running_on_router() {
 # set tcp_fastopen
 # ========================================
 set_tcp_fast_open() {
-    local value=${1:-1}  # 默认值为 1，如果没有传入参数，则使用默认值
-    #判断只能是 0,1,2,3
-    if ! [[ "$value" =~ ^[0-3]$ ]]; then
-        print_warning "⚠️ 无效的 TCP Fast Open 值：$value。请使用 0、1、2 或 3。"
-        return 1
-    fi
+    local value="${1:-1}"
+
+    case "$value" in
+        0|1|2|3)
+            ;;
+        *)
+            print_warning "⚠️ 无效的 TCP Fast Open 值：$value。请使用 0、1、2 或 3。"
+            return 1
+            ;;
+    esac
 
     if [ -f /proc/sys/net/ipv4/tcp_fastopen ]; then
         echo "$value" > /proc/sys/net/ipv4/tcp_fastopen
-        print_success "✅ 已启用 TCP Fast Open。"
+        print_success "✅ TCP Fast Open 已设置为：$value"
     else
         print_warning "⚠️ 当前系统不支持 TCP Fast Open。"
+        return 1
     fi
 }
 

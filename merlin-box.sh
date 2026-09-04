@@ -189,7 +189,7 @@ start() {
   MB_ENABLE_UDP="$start_enable_udp"
   MB_ENABLE_ONESELF_PROXY="$start_enable_oneself_proxy"
 
-	print_line "start merlin-box ${MB_ENABLE_IPV6} ${MB_DISABLE_QUIC_FROM_LAN} ${MB_ENABLE_UDP} ${MB_ENABLE_ONESELF_PROXY}"
+	print_line "start merlin-box ${MB_ENABLE_IPV6} ${MB_DISABLE_QUIC_FROM_LAN} ${MB_ENABLE_UDP} ${MB_ENABLE_ONESELF_PROXY} ${tcp_fast_open}"
 
   # 如果已经启用IPV6支持，使用 check_ipv6_support 函数检测当前路由是否支持IPv6，如果不支持则禁用IPv6支持
   if [ "$MB_ENABLE_IPV6" -eq 1 ]; then
