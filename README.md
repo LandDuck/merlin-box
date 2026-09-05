@@ -78,6 +78,20 @@ This project aims to clearly separate responsibilities:
       </td>
     </tr>
     <tr>
+      <td>Domain Whitelist</td>
+      <td>✅ Supported</td>
+      <td>
+        Implemented through configuring the site-whitelist.txt whitelist domain list to force specified domains to direct connection.
+      </td>
+    </tr>
+    <tr>
+      <td>Custom HOSTS</td>
+      <td>✅ Supported</td>
+      <td>
+        Implemented through configuring the hosts.txt file for custom HOSTS, commonly used by developers to resolve domain names within the local network for debugging.
+      </td>
+    </tr>
+    <tr>
       <td>IP Whitelist</td>
       <td>✅ Supported</td>
       <td>

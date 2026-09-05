@@ -77,6 +77,20 @@
       </td>
     </tr>
     <tr>
+      <td>域名白名单</td>
+      <td>✅ 已支持</td>
+      <td>
+        通过配置 site-whitelist.txt 白名单域名列表使指定域名强制直连。
+      </td>
+    </tr>
+    <tr>
+      <td>自定义HOSTS</td>
+      <td>✅ 已支持</td>
+      <td>
+        通过配置 hosts.txt 文件实现自定义 HOSTS，常用于开发人员在局域网中解析域名做调试。
+      </td>
+    </tr>
+    <tr>
       <td>IP白名单</td>
       <td>✅ 已支持</td>
       <td>
