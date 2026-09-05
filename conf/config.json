@@ -45,7 +45,7 @@
           "short_id": "0123456789abcdef"
         }
       },
-      "tcp_fast_open": false,
+      "tcp_fast_open": true,
       "tag": "5c3f1b5f-1002-4d37-80bc-7295c3462b44",
       "routing_mark": 169
     }

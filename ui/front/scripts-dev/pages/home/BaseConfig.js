@@ -120,12 +120,12 @@ class BaseConfig extends React.Component {
         },
         {
             "value": 1,
-            "label": "启用(1)"
-        }/*,
+            "label": "客户端(1)"
+        },
         {
             "value": 3,
-            "label": "客户端+服务端"
-        }*/
+            "label": "客户及服务端(3)"
+        }
     ]
 
     /**

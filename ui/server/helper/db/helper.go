@@ -426,7 +426,7 @@ func fallbackBinaryConfig(value *int, defaultValue int) int {
 	if value == nil {
 		return defaultValue
 	}
-	if *value != 0 && *value != 1 {
+	if *value != 0 && *value != 1 && *value != 3 {
 		return defaultValue
 	}
 	return *value
