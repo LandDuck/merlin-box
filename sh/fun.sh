@@ -1147,6 +1147,11 @@ set_tcp_fast_open() {
             ;;
     esac
 
+    #不能为0,当为0时, 强制变成1。 路由器层面不关闭，仅关闭singbox
+    if [ "$value" -eq 0 ]; then
+        value=1
+    fi
+
     if [ -f /proc/sys/net/ipv4/tcp_fastopen ]; then
         echo "$value" > /proc/sys/net/ipv4/tcp_fastopen
         print_success "✅ TCP Fast Open 已设置为：$value"
