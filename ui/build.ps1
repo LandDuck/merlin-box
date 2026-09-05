@@ -17,10 +17,13 @@
 #============服务端============
 cd server
 
+#从../../merlin-box.sh中获取版本号
+$version = (Get-Content ../../merlin-box.sh | Select-String -Pattern '^SCRIPT_VERSION="(.*)"' | ForEach-Object { $_.Matches[0].Groups[1].Value })
+#设置环境变量
 $env:GOOS = "linux"
 $env:GOARCH = "arm64"
 $env:CGO_ENABLED = "0"
-go build -ldflags="-s -w" -o ../../bin/merlin-box .
+go build -ldflags="-s -w -X github.com/LandDuck/merlin-box/global.Version=$version" -o ../../bin/merlin-box .
 
 #使用wsl在里面调用 upx --lzma --ultra-brute 压缩 ../../bin/merlin-box
 wsl upx --lzma --ultra-brute ../../bin/merlin-box

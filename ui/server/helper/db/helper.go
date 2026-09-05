@@ -23,14 +23,15 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"merlin-box-ui/global"
-	logger "merlin-box-ui/helper/log"
-	dbModel "merlin-box-ui/model/db"
-	"merlin-box-ui/model/resp"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/LandDuck/merlin-box/global"
+	logger "github.com/LandDuck/merlin-box/helper/log"
+	dbModel "github.com/LandDuck/merlin-box/model/db"
+	"github.com/LandDuck/merlin-box/model/resp"
 )
 
 // ReadFile 读取数据库文件并解析为 dbModel.File 结构体

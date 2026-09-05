@@ -19,10 +19,11 @@
 package middleware
 
 import (
-	"merlin-box-ui/global"
-	httpHelper "merlin-box-ui/helper/http"
 	"net/http"
 	"strings"
+
+	"github.com/LandDuck/merlin-box/global"
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
 )
 
 // Auth 是一个中间件函数，用于验证请求的身份认证信息

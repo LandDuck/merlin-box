@@ -19,7 +19,7 @@
 package tools
 
 import (
-	logger "merlin-box-ui/helper/log"
+	logger "github.com/LandDuck/merlin-box/helper/log"
 
 	"encoding/base64"
 	"encoding/json"

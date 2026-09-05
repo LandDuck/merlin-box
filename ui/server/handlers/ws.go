@@ -19,10 +19,11 @@
 package handlers
 
 import (
-	"merlin-box-ui/global"
-	httpHelper "merlin-box-ui/helper/http"
 	"net/http"
 	"strings"
+
+	"github.com/LandDuck/merlin-box/global"
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
 
 	"github.com/gorilla/websocket"
 )

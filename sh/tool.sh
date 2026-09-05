@@ -524,12 +524,45 @@ build_ui() {
       exit 1
     fi
 
+    # 1. 提取版本号 (通过执行 version 提取最后一行的纯数字版本号)
+    local raw_version_info
+    raw_version_info=$("$server_output_bin" version 2>&1)
+    local raw_version
+    raw_version=$(echo "$raw_version_info" | sed -n 's/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | tail -n 1)
+
+    # 2. 提取架构 (通过 file 命令解析 ELF 信息)
+    local file_info
+    file_info=$(file -b "$server_output_bin")
+    local raw_arch="unknown"
+    case "$file_info" in
+        *aarch64*|*ARM\ aarch64*)
+            raw_arch="arm64"
+            ;;
+        *ARM*)
+            raw_arch="arm"
+            ;;
+        *x86-64*)
+            raw_arch="x86_64"
+            ;;
+        *80386*)
+            raw_arch="x86"
+            ;;
+    esac
+    print_warning "当前 merlin-box 版本: ${raw_version} (${raw_arch})，目标版本: ${SCRIPT_VERSION} (${arch})"
+
+    # 如果版本号和架构相同，则跳过下载
+    if [ "$raw_version" = "$SCRIPT_VERSION" ] && [ "$raw_arch" = "$arch" ]; then
+      print_success "merlin-box 已是最新版本，无需构建"
+      return
+    fi
+
     print_normal "构建服务器端"
 
     # 构建服务器端
     (
       cd "$server_src_dir" || exit 1
-      GOOS=linux GOARCH="$arch" CGO_ENABLED=0 go build -ldflags="-s -w" -o "$server_output_bin" .
+      #将 SCRIPT_VERSION 传递给 go build
+      GOOS=linux GOARCH="$arch" CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/LandDuck/merlin-box/global.Version=${SCRIPT_VERSION}" -o "$server_output_bin" .
     )
     if [ $? -ne 0 ]; then
       print_error "构建 UI 服务器端失败"

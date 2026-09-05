@@ -22,14 +22,15 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"merlin-box-ui/global"
-	"merlin-box-ui/handlers"
-	logger "merlin-box-ui/helper/log"
-	"merlin-box-ui/middleware"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/LandDuck/merlin-box/global"
+	"github.com/LandDuck/merlin-box/handlers"
+	logger "github.com/LandDuck/merlin-box/helper/log"
+	"github.com/LandDuck/merlin-box/middleware"
 
 	"github.com/go-chi/chi/v5"
 )

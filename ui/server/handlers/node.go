@@ -21,17 +21,18 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"merlin-box-ui/global"
-	dbHelper "merlin-box-ui/helper/db"
-	httpHelper "merlin-box-ui/helper/http"
-	validateHelper "merlin-box-ui/helper/validate"
-	dbModel "merlin-box-ui/model/db"
-	reqModel "merlin-box-ui/model/req"
-	"merlin-box-ui/model/singbox"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/LandDuck/merlin-box/global"
+	dbHelper "github.com/LandDuck/merlin-box/helper/db"
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
+	validateHelper "github.com/LandDuck/merlin-box/helper/validate"
+	dbModel "github.com/LandDuck/merlin-box/model/db"
+	reqModel "github.com/LandDuck/merlin-box/model/req"
+	"github.com/LandDuck/merlin-box/model/singbox"
 )
 
 // AddNode 添加节点

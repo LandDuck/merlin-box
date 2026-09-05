@@ -19,13 +19,14 @@
 package handlers
 
 import (
-	"merlin-box-ui/global"
-	dbHelper "merlin-box-ui/helper/db"
-	httpHelper "merlin-box-ui/helper/http"
-	validateHelper "merlin-box-ui/helper/validate"
-	"merlin-box-ui/model/req"
 	"net/http"
 	"strings"
+
+	"github.com/LandDuck/merlin-box/global"
+	dbHelper "github.com/LandDuck/merlin-box/helper/db"
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
+	validateHelper "github.com/LandDuck/merlin-box/helper/validate"
+	"github.com/LandDuck/merlin-box/model/req"
 )
 
 // Logout 处理登出请求

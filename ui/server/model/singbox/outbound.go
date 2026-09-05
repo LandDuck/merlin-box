@@ -18,7 +18,7 @@
 
 package singbox
 
-import "merlin-box-ui/model/db"
+import "github.com/LandDuck/merlin-box/model/db"
 
 // NaiveOutbound 出站配置结构体
 type NaiveOutbound struct {

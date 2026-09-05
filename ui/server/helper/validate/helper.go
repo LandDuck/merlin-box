@@ -20,9 +20,10 @@ package validate
 
 import (
 	"encoding/json"
-	httpHelper "merlin-box-ui/helper/http"
 	"net/http"
 	"regexp"
+
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
 
 	"github.com/go-playground/validator/v10"
 )

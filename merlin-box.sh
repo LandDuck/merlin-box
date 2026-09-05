@@ -304,6 +304,16 @@ test_debug() {
   #echo "disableQUIC: $disableQUIC"
   #echo "routeSelfProxy: $routeSelfProxy"
 
+  #local server_output_bin="${CUR_DIR}/bin/merlin-box"
+  #local raw_version_info
+  #raw_version_info=$("$server_output_bin" version 2>&1)
+  #local raw_version
+  #raw_version=$(echo "$raw_version_info" | sed -n 's/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | tail -n 1)
+  #
+  ##echo "raw_version_info: $raw_version_info"
+  #echo "raw_version: $raw_version"
+
+
 	:
 }
 

@@ -21,16 +21,17 @@ package handlers
 import (
 	"bufio"
 	"fmt"
-	"merlin-box-ui/global"
-	dbHelper "merlin-box-ui/helper/db"
-	httpHelper "merlin-box-ui/helper/http"
-	"merlin-box-ui/model/resp"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/LandDuck/merlin-box/global"
+	dbHelper "github.com/LandDuck/merlin-box/helper/db"
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
+	"github.com/LandDuck/merlin-box/model/resp"
 )
 
 // Status 返回系统当前状态

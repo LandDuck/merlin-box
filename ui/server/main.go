@@ -20,14 +20,15 @@ package main
 
 import (
 	"fmt"
-	"merlin-box-ui/global"
-	logger "merlin-box-ui/helper/log"
-	"merlin-box-ui/server"
-	"merlin-box-ui/tools"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/LandDuck/merlin-box/global"
+	logger "github.com/LandDuck/merlin-box/helper/log"
+	"github.com/LandDuck/merlin-box/server"
+	"github.com/LandDuck/merlin-box/tools"
 )
 
 // commandFunc 定义命令处理函数的类型

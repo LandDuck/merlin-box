@@ -19,12 +19,13 @@
 package handlers
 
 import (
-	dbHelper "merlin-box-ui/helper/db"
-	httpHelper "merlin-box-ui/helper/http"
-	validateHelper "merlin-box-ui/helper/validate"
-	dbModel "merlin-box-ui/model/db"
-	"merlin-box-ui/model/req"
 	"net/http"
+
+	dbHelper "github.com/LandDuck/merlin-box/helper/db"
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
+	validateHelper "github.com/LandDuck/merlin-box/helper/validate"
+	dbModel "github.com/LandDuck/merlin-box/model/db"
+	"github.com/LandDuck/merlin-box/model/req"
 )
 
 // GetDeviceControlConfig 获取设备控制配置

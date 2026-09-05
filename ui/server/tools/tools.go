@@ -20,11 +20,12 @@ package tools
 
 import (
 	"fmt"
-	logger "merlin-box-ui/helper/log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	logger "github.com/LandDuck/merlin-box/helper/log"
 )
 
 // toolFunc 定义工具函数的类型

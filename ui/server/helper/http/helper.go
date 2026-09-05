@@ -21,12 +21,13 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"merlin-box-ui/model/resp"
 	"net"
 	"net/http"
 	"net/url"
 	"sync"
 	"time"
+
+	"github.com/LandDuck/merlin-box/model/resp"
 
 	"golang.org/x/net/proxy"
 )

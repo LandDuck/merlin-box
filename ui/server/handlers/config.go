@@ -21,15 +21,16 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"merlin-box-ui/global"
-	dbHelper "merlin-box-ui/helper/db"
-	httpHelper "merlin-box-ui/helper/http"
-	validateHelper "merlin-box-ui/helper/validate"
-	"merlin-box-ui/model/resp"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/LandDuck/merlin-box/global"
+	dbHelper "github.com/LandDuck/merlin-box/helper/db"
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
+	validateHelper "github.com/LandDuck/merlin-box/helper/validate"
+	"github.com/LandDuck/merlin-box/model/resp"
 )
 
 // GetBaseConfig 获取基础配置

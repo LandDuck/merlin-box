@@ -18,27 +18,23 @@
 
 package global
 
-// DoNotDeleteFiles 不允许删除的配置文件列表
-var DoNotDeleteFiles = []string{
-	"site-blocklist.txt",
-	"site-blacklist.txt",
-	"site-whitelist.txt",
-	"hosts.txt",
+import "sync"
+
+var serviceLogMu sync.RWMutex
+
+// ServiceRunning 标记当前是否有脚本在执行
+var ServiceRunning bool
+
+// SetServiceRunning 设置脚本运行状态
+func SetServiceRunning(running bool) {
+	serviceLogMu.Lock()
+	defer serviceLogMu.Unlock()
+	ServiceRunning = running
 }
 
-// EnvDev 开发环境
-// EnvProd 生产环境
-const (
-	EnvDev      string = "development"
-	EnvProd     string = "production"
-	DefaultPort int    = 8080
-)
-
-// CurrentEnv 当前环境变量，默认为开发环境
-var CurrentEnv = EnvDev
-
-// WorkingDir 当前工作目录
-var WorkingDir string
-
-// Version 程序版本号，可在构建时通过 -ldflags 覆盖
-var Version = "0.0.1"
+// IsServiceRunning 当前是否有脚本在执行
+func IsServiceRunning() bool {
+	serviceLogMu.RLock()
+	defer serviceLogMu.RUnlock()
+	return ServiceRunning
+}

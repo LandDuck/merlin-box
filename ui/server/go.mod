@@ -1,4 +1,4 @@
-module merlin-box-ui
+module github.com/LandDuck/merlin-box
 
 go 1.25.5
 
