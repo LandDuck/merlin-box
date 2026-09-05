@@ -49,6 +49,8 @@ class TuicForm extends React.Component {
 
     // 唯一的ID
     #uuid = ""
+    //isDefault
+    #isDefault = false;
 
     #networkOptions = [
         {label: "ALL", value: ""},
@@ -94,7 +96,23 @@ class TuicForm extends React.Component {
             uuidError: false,
             passwordError: false,
         }
+        const editData = (props.config && props.config.data) || null;
+        if (editData) {
+            this.#uuid = editData.tag || this.#uuid;
+            this.#isDefault = editData.is_default || false;
+            console.log("TuicForm editData", editData);
+            this.state.name = editData.name || "";
+            this.state.server = editData.server || "";
+            this.state.serverName = (editData.tls && editData.tls.server_name) || "";
+            this.state.serverPort = editData.server_port.toString() || "";
+            this.state.uuid = editData.uuid || "";
+            this.state.password = editData.password || "";
+            this.state.congestionControl = editData.congestion_control || "cubic";
+            this.state.udpRelayMode = editData.udp_relay_mode || "native";
+            this.state.network = editData.network || "";
+        }
     }
+
 
     /**
      * 验证表单
@@ -121,7 +139,7 @@ class TuicForm extends React.Component {
     #buildValue(state) {
         return {
             tag: this.#uuid,
-            is_default: false,
+            is_default: this.#isDefault,
             type: "tuic",
             name: state.name.trim(),
             server: state.server.trim(),

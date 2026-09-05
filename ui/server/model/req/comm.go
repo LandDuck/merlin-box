@@ -70,8 +70,10 @@ type SaveDomainControlConfig struct {
 	Hostlist string `json:"hostlist"`
 }
 
-// AddNode 添加节点请求结构体
-type AddNode struct {
+// SaveNode 添加节点请求结构体
+type SaveNode struct {
+	// Action 操作类型，如 add、edit
+	Action string `json:"action" validate:"required,oneof=add edit"`
 	// Type 节点类型，如 naive、shadowsocks 等
 	Type string `json:"type" validate:"required"`
 	// Data 节点数据，前端序列化后的 JSON 字符串

@@ -90,6 +90,8 @@ class VmessForm extends React.Component {
 
     // 唯一的ID
     #uuid = ""
+    //isDefault
+    #isDefault = false;
 
     #networkOptions = [
         {label: "ALL", value: ""},
@@ -160,6 +162,27 @@ class VmessForm extends React.Component {
             serverPortError: false,
             uuidError: false,
         }
+        const editData = (props.config && props.config.data) || null;
+        if (editData) {
+            this.#uuid = editData.tag || this.#uuid;
+            this.#isDefault = editData.is_default || false;
+            console.log("VmessForm editData", editData);
+            this.state.name = editData.name || "";
+            this.state.server = editData.server || "";
+            this.state.serverName = (editData.tls && editData.tls.server_name) || "";
+            this.state.serverPort = editData.server_port.toString() || "";
+            this.state.uuid = editData.uuid || "";
+            this.state.security = editData.security || "auto";
+            this.state.alterId = editData.alter_id === undefined || editData.alter_id === null ? 0 : editData.alter_id;
+            this.state.network = editData.network || "";
+
+            const transport = editData.transport || {};
+            this.state.transportType = transport.type || "";
+            this.state.transportHost = transport.host || "";
+            this.state.transportPath = transport.path || "/";
+            this.state.transportMethod = transport.method || "GET";
+            this.state.transportServiceName = transport.service_name || "";
+        }
     }
 
     /**
@@ -225,7 +248,7 @@ class VmessForm extends React.Component {
 
         return {
             tag: this.#uuid,
-            is_default: false,
+            is_default: this.#isDefault,
             type: "vmess",
             name: state.name.trim(),
             server: state.server.trim(),

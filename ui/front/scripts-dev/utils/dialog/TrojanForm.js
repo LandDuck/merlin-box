@@ -66,7 +66,8 @@ class TrojanForm extends React.Component {
 
     // 唯一的ID
     #uuid = ""
-
+    //isDefault
+    #isDefault = false;
     #networkOptions = [
         {
             label: "ALL",
@@ -154,6 +155,25 @@ class TrojanForm extends React.Component {
             serverPortError: false,
             passwordError: false,
         }
+        const editData = (props.config && props.config.data) || null;
+        if (editData) {
+            this.#uuid = editData.tag || this.#uuid;
+            this.#isDefault = editData.is_default || false;
+            console.log("TrojanForm editData", editData);
+            this.state.name = editData.name || "";
+            this.state.server = editData.server || "";
+            this.state.serverName = (editData.tls && editData.tls.server_name) || "";
+            this.state.serverPort = editData.server_port.toString() || "";
+            this.state.password = editData.password || "";
+            this.state.network = editData.network || "";
+
+            const transport = editData.transport || {};
+            this.state.transportType = transport.type || "";
+            this.state.transportHost = transport.host || "";
+            this.state.transportPath = transport.path || "/";
+            this.state.transportMethod = transport.method || "GET";
+            this.state.transportServiceName = transport.service_name || "";
+        }
     }
 
     /**
@@ -230,7 +250,7 @@ class TrojanForm extends React.Component {
 
         const value = {
             tag: this.#uuid,
-            is_default: false,
+            is_default: this.#isDefault,
             type: "trojan",
             name: state.name.trim(),
             server: state.server.trim(),

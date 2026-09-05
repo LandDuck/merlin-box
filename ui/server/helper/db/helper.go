@@ -395,6 +395,33 @@ func AppendNode(raw json.RawMessage) error {
 	return os.WriteFile(global.DbPath, content, 0o644)
 }
 
+// UpdateNodeByTag 根据 tag 更新节点原始 JSON
+func UpdateNodeByTag(tag string, raw json.RawMessage) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	found := false
+	for i, item := range file.Nodes {
+		var base struct {
+			Tag string `json:"tag"`
+		}
+		if err := json.Unmarshal(item, &base); err == nil && base.Tag == tag {
+			file.Nodes[i] = raw
+			found = true
+			break
+		}
+	}
+	if !found {
+		return fmt.Errorf("node not found: %s", tag)
+	}
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}
+
 func fallbackBinaryConfig(value *int, defaultValue int) int {
 	if value == nil {
 		return defaultValue

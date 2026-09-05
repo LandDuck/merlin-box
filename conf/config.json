@@ -28,20 +28,30 @@
   "outbounds": [
     {
       "type": "vless",
-      "server": "1.1.1.1",
-      "server_port": 9999,
+      "server": "2.2.2.2",
+      "server_port": 8888,
       "uuid": "04763738-9dd4-4d2d-a8ac-a2b52a26df66",
+      "flow": "xtls-rprx-vision",
       "tls": {
         "enabled": true,
-        "server_name": "www.cloudflare.com"
+        "server_name": "www.cloudflare.com",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        },
+        "reality": {
+          "enabled": true,
+          "public_key": "jNXHt1yRo0vDuchQlIP6Z0ZvjT3KtzVI-T4E7RoLJS0",
+          "short_id": "0123456789abcdef"
+        }
       },
       "tcp_fast_open": false,
-      "tag": "1dbb9d3f-96be-47dc-8ae2-9505a4fe2f20",
+      "tag": "5c3f1b5f-1002-4d37-80bc-7295c3462b44",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "1dbb9d3f-96be-47dc-8ae2-9505a4fe2f20"
+    "final": "5c3f1b5f-1002-4d37-80bc-7295c3462b44"
   }
 }

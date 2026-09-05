@@ -75,6 +75,8 @@ class NaiveForm extends React.Component {
 
     // 唯一的ID
     #uuid = ""
+    //isDefault
+    #isDefault = false;
 
     /**
      * 构造方法
@@ -107,6 +109,21 @@ class NaiveForm extends React.Component {
             usernameError: false,
             passwordError: false,
         }
+        const editData = (props.config && props.config.data) || null;
+        if (editData) {
+            this.#uuid = editData.tag || this.#uuid;
+            this.#isDefault = editData.is_default || false;
+            //this.setData(editData);
+            this.state.name = editData.name || "";
+            this.state.server = editData.server || "";
+            this.state.serverName = (editData.tls && editData.tls.server_name) || "";
+            this.state.serverPort = editData.server_port.toString() || "";
+            this.state.username = editData.username || "";
+            this.state.password = editData.password || "";
+            this.state.udpOverTcp = !!editData.udp_over_tcp;
+            this.state.quic = !!editData.quic;
+            this.state.quicCongestionControl = editData.quic_congestion_control || "bbr";
+        }
     }
 
     /**
@@ -134,7 +151,7 @@ class NaiveForm extends React.Component {
     #buildValue(state) {
         const value = {
             tag: this.#uuid,
-            is_default: false,
+            is_default: this.#isDefault,
             type: "naive",
             name: state.name.trim(),
             server: state.server.trim(),

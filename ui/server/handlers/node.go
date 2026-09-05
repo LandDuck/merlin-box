@@ -35,80 +35,110 @@ import (
 	"github.com/LandDuck/merlin-box/model/singbox"
 )
 
-// AddNode 添加节点
-func AddNode(w http.ResponseWriter, r *http.Request) {
-	requestData, ok := validateHelper.BindAndValidate[reqModel.AddNode](w, r)
+// SaveNode 添加节点
+func SaveNode(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[reqModel.SaveNode](w, r)
 	if !ok {
 		return
 	}
 	switch requestData.Type {
 	case "naive":
-		addNaiveNode(w, requestData.Data)
+		saveNaiveNode(w, requestData.Data, requestData.Action)
 	case "shadowsocks":
-		addShadowsocksNode(w, requestData.Data)
+		saveShadowsocksNode(w, requestData.Data, requestData.Action)
 	case "anytls":
-		addAnytlsNode(w, requestData.Data)
+		saveAnytlsNode(w, requestData.Data, requestData.Action)
 	case "hysteria2":
-		addHysteria2Node(w, requestData.Data)
+		saveHysteria2Node(w, requestData.Data, requestData.Action)
 	case "trojan":
-		addTrojanNode(w, requestData.Data)
+		saveTrojanNode(w, requestData.Data, requestData.Action)
 	case "vmess":
-		addVmessNode(w, requestData.Data)
+		saveVmessNode(w, requestData.Data, requestData.Action)
 	case "vless":
-		addVlessNode(w, requestData.Data)
+		saveVlessNode(w, requestData.Data, requestData.Action)
 	case "tuic":
-		addTuicNode(w, requestData.Data)
+		saveTuicNode(w, requestData.Data, requestData.Action)
 	case "snell":
-		addSnellNode(w, requestData.Data)
+		saveSnellNode(w, requestData.Data, requestData.Action)
 	default:
 		httpHelper.ResponseFailure(w, "不支持的节点类型: "+requestData.Type)
 	}
 }
 
-// saveNode 通用节点保存逻辑：检查 tag 唯一性 → 序列化 → 持久化
-func saveNode(w http.ResponseWriter, tag string, node any) {
-	exists, err := dbHelper.NodeTagExists(tag)
-	if err != nil {
-		httpHelper.ResponseFailure(w, "读取节点数据失败")
-		return
-	}
-	if exists {
-		httpHelper.ResponseFailure(w, "节点 tag 已存在，请勿重复添加")
-		return
-	}
+// saveNode 通用节点保存逻辑：根据 action 判断是新增还是更新，再执行对应持久化
+func saveNode(w http.ResponseWriter, tag string, node any, action string) {
 	raw, err := json.MarshalIndent(node, "", "  ")
 	if err != nil {
 		httpHelper.ResponseFailure(w, "节点数据序列化失败")
 		return
 	}
-	if err := dbHelper.AppendNode(raw); err != nil {
-		httpHelper.ResponseFailure(w, "添加节点失败")
-		return
-	}
 
-	//验证是否只有一个 节点
-	nodes, err := dbHelper.GetNodeList()
-	if err == nil {
-		// 如果只有一个节点，设置为默认节点
-		if len(nodes) == 1 {
+	if action == "add" {
+		exists, err := dbHelper.NodeTagExists(tag)
+		if err != nil {
+			httpHelper.ResponseFailure(w, "读取节点数据失败")
+			return
+		}
+		if exists {
+			httpHelper.ResponseFailure(w, "节点 tag 已存在，请勿重复添加")
+			return
+		}
+		if err := dbHelper.AppendNode(raw); err != nil {
+			httpHelper.ResponseFailure(w, "添加节点失败")
+			return
+		}
+
+		// 验证是否只有一个节点，若是则设置为默认节点
+		nodes, err := dbHelper.GetNodeList()
+		if err == nil && len(nodes) == 1 {
 			if err := dbHelper.SetDefaultNode(tag); err != nil {
 				httpHelper.ResponseFailure(w, "设置默认节点失败")
 				return
 			}
 			configJson, err := parseNode(raw, tag)
 			if err == nil {
-				//写入 singbox 配置文件
 				confPath := filepath.Join(global.ConfDir, "config.json")
 				_ = os.WriteFile(confPath, []byte(configJson), 0644)
 			}
 		}
+		httpHelper.ResponseSuccess(w, "添加成功")
+		return
 	}
 
-	httpHelper.ResponseSuccess(w, "添加成功")
+	if action == "edit" {
+		if err := dbHelper.UpdateNodeByTag(tag, raw); err != nil {
+			if strings.Contains(err.Error(), "node not found") {
+				httpHelper.ResponseFailure(w, "节点不存在，无法编辑")
+			} else {
+				httpHelper.ResponseFailure(w, "更新节点失败")
+			}
+			return
+		}
+
+		// 验证当前节点是否是default节点，如果是则更新配置文件
+		var nodeData struct {
+			IsDefault bool `json:"is_default"`
+		}
+		err := json.Unmarshal(raw, &nodeData)
+		if err == nil {
+			if nodeData.IsDefault {
+				configJson, err := parseNode(raw, tag)
+				if err == nil {
+					confPath := filepath.Join(global.ConfDir, "config.json")
+					_ = os.WriteFile(confPath, []byte(configJson), 0644)
+				}
+			}
+		}
+
+		httpHelper.ResponseSuccess(w, "更新成功")
+		return
+	}
+
+	httpHelper.ResponseFailure(w, "不支持的操作类型: "+action)
 }
 
-// addNaiveNode 处理 Naive 节点添加逻辑
-func addNaiveNode(w http.ResponseWriter, data string) {
+// saveNaiveNode 处理 Naive 节点添加逻辑
+func saveNaiveNode(w http.ResponseWriter, data string, action string) {
 	var node dbModel.NaiveNode
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -118,7 +148,7 @@ func addNaiveNode(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateNaiveNode 校验 Naive 节点各必填字段
@@ -157,8 +187,8 @@ var validShadowsocksMethods = map[string]struct{}{
 	"rc4-md5": {}, "chacha20-ietf": {}, "xchacha20": {},
 }
 
-// addShadowsocksNode 处理 Shadowsocks 节点添加逻辑
-func addShadowsocksNode(w http.ResponseWriter, data string) {
+// saveShadowsocksNode 处理 Shadowsocks 节点添加逻辑
+func saveShadowsocksNode(w http.ResponseWriter, data string, action string) {
 	var node dbModel.ShadowsocksNode
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -168,7 +198,7 @@ func addShadowsocksNode(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateShadowsocksNode 校验 Shadowsocks 节点各必填字段
@@ -197,8 +227,8 @@ func validateShadowsocksNode(node dbModel.ShadowsocksNode) error {
 	return nil
 }
 
-// addAnytlsNode 处理 Anytls 节点添加逻辑
-func addAnytlsNode(w http.ResponseWriter, data string) {
+// saveAnytlsNode 处理 Anytls 节点添加逻辑
+func saveAnytlsNode(w http.ResponseWriter, data string, action string) {
 	var node dbModel.AnytlsNode
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -208,7 +238,7 @@ func addAnytlsNode(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateAnytlsNode 校验 Anytls 节点各必填字段
@@ -234,8 +264,8 @@ func validateAnytlsNode(node dbModel.AnytlsNode) error {
 	return nil
 }
 
-// addHysteria2Node 处理 Hysteria2 节点添加逻辑
-func addHysteria2Node(w http.ResponseWriter, data string) {
+// saveHysteria2Node 处理 Hysteria2 节点添加逻辑
+func saveHysteria2Node(w http.ResponseWriter, data string, action string) {
 	var node dbModel.Hysteria2Node
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -245,7 +275,7 @@ func addHysteria2Node(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateHysteria2Node 校验 Hysteria2 节点各必填字段
@@ -274,8 +304,8 @@ func validateHysteria2Node(node dbModel.Hysteria2Node) error {
 	return nil
 }
 
-// addTrojanNode 处理 Trojan 节点添加逻辑
-func addTrojanNode(w http.ResponseWriter, data string) {
+// saveTrojanNode 处理 Trojan 节点添加逻辑
+func saveTrojanNode(w http.ResponseWriter, data string, action string) {
 	var node dbModel.TrojanNode
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -285,7 +315,7 @@ func addTrojanNode(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateTrojanNode 校验 Trojan 节点各必填字段
@@ -311,8 +341,8 @@ func validateTrojanNode(node dbModel.TrojanNode) error {
 	return nil
 }
 
-// addVmessNode 处理 Vmess 节点添加逻辑
-func addVmessNode(w http.ResponseWriter, data string) {
+// saveVmessNode 处理 Vmess 节点添加逻辑
+func saveVmessNode(w http.ResponseWriter, data string, action string) {
 	var node dbModel.VmessNode
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -322,7 +352,7 @@ func addVmessNode(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateVmessNode 校验 Vmess 节点各必填字段
@@ -345,8 +375,8 @@ func validateVmessNode(node dbModel.VmessNode) error {
 	return nil
 }
 
-// addVlessNode 处理 Vless 节点添加逻辑
-func addVlessNode(w http.ResponseWriter, data string) {
+// saveVlessNode 处理 Vless 节点添加逻辑
+func saveVlessNode(w http.ResponseWriter, data string, action string) {
 	var node dbModel.VlessNode
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -356,7 +386,7 @@ func addVlessNode(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateVlessNode 校验 Vless 节点各必填字段
@@ -379,8 +409,8 @@ func validateVlessNode(node dbModel.VlessNode) error {
 	return nil
 }
 
-// addTuicNode 处理 Tuic 节点添加逻辑
-func addTuicNode(w http.ResponseWriter, data string) {
+// saveTuicNode 处理 Tuic 节点添加逻辑
+func saveTuicNode(w http.ResponseWriter, data string, action string) {
 	var node dbModel.TuicNode
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -390,7 +420,7 @@ func addTuicNode(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateTuicNode 校验 Tuic 节点各必填字段
@@ -419,8 +449,8 @@ func validateTuicNode(node dbModel.TuicNode) error {
 	return nil
 }
 
-// addSnellNode 处理 Snell 节点添加逻辑
-func addSnellNode(w http.ResponseWriter, data string) {
+// saveSnellNode 处理 Snell 节点添加逻辑
+func saveSnellNode(w http.ResponseWriter, data string, action string) {
 	var node dbModel.SnellNode
 	if err := json.Unmarshal([]byte(data), &node); err != nil {
 		httpHelper.ResponseFailure(w, "节点数据解析失败")
@@ -430,7 +460,7 @@ func addSnellNode(w http.ResponseWriter, data string) {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}
-	saveNode(w, node.Tag, node)
+	saveNode(w, node.Tag, node, action)
 }
 
 // validateSnellNode 校验 Snell 节点各必填字段
@@ -480,6 +510,20 @@ func DeleteNode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpHelper.ResponseSuccess(w, "删除成功")
+}
+
+// LoadNode 加载节点（按 tag）
+func LoadNode(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[reqModel.NodeTagRequest](w, r)
+	if !ok {
+		return
+	}
+	node, err := dbHelper.GetNodeByTag(requestData.Tag)
+	if err != nil {
+		httpHelper.ResponseFailure(w, "获取节点失败")
+		return
+	}
+	httpHelper.ResponseSuccess(w, node)
 }
 
 // SetDefaultNode 设置默认节点（按 tag）

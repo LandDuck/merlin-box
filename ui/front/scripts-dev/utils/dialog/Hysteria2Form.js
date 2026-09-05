@@ -51,6 +51,8 @@ class Hysteria2Form extends React.Component {
 
     // 唯一的ID
     #uuid = ""
+    //isDefault
+    #isDefault = false;
 
     #networkOptions = [
         {
@@ -108,6 +110,22 @@ class Hysteria2Form extends React.Component {
             obfsPasswordError: false,
             passwordError: false,
         }
+        const editData = (props.config && props.config.data) || null;
+        if (editData) {
+            this.#uuid = editData.tag || this.#uuid;
+            this.#isDefault = editData.is_default || false;
+            console.log("Hysteria2Form editData", editData);
+            this.state.name = editData.name || "";
+            this.state.server = editData.server || "";
+            this.state.serverName = (editData.tls && editData.tls.server_name) || "";
+            this.state.serverPort = editData.server_port.toString() || "";
+            this.state.upMbps = editData.up_mbps === undefined || editData.up_mbps === null ? "100" : String(editData.up_mbps);
+            this.state.downMbps = editData.down_mbps === undefined || editData.down_mbps === null ? "100" : String(editData.down_mbps);
+            this.state.obfsType = (editData.obfs && editData.obfs.type) || "salamander";
+            this.state.obfsPassword = (editData.obfs && editData.obfs.password) || "";
+            this.state.password = editData.password || "";
+            this.state.network = editData.network || "";
+        }
     }
 
     /**
@@ -135,7 +153,7 @@ class Hysteria2Form extends React.Component {
     #buildValue(state) {
         return {
             tag: this.#uuid,
-            is_default: false,
+            is_default: this.#isDefault,
             type: "hysteria2",
             name: state.name.trim(),
             server: state.server.trim(),

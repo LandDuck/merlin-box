@@ -122,6 +122,26 @@ class NodeList extends React.Component {
     }
 
     /**
+     * 编辑节点
+     * @param tag
+     */
+    #editNode(tag) {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_loadNode,
+            data: {tag},
+            success: (data) => {
+                this.$helper.showAddNodeDialog({
+                    data,
+                    onOk: () => {
+                        this.#loadNodeList();
+                        return true;
+                    }
+                });
+            }
+        });
+    }
+
+    /**
      * 渲染单张节点卡片
      */
     #renderCard(node) {
@@ -138,12 +158,19 @@ class NodeList extends React.Component {
             </div>
             <div className="node-name">{node.name}</div>
             <div className="node-ip">{node.server}</div>
-            {!isDefault && <div className="node-actions">
+            {!isDefault ?  <div className="node-actions">
                 <button className="node-action primary" onClick={() => this.#setDefault(node.tag)}>
                     设为默认
                 </button>
+                <button className="node-action primary" onClick={() => this.#editNode(node.tag)}>
+                    编辑
+                </button>
                 <button className="node-action" onClick={() => this.#deleteNode(node.tag)}>
                     删除
+                </button>
+            </div> : <div className="node-actions">
+                <button className="node-action primary" onClick={() => this.#editNode(node.tag)}>
+                    编辑
                 </button>
             </div>}
         </div>;

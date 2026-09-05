@@ -47,8 +47,12 @@ class AddNodeDialog extends DialogBase {
         super(props);
         this.#props = props;
         this.#config = props.config || {};
+        let current = "naive";
+        if (this.#config.data) {
+            current = this.#config.data.type || "naive";
+        }
         this.state = Object.assign(this.state, {
-            current: "naive" //当前选中的节点类型
+            current: current //当前选中的节点类型
         });
     }
 
@@ -73,14 +77,15 @@ class AddNodeDialog extends DialogBase {
         //console.log("提交数据:", data);
         const jsonData = JSON.stringify(data);
         this.$http.sendPost({
-            url: this.$config.apis.comm_addNode,
+            url: this.$config.apis.comm_saveNode,
             data: {
+                action: this.#config.data ? "edit" : "add",
                 type: data.type,
                 data: jsonData
             },
             success: () => {
                 let result = false;
-                this.$helper.success("节点添加成功。");
+                this.$helper.success("节点保存成功。");
                 if (this.#config.onOk) {
                     result = this.#config.onOk();
                 }
@@ -152,7 +157,11 @@ class AddNodeDialog extends DialogBase {
         return <div className="ns-layer add-node-layer">
             <div className={`nlc ${this.state.show ? 'show' : ''}`}>
                 <div className="nlc-inner">
-                    <div className="title">添加节点</div>
+                    <div className="title">
+                        {
+                            this.#config.data ? '编辑节点' : '添加节点'
+                        }
+                    </div>
                     <div className="tab-group">
                         <div className="tab-bar">
                             <a href="javascript:void(0);" className={this.state.current === "naive" ? "active" : ""} onClick={() =>

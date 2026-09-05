@@ -67,6 +67,8 @@ class ShadowsocksForm extends React.Component {
 
     // 唯一的ID
     #uuid = ""
+    //isDefault
+    #isDefault = false;
 
     //网络协议选项
     #networkOptions = [
@@ -183,7 +185,21 @@ class ShadowsocksForm extends React.Component {
             serverPortError: false,
             passwordError: false,
         }
+        const editData = (props.config && props.config.data) || null;
+        if (editData) {
+            this.#uuid = editData.tag || this.#uuid;
+            this.#isDefault = editData.is_default || false;
+            console.log("ShadowsocksForm editData", editData);
+            this.state.name = editData.name || "";
+            this.state.server = editData.server || "";
+            this.state.serverPort = editData.server_port.toString() || "";
+            this.state.password = editData.password || "";
+            this.state.network = editData.network || "";
+            this.state.method = editData.method || "2022-blake3-aes-128-gcm";
+            this.state.udpOverTcp = !!editData.udp_over_tcp;
+        }
     }
+
 
     /**
      * 验证表单
@@ -205,7 +221,7 @@ class ShadowsocksForm extends React.Component {
     #buildValue(state) {
         return {
             tag: this.#uuid,
-            is_default: false,
+            is_default: this.#isDefault,
             type: "shadowsocks",
             name: state.name.trim(),
             server: state.server.trim(),
