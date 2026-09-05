@@ -20,6 +20,7 @@ import * as esbuild from "esbuild";
 import glob from "fast-glob";
 import chokidar from "chokidar";
 import path from "path";
+import { fileURLToPath } from "url";
 import fs from "fs/promises";
 import less from "less";
 
@@ -57,22 +58,37 @@ const esbuildConfig = {
     loader: {
         ".js": "jsx"
     }
-}
+};
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * 创建 esbuild 配置，并注入编译常量
  * @param {boolean} isDev
  * @returns {object}
  */
-function createEsbuildConfig(isDev) {
+async function createEsbuildConfig(isDev) {
+    let version = "";
+    if (!isDev) {
+        //从../../merlin-box.sh中读取版本号
+        const merlinBoxShPath = path.join(__dirname, "../../merlin-box.sh");
+        const merlinBoxShContent = await fs.readFile(merlinBoxShPath, "utf8");
+        const match = merlinBoxShContent.match(/SCRIPT_VERSION="([^"]+)"/);
+        if (match) {
+            version = match[1];
+        }
+    }
     return {
         ...esbuildConfig,
         define: {
             ...(esbuildConfig.define || {}),
-            IS_DEV: isDev ? "true" : "false"
+            IS_DEV: isDev ? "true" : "false",
+            SCRIPT_VERSION: `"${version}"`
         }
     };
 }
+
 // main context
 let mainContext = null;
 
@@ -129,7 +145,7 @@ async function createPageContext(file) {
             file
         ],
         outfile,
-        ...createEsbuildConfig(true)
+        ...(await createEsbuildConfig(true))
     });
     await ctx.watch();
     pageContexts.set(file, ctx);
@@ -177,7 +193,7 @@ async function initMain() {
             `${SRC}/main.js`
         ],
         outfile: `${OUT}/main.js`,
-        ...createEsbuildConfig(true)
+        ...(await createEsbuildConfig(true))
     });
     await mainContext.watch();
     console.log("watch main");
@@ -307,7 +323,7 @@ export async function build() {
             `${SRC}/main.js`
         ],
         outfile: `${DIST}/${OUT}/main.js`,
-        ...createEsbuildConfig(false),
+        ...(await createEsbuildConfig(false)),
         banner: {
             js: COPYRIGHT_BANNER
         },
@@ -321,7 +337,7 @@ export async function build() {
                 file
             ],
             outfile: `${DIST}/${pageOutput(file)}`,
-            ...createEsbuildConfig(false),
+            ...(await createEsbuildConfig(false)),
             banner: {
                 js: COPYRIGHT_BANNER
             },
