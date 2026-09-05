@@ -215,6 +215,12 @@ class Status extends React.Component {
                     }
                 </div>
                 <div className="system-stat">
+                    <div className="stat-label">版本</div>
+                    <div className="stat-value">
+                        {this.$config.data.version}
+                    </div>
+                </div>
+                <div className="system-stat">
                     <div className="stat-label">国内延时</div>
                     <div className="stat-value speed">
                         {this.state.domesticDelay} ms
