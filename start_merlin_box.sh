@@ -151,8 +151,9 @@ if { [ "$FROM" = "wan_event" ] && [ "$P1" = "0" ] && [ "$P2" = "connected" ]; } 
           enableUDP=$(get_json_value "enableUDP" 0 "$MD_ROOT_DIR/db/db.json")
           disableQUIC=$(get_json_value "disableQUIC" 1 "$MD_ROOT_DIR/db/db.json")
           routeSelfProxy=$(get_json_value "routeSelfProxy" 0 "$MD_ROOT_DIR/db/db.json")
-          #显式参数重启：IPv6 QUIC拦截 UDP 自身代理
-          ./merlin-box.sh restart "$enableIPv6" "$disableQUIC" "$enableUDP" "$routeSelfProxy" >> "$LOGFILE" 2>&1
+          tcpFastOpen=$(get_json_value "tcpFastOpen" 0 "$MD_ROOT_DIR/db/db.json")
+          #显式参数重启：IPv6 QUIC拦截 UDP 自身代理 TCP快速打开
+          ./merlin-box.sh restart "$enableIPv6" "$disableQUIC" "$enableUDP" "$routeSelfProxy" "$tcpFastOpen" >> "$LOGFILE" 2>&1
           EXIT_CODE=$?
           log_msg "merlin-box 重启命令执行完毕 (退出码: $EXIT_CODE)"
         else
