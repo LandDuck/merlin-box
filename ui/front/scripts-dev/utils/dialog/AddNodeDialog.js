@@ -85,7 +85,11 @@ class AddNodeDialog extends DialogBase {
             },
             success: () => {
                 let result = false;
-                this.$helper.success("节点保存成功。");
+                if (this.#config.data && this.#config.data.is_default) {
+                    this.$helper.warning("节点保存成功，重启后生效。");
+                } else {
+                    this.$helper.success("节点保存成功。");
+                }
                 if (this.#config.onOk) {
                     result = this.#config.onOk();
                 }

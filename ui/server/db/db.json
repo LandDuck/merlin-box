@@ -42,20 +42,20 @@
   },
   "nodes": [
     {
-      "is_default": false,
       "name": "my_anytls",
-      "password": "888888",
+      "tag": "637efc73-0ce1-4580-8b0a-b5ec787e6644",
+      "type": "anytls",
+      "is_default": false,
       "server": "1.1.1.4",
       "server_port": 80,
-      "tag": "637efc73-0ce1-4580-8b0a-b5ec787e6644",
+      "password": "888888",
       "tls": {
         "enabled": true,
         "server_name": "www.cloufflare.com"
-      },
-      "type": "anytls"
+      }
     },
     {
-      "name": "my_vless---",
+      "name": "my_vless----",
       "tag": "5c3f1b5f-1002-4d37-80bc-7295c3462b44",
       "type": "vless",
       "is_default": true,
