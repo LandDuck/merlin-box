@@ -64,6 +64,10 @@ type SaveDomainControlConfig struct {
 	Blocklist string `json:"blocklist"`
 	// Blacklist 域名黑名单列表, 一行一个
 	Blacklist string `json:"blacklist"`
+	// Whitelist 域名白名单列表, 一行一个
+	Whitelist string `json:"whitelist"`
+	// Hostlist 域名 hosts 列表, 一行一个
+	Hostlist string `json:"hostlist"`
 }
 
 // AddNode 添加节点请求结构体

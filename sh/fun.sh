@@ -1147,7 +1147,8 @@ set_tcp_fast_open() {
             ;;
     esac
 
-    #不能为0,当为0时, 强制变成1。 路由器层面不关闭，仅关闭singbox
+    # 0 表示仅关闭 sing-box 的 TFO；
+    # 路由器内核仍保持客户端 TFO，因此强制使用 1
     if [ "$value" -eq 0 ]; then
         value=1
     fi

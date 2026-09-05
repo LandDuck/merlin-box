@@ -1,0 +1,2 @@
+# 域名白名单，强制不走代理
+*.mysql.rds.aliyuncs.com

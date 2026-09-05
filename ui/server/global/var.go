@@ -93,6 +93,14 @@ func AppendServiceLog(line string) {
 	LogHub.Broadcast(line)
 }
 
+// DoNotDeleteFiles 不允许删除的配置文件列表
+var DoNotDeleteFiles = []string{
+	"site-blocklist.txt",
+	"site-blacklist.txt",
+	"site-whitelist.txt",
+	"hosts.txt",
+}
+
 // EnvDev 开发环境
 // EnvProd 生产环境
 const (

@@ -131,6 +131,8 @@ func SaveDomainControlConfig(w http.ResponseWriter, r *http.Request) {
 	if err := dbHelper.SaveDomainControlConfig(dbModel.DomainControlInfo{
 		Blocklist: requestData.Blocklist,
 		Blacklist: requestData.Blacklist,
+		Whitelist: requestData.Whitelist,
+		Hostlist:  requestData.Hostlist,
 	}); err != nil {
 		httpHelper.ResponseFailure(w, "保存域名控制配置失败")
 		return

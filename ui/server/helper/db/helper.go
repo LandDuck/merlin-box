@@ -144,15 +144,12 @@ func SaveDeviceControlConfig(deviceInfo dbModel.DeviceInfo) error {
 
 // syncConfigFile 同步配置文件到 res 目录
 func syncConfigFile(path string, content string) error {
-	var doNotDeleteFiles = []string{
-		"site-blocklist.txt",
-		"site-blacklist.txt",
-	}
+
 	if strings.TrimSpace(content) == "" {
 
-		//判断 path 在 doNotDeleteFiles 列表中是否存在
+		//判断 path 在 DoNotDeleteFiles 列表中是否存在
 		exists := false
-		for _, f := range doNotDeleteFiles {
+		for _, f := range global.DoNotDeleteFiles {
 			if strings.HasSuffix(path, f) {
 				exists = true
 				break
@@ -160,7 +157,7 @@ func syncConfigFile(path string, content string) error {
 		}
 
 		if exists {
-			//如果在 doNotDeleteFiles 列表中，不删除文件, 直接写入空内容
+			//如果在 DoNotDeleteFiles 列表中，不删除文件, 直接写入空内容
 			return os.WriteFile(path, []byte(content), 0o644)
 		}
 
@@ -264,11 +261,19 @@ func SaveDomainControlConfig(domainInfo dbModel.DomainControlInfo) error {
 
 	blacklistPath := global.ResDir + "/site-blacklist.txt"
 	blocklistPath := global.ResDir + "/site-blocklist.txt"
+	whitelistPath := global.ResDir + "/site-whitelist.txt"
+	hostsPath := global.ResDir + "/hosts.txt"
 	if err := syncConfigFile(blacklistPath, domainInfo.Blacklist); err != nil {
 		logger.Warn("write domain blacklist file failed:", err)
 	}
 	if err := syncConfigFile(blocklistPath, domainInfo.Blocklist); err != nil {
 		logger.Warn("write domain blocklist file failed:", err)
+	}
+	if err := syncConfigFile(whitelistPath, domainInfo.Whitelist); err != nil {
+		logger.Warn("write domain whitelist file failed:", err)
+	}
+	if err := syncConfigFile(hostsPath, domainInfo.Hostlist); err != nil {
+		logger.Warn("write hosts file failed:", err)
 	}
 	return os.WriteFile(global.DbPath, content, 0o644)
 }
