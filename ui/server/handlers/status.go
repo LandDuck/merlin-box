@@ -34,6 +34,23 @@ import (
 	"github.com/LandDuck/merlin-box/model/resp"
 )
 
+// Delay 返回测速延时
+func Delay(response http.ResponseWriter, request *http.Request) {
+	// 测速
+	var domesticDelay = -1
+	var internationalDelay = -1
+	if global.CurrentEnv == global.EnvDev {
+		//internationalDelay = httpHelper.TestDelay("https://www.google.com", false)
+	} else {
+		domesticDelay = httpHelper.TestDelay("https://www.baidu.com", false)
+		internationalDelay = httpHelper.TestDelay("https://www.google.com", true)
+	}
+	httpHelper.ResponseSuccess(response, resp.DelayResponse{
+		DomesticDelay:      domesticDelay,
+		InternationalDelay: internationalDelay,
+	})
+}
+
 // Status 返回系统当前状态
 func Status(response http.ResponseWriter, request *http.Request) {
 
@@ -65,21 +82,10 @@ func Status(response http.ResponseWriter, request *http.Request) {
 		status = 1
 	}
 
-	// 测速
-	var domesticDelay = -1
-	var internationalDelay = -1
-	if global.CurrentEnv == global.EnvDev {
-		//internationalDelay = httpHelper.TestDelay("https://www.google.com", false)
-	} else {
-		domesticDelay = httpHelper.TestDelay("https://www.baidu.com", false)
-		internationalDelay = httpHelper.TestDelay("https://www.google.com", true)
-	}
 	httpHelper.ResponseSuccess(response, resp.StatusResponse{
-		WorkingDir:         global.WorkingDir,
-		Duration:           duration,
-		Status:             status,
-		DomesticDelay:      domesticDelay,
-		InternationalDelay: internationalDelay,
+		WorkingDir: global.WorkingDir,
+		Duration:   duration,
+		Status:     status,
 	})
 }
 

@@ -59,6 +59,7 @@ func startHTTPServer(port int) {
 	router.Post("/api/login", handlers.Login)
 	router.Post("/api/init", handlers.Init)
 	router.Post("/api/status", handlers.Status)
+	router.Post("/api/delay", handlers.Delay)
 	router.Post("/api/logout", handlers.Logout)
 	router.Post("/api/change_password", handlers.ChangePassword)
 	router.Post("/api/get_device_control_config", handlers.GetDeviceControlConfig)

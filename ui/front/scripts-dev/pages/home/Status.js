@@ -22,8 +22,11 @@
  */
 class Status extends React.Component {
 
-    //定义一个setTimeout的定时器
-    #timer = null;
+    //定义一个刷新状态的的定时器
+    #statusTimer = null;
+
+    //定义一个刷新延时的定时器
+    #delayTimer = null;
 
     //WebSocket 实例
     #ws = null;
@@ -51,6 +54,7 @@ class Status extends React.Component {
      */
     componentDidMount() {
         this.#refreshStatus();
+        this.#refreshDelay();
         this.#connectWS();
     }
 
@@ -58,7 +62,7 @@ class Status extends React.Component {
      * 组件卸载
      */
     componentWillUnmount() {
-        this.#stopTimer();
+        this.#clearTimer();
         this.#closeWS();
     }
 
@@ -103,11 +107,40 @@ class Status extends React.Component {
     /**
      * 启动定时器
      */
-    #startTimer() {
-        this.#timer = setTimeout(() => {
+    #delayRefreshStatus() {
+        clearTimeout(this.#statusTimer)
+        this.#statusTimer = setTimeout(() => {
             // 定时器逻辑
             this.#refreshStatus();
         }, 2000);
+    }
+
+    /**
+     * 启动定时器
+     */
+    #delayRefreshDelay() {
+        clearTimeout(this.#delayTimer)
+        this.#delayTimer = setTimeout(() => {
+            // 定时器逻辑
+            this.#refreshDelay();
+        }, 2000);
+    }
+
+    /**
+     * 刷新延时
+     */
+    #refreshDelay() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_delay,
+            success: (status) => {
+                this.setState({
+                    domesticDelay: status.domesticDelay,
+                    internationalDelay: status.internationalDelay
+                });
+                // 重新启动定时器
+                this.#delayRefreshDelay();
+            }
+        });
     }
 
     /**
@@ -121,12 +154,10 @@ class Status extends React.Component {
                 this.setState({
                     status: status.status,
                     runningTime: this.$helper.formatDuration(status.duration),
-                    workingDir: status.workingDir,
-                    domesticDelay: status.domesticDelay,
-                    internationalDelay: status.internationalDelay
+                    workingDir: status.workingDir
                 });
                 // 重新启动定时器
-                this.#startTimer();
+                this.#delayRefreshStatus();
             }
         });
     }
@@ -134,10 +165,14 @@ class Status extends React.Component {
     /**
      * 停止定时器
      */
-    #stopTimer() {
-        if (this.#timer) {
-            clearTimeout(this.#timer);
-            this.#timer = null;
+    #clearTimer() {
+        if (this.#statusTimer) {
+            clearTimeout(this.#statusTimer);
+            this.#statusTimer = null;
+        }
+        if (this.#delayTimer) {
+            clearTimeout(this.#delayTimer);
+            this.#delayTimer = null;
         }
     }
 

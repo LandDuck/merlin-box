@@ -38,6 +38,14 @@ type StatusResponse struct {
 	// WorkingDir merlin-box 的路径
 	WorkingDir string `json:"workingDir"`
 	// DomesticDelay 国内延迟 ms
+	// DomesticDelay int `json:"domesticDelay"`
+	// InternationalDelay 国际延迟 ms
+	// InternationalDelay int `json:"internationalDelay"`
+}
+
+// DelayResponse 延迟响应结构体，包含国内和国际延迟
+type DelayResponse struct {
+	// DomesticDelay 国内延迟 ms
 	DomesticDelay int `json:"domesticDelay"`
 	// InternationalDelay 国际延迟 ms
 	InternationalDelay int `json:"internationalDelay"`
