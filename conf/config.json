@@ -17,41 +17,23 @@
       "tag": "tproxy-in",
       "listen": "::",
       "listen_port": 65002
-    },
-    {
-      "type": "redirect",
-      "tag": "redirect-in",
-      "listen": "::",
-      "listen_port": 65003
     }
   ],
   "outbounds": [
     {
-      "type": "vless",
-      "server": "2.2.2.2",
-      "server_port": 8888,
-      "uuid": "04763738-9dd4-4d2d-a8ac-a2b52a26df66",
-      "flow": "xtls-rprx-vision",
-      "tls": {
-        "enabled": true,
-        "server_name": "www.cloudflare.com",
-        "utls": {
-          "enabled": true,
-          "fingerprint": "chrome"
-        },
-        "reality": {
-          "enabled": true,
-          "public_key": "jNXHt1yRo0vDuchQlIP6Z0ZvjT3KtzVI-T4E7RoLJS0",
-          "short_id": "0123456789abcdef"
-        }
-      },
+      "type": "shadowsocks",
+      "server": "6.6.6.6",
+      "server_port": 80,
+      "method": "2022-blake3-aes-128-gcm",
+      "password": "123456",
+      "udp_over_tcp": true,
       "tcp_fast_open": false,
-      "tag": "5c3f1b5f-1002-4d37-80bc-7295c3462b44",
+      "tag": "d83c3d97-abd5-4785-87e1-61c8b24004b3",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "5c3f1b5f-1002-4d37-80bc-7295c3462b44"
+    "final": "d83c3d97-abd5-4785-87e1-61c8b24004b3"
   }
 }

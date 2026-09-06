@@ -573,6 +573,36 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 		return "{}", err
 	}
 
+	//读取基础配置
+	baseConfig, baseConfigErr := dbHelper.GetBaseConfig()
+	if baseConfigErr != nil {
+		return "{}", baseConfigErr
+	}
+
+	inbounds := []singbox.Inbound{
+		{
+			Type:       "socks",
+			Tag:        "socks-in",
+			Listen:     "::",
+			ListenPort: 65001,
+		},
+		{
+			Type:       "tproxy",
+			Tag:        "tproxy-in",
+			Listen:     "::",
+			ListenPort: 65002,
+		},
+	}
+
+	if baseConfig.RouteSelfProxy == 1 {
+		inbounds = append(inbounds, singbox.Inbound{
+			Type:       "redirect",
+			Tag:        "redirect-in",
+			Listen:     "::",
+			ListenPort: 65003,
+		})
+	}
+
 	//组织config
 	config := singbox.Config{
 		Log: singbox.LogConfig{
@@ -581,36 +611,12 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 			Output:    "logs/singbox-bin.log",
 			Timestamp: true,
 		},
-		Inbounds: []singbox.Inbound{
-			{
-				Type:       "socks",
-				Tag:        "socks-in",
-				Listen:     "::",
-				ListenPort: 65001,
-			},
-			{
-				Type:       "tproxy",
-				Tag:        "tproxy-in",
-				Listen:     "::",
-				ListenPort: 65002,
-			},
-			{
-				Type:       "redirect",
-				Tag:        "redirect-in",
-				Listen:     "::",
-				ListenPort: 65003,
-			},
-		},
+		Inbounds:  inbounds,
 		Outbounds: []any{},
 		Route: singbox.RouteConfig{
 			Rules: []any{},
 			Final: tag,
 		},
-	}
-
-	baseConfig, baseConfigErr := dbHelper.GetBaseConfig()
-	if baseConfigErr != nil {
-		return "{}", baseConfigErr
 	}
 
 	//按不同类型处理
