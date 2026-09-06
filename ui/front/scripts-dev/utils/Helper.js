@@ -481,7 +481,7 @@ class Helper {
             }
             $(".ns-content").append($(`<div class='${className}'>
         <div><span></span><span></span><span></span></div>
-         <div>${text}</div>
+         <div class="loading-text">${text}</div>
 </div>`));
             setTimeout(() => {
                 $(".custom-loading").addClass("show")

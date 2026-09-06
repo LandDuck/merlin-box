@@ -184,6 +184,36 @@ class Status extends React.Component {
     }
 
     /**
+     * 重启WEB UI服务
+     */
+    #restartUI() {
+        let seconds = 5;
+        this.$helper.showLoading(true, `正在重启WEB UI服务 ${seconds}`);
+        this.$http.sendPost({
+            url: this.$config.apis.comm_restartUI,
+            success: () => {
+                //5秒后刷新页面
+                const m = setInterval(() => {
+                    //location.reload();
+                    seconds--;
+                    $(".custom-loading .loading-text").html(`正在重启WEB UI服务 ${seconds}`);
+                    if (seconds <= 0) {
+                        location.reload();
+                        clearInterval(m);
+                    }
+                }, 1000);
+            }
+        });
+    }
+
+    /**
+     * 检查更新
+     */
+    #checkUpdate() {
+        //this.#runAction(this.$config.apis.comm_checkUpdate, "正在检查更新");
+    }
+
+    /**
      * 更新规则
      */
     #updateRules() {
@@ -271,6 +301,21 @@ class Status extends React.Component {
                             <span className="icon-reboot"/>
                             重启代理
                         </button>,
+                        <button className="btn-secondary" key={"reboot-ui"} onClick={(e) => {
+                            this.$helper.showAlertLayer({
+                                title: "操作提示",
+                                content: "确定要重启WEB UI服务吗？UI会断掉哦~",
+                                onCancel: () => {
+                                    this.$helper.warning("已取消重启WEB UI服务");
+                                },
+                                onOk: () => {
+                                    this.#restartUI();
+                                }
+                            });
+                        }}>
+                            <span className="icon-reboot"/>
+                            重启 WEB UI
+                        </button>,
                         <button className="btn-secondary" key={"update-rules"} onClick={(e) => {
                             this.$helper.showAlertLayer({
                                 title: "操作提示",
@@ -286,7 +331,6 @@ class Status extends React.Component {
                             <span className="icon-update"/>
                             更新规则
                         </button>
-
                     ]
                 }
             </div>

@@ -313,6 +313,8 @@ test_debug() {
   ##echo "raw_version_info: $raw_version_info"
   #echo "raw_version: $raw_version"
 
+  #VERSION=$(get_github_latest_release "LandDuck/merlin-box")
+  #print_warning "远程仓库最新版本: $VERSION"
 
 	:
 }

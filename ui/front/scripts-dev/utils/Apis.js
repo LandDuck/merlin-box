@@ -24,6 +24,7 @@ export default {
     comm_logout: 'api/logout',
     comm_stop: 'api/stop',
     comm_restart: 'api/restart',
+    comm_restartUI: 'api/restart_ui',
     comm_start: 'api/start',
     comm_updateRules: 'api/update_rules',
     comm_showDhcpClientList: 'api/show_dhcp_client_list',

@@ -1,0 +1,72 @@
+@import (reference) "common.less";
+
+@keyframes flash {
+  0% {
+    opacity: 1;
+    .scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    .scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    .scale(1);
+  }
+}
+
+.custom-loading {
+  position: absolute;
+  z-index: 2000;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+
+  > div {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .transition-duration(0.1s);
+
+  &.mask {
+    background-color: rgba(12, 19, 34, 0.6);
+    //毛玻璃
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  &.show {
+    opacity: 1;
+  }
+
+  span {
+    height: 14px;
+    width: 14px;
+    border-radius: 20px;
+    background-color: #0EA5FF;
+    display: block;
+    margin-right: 2px;
+    margin-left: 2px;
+    .animation-name(flash);
+    .animation-duration(0.5s);
+    .animation-iteration-count(infinite);
+    .animation-timing-function(linear);
+    .transform-origin(center center);
+  }
+
+  span:nth-child(2) {
+    .animation-delay(0.15s);
+  }
+
+  span:nth-child(3) {
+    .animation-delay(0.3s);
+  }
+}

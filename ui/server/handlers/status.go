@@ -216,6 +216,15 @@ func Restart(w http.ResponseWriter, r *http.Request) {
 	httpHelper.ResponseSuccess[any](w, nil)
 }
 
+// RestartUI 重启 merlin-box-ui 服务
+func RestartUI(w http.ResponseWriter, r *http.Request) {
+	if err := runServiceScriptAsync("server", "restart"); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	httpHelper.ResponseSuccess[any](w, nil)
+}
+
 // UpdateRules 更新规则文件，并异步返回脚本输出日志
 func UpdateRules(w http.ResponseWriter, r *http.Request) {
 	if err := runServiceScriptAsync("tool", "update_rules"); err != nil {
