@@ -187,7 +187,7 @@ update(){
     cp -rf "${tmp_dir}/start_merlin_box.sh" "${CUR_DIR}/start_merlin_box.sh"
 
     rm -rf "${tmp_dir}"
-    print_success "更新完成"
+    print_success "更新完成，重启相关服务后生效"
 
 }
 
