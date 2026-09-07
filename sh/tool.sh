@@ -594,12 +594,25 @@ get_github_latest_release() {
         return 1
     fi
 
+    print_normal "准备获取 GitHub 仓库 [${repo}] 的最新 Release 版本号">&2
+
     # 1. 发送请求提取 tag_name
     local tag
-    tag=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" \
-        | grep -o '"tag_name": *"[^"]*"' \
-        | head -n 1 \
-        | sed 's/"tag_name": *"\([^"]*\)"/\1/')
+
+    # 是否在路由器中
+    if is_running_on_router; then
+      print_normal "在路由器中运行，使用本机sock5代理">&2
+      tag=$(curl -fsS --proxy "socks5h://127.0.0.1:65001" "https://api.github.com/repos/${repo}/releases/latest" \
+              | grep -o '"tag_name": *"[^"]*"' \
+              | head -n 1 \
+              | sed 's/"tag_name": *"\([^"]*\)"/\1/')
+    else
+      print_normal "在PC上运行，使用本机直连">&2
+      tag=$(curl -fsS  "https://api.github.com/repos/${repo}/releases/latest" \
+              | grep -o '"tag_name": *"[^"]*"' \
+              | head -n 1 \
+              | sed 's/"tag_name": *"\([^"]*\)"/\1/')
+    fi
 
     # 2. 纯数字版本号清洗 (去除 Release、v 等字母前缀/后缀，仅保留数字和 .)
     local version
@@ -610,7 +623,7 @@ get_github_latest_release() {
         echo "$version"
         return 0
     else
-        echo "错误: 无法获取 [${repo}] 的 Release 版本（可能是无效仓库或超出了 API 速率限制）" >&2
+        print_error "错误: 无法获取 [${repo}] 的 Release 版本" >&2
         return 1
     fi
 }
