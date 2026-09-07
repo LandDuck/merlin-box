@@ -277,11 +277,7 @@ merlin-box/
 
 ```bash
 chmod +x merlin-box.sh
-chmod +x start_merlin_box.sh
-chmod +x bin/sing-box
-chmod +x bin/smartdns
-chmod +x bin/merlin-box
-chmod +x scripts/dnsmasq.postconf
+./merlin-box.sh init
 ```
 
 ---

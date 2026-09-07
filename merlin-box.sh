@@ -333,6 +333,50 @@ test_print() {
 }
 
 #=========================================
+# 用于第一次初始化
+#=========================================
+init() {
+  #判断是否在路由器中
+  if ! is_running_on_router; then
+      print_warning "⚠️ 当前环境非路由器，无法初始化 merlin-box。"
+      return 1
+  fi
+  #调整脚本权限
+  print_line "初始化merlin-box脚本权限"
+  chmod +x "$CUR_DIR/start_merlin_box.sh"
+  chmod +x "$CUR_DIR/bin/sing-box"
+  chmod +x "$CUR_DIR/bin/smartdns"
+  chmod +x "$CUR_DIR/bin/merlin-box"
+  chmod +x "$CUR_DIR/scripts/dnsmasq.postconf"
+  local merlinbox_bin="${CUR_DIR}/bin/merlin-box"
+  if [ -f "$merlinbox_bin" ]; then
+    chmod +x "$merlinbox_bin"
+  fi
+  print_success "完成脚本权限修改"
+  #询问用户是否安装自动启动
+  read -p "是否安装开机自启脚本？(y/n): " install_autostart
+  if [ "$install_autostart" = "y" ] || [ "$install_autostart" = "Y" ]; then
+    install
+  else
+    print_warning "未安装开机自启脚本，请手动执行 'merlin-box.sh install' 来设置开机自启。"
+  fi
+  #是否启动WEBUI
+  if [ -f "$merlinbox_bin" ]; then
+    read -p "是否启动WEBUI服务？(y/n): " start_webui
+    if [ "$start_webui" = "y" ] || [ "$start_webui" = "Y" ]; then
+      read -p "请输入WEBUI端口号 (默认: 8080): " webui_port
+      webui_port="${webui_port:-8080}"
+      start_server "$webui_port"
+      print_success "WEBUI服务已启动，请访问 http://<路由器IP>:${webui_port} 来访问WEBUI。"
+    else
+      print_warning "未启动WEBUI服务，请手动执行 'merlin-box.sh server' 来启动WEBUI。"
+    fi
+  else
+    print_warning "当前使用的是无UI版本，请手动配置 sing-box 配置文件，再使用 'merlin-box.sh start' 来启动服务。"
+  fi
+}
+
+#=========================================
 # 生成启动脚本 & 将 当前脚本放在 /jffs/scripts/wan-event 中以便每次拨号后自动启动
 #=========================================
 install() {
@@ -442,6 +486,9 @@ main() {
 
   # 根据传入的参数执行相应的操作
 	case "$1" in
+	  init)
+      init
+      ;;
 	  install)
   		install
   		;;
