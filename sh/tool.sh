@@ -50,6 +50,148 @@ compress_smartdns() {
 }
 
 #=========================================
+#下载一个文件
+# 参数1: 下载的URL
+# 参数2: 保存的目标路径
+#=========================================
+download_file() {
+
+  local url="$1"
+  local target_path="$2"
+
+  if [ -z "$url" ] || [ -z "$target_path" ]; then
+    print_error "下载文件失败: URL 或目标路径为空"
+    return 1
+  fi
+
+  print_normal "下载文件: $url 到 $target_path"
+
+  if type curl >/dev/null 2>&1; then
+    print_normal "检测到 curl，使用 SOCKS5 代理(127.0.0.1:65001)下载文件"
+    curl --fail --silent --show-error --location --proxy "socks5h://127.0.0.1:65001" -o "$target_path" "$url"
+    if [ $? -ne 0 ]; then
+      print_error "下载 $url 失败"
+      return 1
+    fi
+  else
+    print_normal "未检测到 curl，使用 wget 直连下载规则文件"
+    wget --no-hsts -O "$target_path" "$url"
+    if [ $? -ne 0 ]; then
+      rm -rf "${tmp_dir}"
+      print_error "下载 $url 失败"
+      return 1
+    fi
+  fi
+
+  print_success "下载完成: $target_path"
+
+  return 0
+}
+#=========================================
+# 更新 merlin-box
+#=========================================
+update(){
+    print_line "更新 merlin-box"
+
+    # 检测是否在路由器中, 如果不在不执行
+    print_normal "检测是否在路由器中运行"
+    if ! is_running_on_router; then
+        print_error "未在路由器中运行，无法更新 merlin-box，请在路由器中运行此脚本以更新 merlin-box"
+        exit 1
+    else
+      print_success "检测到在路由器中运行，继续更新 merlin-box"
+    fi
+
+    print_normal "检测仓库最新版本"
+    local latest_version=$(get_github_latest_release "LandDuck/merlin-box")
+    if [ -z "$latest_version" ]; then
+        print_error "获取最新版本失败"
+        exit 1
+    fi
+    print_success "最新版本: $latest_version"
+    if [ "$latest_version" = "$SCRIPT_VERSION" ]; then
+        print_success "当前已是最新版本: $SCRIPT_VERSION"
+        exit 0
+    else
+        print_normal "当前版本: $SCRIPT_VERSION, 最新版本: $latest_version"
+    fi
+
+    print_normal "检测是否为UI版本"
+    local noui=""
+    # merlin-box 可执行文件路径
+    local merlinbox_bin="${CUR_DIR}/bin/merlin-box"
+    #如果 merlin-box 可执行文件不存在，noui='-noui'
+    if [ ! -f "$merlinbox_bin" ]; then
+        print_warning "merlin-box 可执行文件不存在，当前为非UI版本"
+        noui="-noui"
+    else
+        print_normal "merlin-box 可执行文件存在，当前为UI版本"
+    fi
+
+    print_normal "检测CPU架构"
+    local smartdns_bin="${CUR_DIR}/bin/smartdns"
+    local arch
+    arch=$(get_executable_arch "$smartdns_bin")
+    print_success "检测到CPU架构: $arch"
+
+    #如果arch不是 arm或arm64, 则提示错误
+    if [ "$arch" != "arm" ] && [ "$arch" != "arm64" ]; then
+        print_error "不支持的CPU架构: $arch, 仅支持 arm 或 arm64"
+        exit 1
+    fi
+
+    #https://github.com/LandDuck/merlin-box/releases/download/v1.0.7/merlin-box-arm64_1.0.7.tar.gz
+    local download_url="https://github.com/LandDuck/merlin-box/releases/download/v${latest_version}/merlin-box${noui}-${arch}_${latest_version}.tar.gz"
+    print_normal "下载地址: $download_url"
+    local tmp_dir="${CUR_DIR}/.tmp-update-merlin-box"
+    rm -rf "${tmp_dir}"
+    mkdir -p "${tmp_dir}"
+    if [ $? -ne 0 ]; then
+      print_error "创建临时目录失败: ${tmp_dir}"
+      exit 1
+    fi
+
+    local tmp_file="${tmp_dir}/merlin-box.tar.gz"
+    if ! download_file "$download_url" "$tmp_file"; then
+      rm -rf "${tmp_dir}"
+      print_error "下载 merlin-box 失败"
+      exit 1
+    fi
+
+    print_success "下载完成: $tmp_file"
+    print_normal "解压下载的文件"
+    tar -xzf "$tmp_file" -C "$tmp_dir"
+    if [ $? -ne 0 ]; then
+      rm -rf "${tmp_dir}"
+      print_error "解压 merlin-box 失败"
+      exit 1
+    fi
+
+    print_success "解压完成"
+
+    print_normal "复制文件"
+    #bin目录、scripts目录、sh目录
+    #如果是UI版本, 再移动wwwroot目录
+    #LICENSE文件、merlin-box.sh文件、README.md文件、README.zh-CN.md文件、RELEASE.md文件、start_merlin_box.sh文件
+    cp -rf "${tmp_dir}/bin"/* "${CUR_DIR}/bin/"
+    cp -rf "${tmp_dir}/scripts"/* "${CUR_DIR}/scripts/"
+    cp -rf "${tmp_dir}/sh"/* "${CUR_DIR}/sh/"
+    if [ "$noui" = "" ]; then
+      cp -rf "${tmp_dir}/wwwroot"/* "${CUR_DIR}/wwwroot/"
+    fi
+    cp -rf "${tmp_dir}/LICENSE" "${CUR_DIR}/LICENSE"
+    cp -rf "${tmp_dir}/merlin-box.sh" "${CUR_DIR}/merlin-box.sh"
+    cp -rf "${tmp_dir}/README.md" "${CUR_DIR}/README.md"
+    cp -rf "${tmp_dir}/README.zh-CN.md" "${CUR_DIR}/README.zh-CN.md"
+    cp -rf "${tmp_dir}/RELEASE.md" "${CUR_DIR}/RELEASE.md"
+    cp -rf "${tmp_dir}/start_merlin_box.sh" "${CUR_DIR}/start_merlin_box.sh"
+
+    rm -rf "${tmp_dir}"
+    print_success "更新完成"
+
+}
+
+#=========================================
 # 更新规则文件
 #=========================================
 update_rules() {
@@ -59,8 +201,8 @@ update_rules() {
     print_normal "检测到在路由器中运行，直接下载规则文件到 res 目录"
 
     # 需要检测是否存在 PID_FILE 文件，如果不存在，证明没有运行，不能更新规则文件
-    if [ ! -f "$PID_FILE" ]; then
-      print_error "未检测到 PID 文件，merlin-box 可能未运行，请先启动 merlin-box 后再更新规则文件"
+    if ! is_running; then
+      print_error "merlin-box 可能未运行，请先启动 merlin-box 后再更新规则文件"
       exit 1
     fi
 
@@ -76,46 +218,24 @@ update_rules() {
       exit 1
     fi
 
-    if type curl >/dev/null 2>&1; then
-      print_normal "检测到 curl，使用 SOCKS5 代理(127.0.0.1:65001)下载规则文件"
-      for rule in chn-ip4 chn-ip6 chn-site; do
-        local target_file="${CUR_DIR}/res/${rule}.txt"
-        local tmp_file="${tmp_dir}/${rule}.txt"
-        curl --fail --silent --show-error --location --proxy "socks5h://127.0.0.1:65001" -o "${tmp_file}" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/${rule}.txt"
-        if [ $? -ne 0 ]; then
-          rm -rf "${tmp_dir}"
-          print_error "下载 ${rule}.txt 失败"
-          exit 1
-        fi
+    for rule in chn-ip4 chn-ip6 chn-site; do
+      local target_file="${CUR_DIR}/res/${rule}.txt"
+      local tmp_file="${tmp_dir}/${rule}.txt"
+      if download_file "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/${rule}.txt" "${tmp_file}"; then
         cp "${tmp_file}" "${target_file}"
         if [ $? -ne 0 ]; then
           rm -rf "${tmp_dir}"
           print_error "写入 ${target_file} 失败"
           exit 1
         fi
-      done
-    else
-      print_normal "未检测到 curl，使用 wget 直连下载规则文件"
-      for rule in chn-ip4 chn-ip6 chn-site; do
-        local target_file="${CUR_DIR}/res/${rule}.txt"
-        local tmp_file="${tmp_dir}/${rule}.txt"
-        wget --no-hsts -O "${tmp_file}" "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/${rule}.txt"
-        if [ $? -ne 0 ]; then
-          rm -rf "${tmp_dir}"
-          print_error "下载 ${rule}.txt 失败"
-          exit 1
-        fi
-        cp "${tmp_file}" "${target_file}"
-        if [ $? -ne 0 ]; then
-          rm -rf "${tmp_dir}"
-          print_error "写入 ${target_file} 失败"
-          exit 1
-        fi
-      done
-    fi
-    rm -rf "${tmp_dir}"
+      else
+        rm -rf "${tmp_dir}"
+        print_error "下载 ${rule}.txt 失败"
+        exit 1
+      fi
+    done
 
-    print_success "规则文件更新完成"
+    rm -rf "${tmp_dir}"
 
   else
     print_warning "未在路由器中运行，使用 python3 ./tools/update-rules/main.py 更新规则文件"
@@ -126,7 +246,67 @@ update_rules() {
       exit 1
     fi
   fi
+
   print_success "规则文件更新完成"
+}
+
+#==========================================
+# 提取某个可执行文件的CPU架构
+# 参数1: 可执行文件路径
+# 返回值: 输出架构名称 (arm64, arm, x86_64, x86, unknown)
+#==========================================
+get_executable_arch() {
+  local executable_path="$1"
+  local file_info
+  local elf_machine
+  local arch="unknown"
+
+  if [ ! -f "$executable_path" ]; then
+      print_error "错误: 可执行文件不存在: $executable_path"
+      echo "unknown"
+      return 1
+  fi
+
+  # 优先使用 file
+  if type file >/dev/null 2>&1; then
+      file_info=$(file -b "$executable_path" 2>/dev/null)
+
+      case "$file_info" in
+          *aarch64*|*AArch64*|*ARM\ aarch64*)
+              arch="arm64"
+              ;;
+          *ARM*)
+              arch="arm"
+              ;;
+          *x86-64*|*x86_64*)
+              arch="x86_64"
+              ;;
+          *80386*)
+              arch="x86"
+              ;;
+      esac
+
+  # file 不存在时使用 hexdump
+  elif type hexdump >/dev/null 2>&1; then
+      elf_machine=$(hexdump -s 18 -n 2 -e '2/1 "%02x"' "$executable_path" 2>/dev/null)
+
+      case "$elf_machine" in
+          b700)
+              arch="arm64"
+              ;;
+          2800)
+              arch="arm"
+              ;;
+          3e00)
+              arch="x86_64"
+              ;;
+          0300)
+              arch="x86"
+              ;;
+      esac
+  fi
+
+  echo "$arch"
 }
 
 #=========================================
@@ -169,25 +349,9 @@ download_smartdns() {
   local raw_version
   raw_version=$(echo "$raw_version_info" | grep -oP 'Release\K[0-9.]+' || echo "$raw_version_info" | sed -n 's/.*Release\([0-9.]*\).*/\1/p')
 
-  # 2. 提取架构 (通过 file 命令解析 ELF 信息)
-  local file_info
-  file_info=$(file -b "$file_path")
-  local raw_arch="unknown"
-
-  case "$file_info" in
-      *aarch64*|*ARM\ aarch64*)
-          raw_arch="arm64"
-          ;;
-      *ARM*)
-          raw_arch="arm"
-          ;;
-      *x86-64*)
-          raw_arch="x86_64"
-          ;;
-      *80386*)
-          raw_arch="x86"
-          ;;
-  esac
+  # 2. 提取架构
+  local raw_arch
+  raw_arch=$(get_executable_arch "$file_path")
 
   print_warning "当前 smartdns 版本: ${raw_version} (${raw_arch})，目标版本: ${smartdns_version} (${arch})"
 

@@ -1187,3 +1187,13 @@ get_json_value() {
 
     [ -n "$value" ] && echo "$value" || echo "$default"
 }
+
+#=========================================
+# 检查是否在运行中
+#=========================================
+is_running() {
+  if [ -f "$PID_FILE" ]; then
+    return 0  # 运行中
+  fi
+  return 1  # 未运行
+}

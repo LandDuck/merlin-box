@@ -22,6 +22,8 @@ export default {
     comm_changePassword: 'api/change_password',
     comm_status: 'api/status',
     comm_delay: 'api/delay',
+    comm_remoteVersion: 'api/remote_version',
+    comm_update: 'api/update',
     comm_logout: 'api/logout',
     comm_stop: 'api/stop',
     comm_restart: 'api/restart',

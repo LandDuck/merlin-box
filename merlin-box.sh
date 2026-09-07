@@ -91,14 +91,16 @@ show_help() {
   $SCRIPT_NAME <command> [args]
 
 命令:
-  start        启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
-  stop         停止服务
-  restart      重启服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
-  server       启动WEBUI服务，子命令：start/stop/restart 默认start，可选参数: [port]
-  install      设置 merlin-box 开机自启
-  uninstall    卸载 merlin-box 开机自启
-  tool         工具命令
-  test         测试命令
+  start           启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
+  stop            停止服务
+  restart         重启服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
+  server          启动WEBUI服务，子命令：start/stop/restart 默认start，可选参数: [port]
+  update          更新merlin-box
+  remote_version  显示远程仓库最新版本
+  install         设置 merlin-box 开机自启
+  uninstall       卸载 merlin-box 开机自启
+  tool            工具命令
+  test            测试命令
 
 tool 子命令:
   compress_singbox   压缩 sing-box 可执行文件
@@ -205,8 +207,8 @@ start() {
       exit 1
   fi
 
-  # 如果存在 merlin-box 的 PID 文件，说明 merlin-box 已经在运行，先停止它
-  if [ -f "$PID_FILE" ]; then
+  # 如果存在 merlin-box 已经在运行，先停止它
+  if is_running; then
     print_warning "检测到 merlin-box 已经在运行，先停止它"
     stop
     sleep 2
@@ -558,6 +560,13 @@ main() {
       fi
 			restart "$2" "$3" "$4" "$5" "$6"
 			;;
+	  remote_version)
+      VERSION=$(get_github_latest_release "LandDuck/merlin-box")
+      print_warning "远程仓库最新版本: $VERSION"
+      ;;
+    update)
+      update
+      ;;
 		-h|--help)
 			show_help
 			;;

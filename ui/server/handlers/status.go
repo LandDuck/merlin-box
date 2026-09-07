@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -225,6 +226,35 @@ func Restart(w http.ResponseWriter, r *http.Request) {
 // RestartUI 重启 merlin-box-ui 服务
 func RestartUI(w http.ResponseWriter, r *http.Request) {
 	if err := runServiceScriptAsync("server", "restart"); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	httpHelper.ResponseSuccess[any](w, nil)
+}
+
+// RemoteVersion 返回远程版本信息
+func RemoteVersion(w http.ResponseWriter, r *http.Request) {
+	output, err := runServiceScript("remote_version")
+	if err != nil {
+		httpHelper.ResponseFailure(w, "获取远程版本信息失败: "+err.Error())
+		return
+	}
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	var version string
+
+	// 匹配 x.y.z 形式的版本号
+	re := regexp.MustCompile(`\b(\d+\.\d+\.\d+)\b`)
+	matches := re.FindStringSubmatch(lines[len(lines)-1])
+
+	if len(matches) > 1 {
+		version = matches[1]
+	}
+	httpHelper.ResponseSuccess(w, version)
+}
+
+// Update 更新 merlin-box 服务，并异步返回脚本输出日志
+func Update(w http.ResponseWriter, r *http.Request) {
+	if err := runServiceScriptAsync("update"); err != nil {
 		httpHelper.ResponseFailure(w, err.Error())
 		return
 	}

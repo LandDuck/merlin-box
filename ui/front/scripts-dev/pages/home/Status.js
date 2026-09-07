@@ -245,6 +245,30 @@ class Status extends React.Component {
      * 检查更新
      */
     #checkUpdate() {
+        this.$http.sendPost({
+            url: this.$config.apis.comm_remoteVersion,
+            success: (data) => {
+                if (!data || data.trim() === "") {
+                    this.$helper.warning("未获取到版本信息，请检查网络连接");
+                    return;
+                }
+                if (data.trim() === this.$config.data.version) {
+                    this.$helper.success("当前已是最新版本");
+                } else {
+                    this.$helper.showAlertLayer({
+                        title: "更新提示",
+                        content: `检测到新版本：${data.trim()}，是否更新？`,
+                        onCancel: () => {
+                            this.$helper.warning("已取消更新");
+                        },
+                        onOk: () => {
+                            //window.open("https://example.com/download");
+                            this.#runAction(this.$config.apis.comm_update, "正在更新");
+                        }
+                    });
+                }
+            }
+        });
         //this.#runAction(this.$config.apis.comm_checkUpdate, "正在检查更新");
     }
 
@@ -365,6 +389,12 @@ class Status extends React.Component {
                         }}>
                             <span className="icon-update"/>
                             更新规则
+                        </button>,
+                        <button className="btn-secondary" key={"check-update"} onClick={(e) => {
+                            this.#checkUpdate();
+                        }}>
+                            <span className="icon-check"/>
+                            检查更新
                         </button>
                     ]
                 }
