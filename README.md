@@ -22,7 +22,7 @@ This project aims to clearly separate responsibilities:
 
 ---
 
-# 📋 Current Features and Limitations
+# 📋 Features and Limitations
 
 <table>
   <thead>
@@ -159,6 +159,32 @@ This project aims to clearly separate responsibilities:
 - QUIC is part of UDP. Regardless of whether UDP proxy is enabled, the project adopts an interception scheme (DROP UDP 443), which means websites that rely on H3/QUIC will not be able to access via QUIC on the client side (usually falls back to TCP/TLS; some sites may fail to open or behave abnormally).
 - ⚠️ Device blacklist and whitelist functionality depends on whether device_blacklist.txt/device_whitelist.txt files exist. As long as the files exist, the script will enable the blacklist/whitelist functionality. If you do not need this feature, please delete these two files.
 - WEB UI is started using ./merlin-box.sh server, with the default port being 8080. You can specify a port when starting: ./merlin-box.sh server 8081. The default login username/password is admin/merlinbox.
+---
+
+# 🖥️ UI Preview
+
+<a href="ui/images/login.webp">
+  <img src="ui/images/login.webp" width="120" alt="登录界面">
+</a>
+<a href="ui/images/node.webp">
+  <img src="ui/images/node.webp" width="120" alt="节点管理">
+</a>
+<a href="ui/images/add.webp">
+  <img src="ui/images/add.webp" width="120" alt="添加节点">
+</a>
+<a href="ui/images/domain.webp">
+  <img src="ui/images/domain.webp" width="120" alt="域名黑白名单">
+</a>
+<a href="ui/images/ip4.webp">
+  <img src="ui/images/ip4.webp" width="120" alt="IPv4 黑白名单">
+</a>
+<a href="ui/images/ip6.webp">
+  <img src="ui/images/ip6.webp" width="120" alt="IPv6 黑白名单">
+</a>
+<a href="ui/images/mac.webp">
+  <img src="ui/images/mac.webp" width="120" alt="设备黑白名单">
+</a>
+
 ---
 
 # ⚙️ Core Execution Logic

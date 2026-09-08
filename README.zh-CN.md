@@ -21,7 +21,7 @@
 
 ---
 
-# 📋 当前功能与限制
+# 📋 功能与限制
 
 <table>
   <thead>
@@ -158,6 +158,32 @@
 - QUIC 属于 UDP，无论是否开启 UDP 代理，项目均采取拦截方案（DROP UDP 443），因此会导致依赖 H3/QUIC 的网站在客户端侧无法以 QUIC 访问（通常会回退到 TCP/TLS；个别站点可能表现为打不开或异常）。
 - ⚠️设备黑白名单功能依赖  device_blacklist.txt/device_whitelist.txt 文件是否存在，只要文件存在，脚本就会启用黑/白名单功能，如果不需要此功能，请删除这两个文件。
 - WEB UI 使用 ./merlin-box.sh server 启动，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081 。登录用户名密码默认为 admin/merlinbox。
+---
+
+# 🖥️ UI 预览
+
+<a href="ui/images/login.webp">
+  <img src="ui/images/login.webp" width="120" alt="登录界面">
+</a>
+<a href="ui/images/node.webp">
+  <img src="ui/images/node.webp" width="120" alt="节点管理">
+</a>
+<a href="ui/images/add.webp">
+  <img src="ui/images/add.webp" width="120" alt="添加节点">
+</a>
+<a href="ui/images/domain.webp">
+  <img src="ui/images/domain.webp" width="120" alt="域名黑白名单">
+</a>
+<a href="ui/images/ip4.webp">
+  <img src="ui/images/ip4.webp" width="120" alt="IPv4 黑白名单">
+</a>
+<a href="ui/images/ip6.webp">
+  <img src="ui/images/ip6.webp" width="120" alt="IPv6 黑白名单">
+</a>
+<a href="ui/images/mac.webp">
+  <img src="ui/images/mac.webp" width="120" alt="设备黑白名单">
+</a>
+
 ---
 
 # ⚙️ 核心运行逻辑
