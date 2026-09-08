@@ -223,6 +223,7 @@ smartdns 配置：
 - 入站：
     - SOCKS：`65001`（供 smartdns foreign 上游经代理解析）
     - TPROXY：`65002`（供透明代理接收）
+    - REDIRECT：`65003`（供路由自身经代理访问）
 - 出站：在 `conf/config.json` 自行配置
 
 sing-box（conf/config.json）配置参考：

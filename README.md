@@ -224,6 +224,7 @@ Optional whitelist files:
 - Inbound:
     - SOCKS: `65001` (for smartdns foreign upstream to resolve through proxy)
     - TPROXY: `65002` (for transparent proxy receiving)
+    - REDIRECT: `65003` (for the router itself to access through the proxy)
 - Outbound: Configure yourself in `conf/config.json`
 
 sing-box (conf/config.json) configuration reference:
