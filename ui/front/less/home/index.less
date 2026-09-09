@@ -204,5 +204,60 @@
 
 //----------红黑电竞风----------
 body.rog-rapture {
-
+  .home-index {
+    .rt-gradient {
+      background: radial-gradient(ellipse 70.71% 70.71% at 50.00% 50.00%, rgba(200, 16, 46, 0.10) 0%, rgba(200, 16, 46, 0) 70%) !important;
+    }
+    .lt-gradient {
+      background: radial-gradient(ellipse 70.71% 70.71% at 50.00% 50.00%, rgba(200, 16, 46, 0.10) 0%, rgba(200, 16, 46, 0) 70%) !important;
+    }
+    .login-card {
+      background-color: #18181C !important;
+      outline-color: rgba(255, 255, 255, .1) !important;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, .4) !important;
+    }
+    .login-title {
+      color: #F2F2F4 !important;
+    }
+    .login-subtitle {
+      color: #C4C4CC !important;
+    }
+    .login-input {
+      background-color: #18181C !important;
+      outline-color: rgba(255, 255, 255, .1) !important;
+      &:focus-within {
+        background-color: rgba(200, 16, 46, .08) !important;
+        outline-color: rgba(200, 16, 46, .65) !important;
+        box-shadow: 0 0 0 1px rgba(200, 16, 46, .25), 0 0 18px rgba(200, 16, 46, .25) !important;
+      }
+      &.error {
+        background-color: rgba(255, 0, 0, .08) !important;
+        outline-color: rgba(255, 0, 0, .65) !important;
+        box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25) !important;
+      }
+      input {
+        background-color: transparent !important;
+        color: #C4C4CC !important;
+        &::placeholder {
+          color: #888892 !important;
+        }
+      }
+    }
+    .login-button {
+      background-color: #C8102E !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 0 15px rgba(200, 16, 46, .2) !important;
+      &:hover {
+        background-color: #E32646 !important;
+        box-shadow: 0 0 24px rgba(200, 16, 46, .45) !important;
+      }
+      &:active {
+        background-color: #9E102A !important;
+        box-shadow: 0 0 10px rgba(200, 16, 46, .25) !important;
+      }
+      &:focus-visible {
+        outline-color: rgba(255, 113, 133, .8) !important;
+      }
+    }
+  }
 }

@@ -275,5 +275,105 @@
 
 //----------红黑电竞风----------
 body.rog-rapture {
-
+  .add-node-layer {
+    .nlc {
+      background-color: #202024 !important;
+      box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.50) !important;
+      outline-color: rgba(255, 255, 255, 0.10) !important;
+    }
+    .title {
+      color: #F2F2F4 !important;
+    }
+    .tab-group {
+      .tab-bar {
+        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+        a {
+          color: #C4C4CC !important;
+          border-bottom-color: transparent !important;
+          &:hover {
+            color: #F2F2F4 !important;
+            background-color: #18181C !important;
+          }
+          &.active {
+            color: #FF7185 !important;
+            border-bottom-color: #FF7185 !important;
+            background-color: rgba(200, 16, 46, 0.06) !important;
+          }
+        }
+      }
+      .tab-content {
+        .add-node-form {
+          .form-item {
+            label {
+              color: #C4C4CC !important;
+            }
+            .nlc-input {
+              background-color: #18181C !important;
+              outline-color: rgba(255, 255, 255, .1) !important;
+              &:focus-within {
+                background-color: rgba(200, 16, 46, .08) !important;
+                outline-color: rgba(200, 16, 46, .65) !important;
+                box-shadow: 0 0 0 1px rgba(200, 16, 46, .25), 0 0 18px rgba(200, 16, 46, .25) !important;
+              }
+              &.error {
+                background-color: rgba(255, 0, 0, .08) !important;
+                outline-color: rgba(255, 0, 0, .65) !important;
+                box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25) !important;
+              }
+              input, select {
+                background-color: transparent !important;
+                color: #C4C4CC !important;
+                option {
+                  background-color: #202024 !important;
+                  color: #C4C4CC !important;
+                }
+                &::placeholder {
+                  color: #888892 !important;
+                }
+              }
+            }
+            .form-help-tag {
+              background-color: rgba(200, 16, 46, .12) !important;
+              outline-color: rgba(200, 16, 46, .35) !important;
+              color: #FF9AAA !important;
+            }
+          }
+          .ant-select {
+            --ant-select-bg: #29292E !important;
+            --ant-select-selector-bg: #29292E !important;
+            --ant-select-clear-bg: #29292E !important;
+            outline-color: rgba(255, 255, 255, .1) !important;
+            &:focus-within {
+              --ant-select-bg: rgba(200, 16, 46, .08) !important;
+              --ant-select-selector-bg: rgba(200, 16, 46, .08) !important;
+              --ant-select-clear-bg: rgba(200, 16, 46, .08) !important;
+              outline-color: rgba(200, 16, 46, .65) !important;
+              box-shadow: 0 0 0 1px rgba(200, 16, 46, .25), 0 0 18px rgba(200, 16, 46, .25) !important;
+            }
+          }
+        }
+      }
+    }
+    .btn {
+      .btn-cancel {
+        color: #C4C4CC !important;
+        &:hover {
+          color: #ffffff !important;
+        }
+      }
+      .btn-ok {
+        background-color: #C8102E !important;
+        box-shadow: 0px 0px 15px rgba(200, 16, 46, 0.20) !important;
+        color: #FFFFFF !important;
+        &:hover {
+          background-color: #E32646 !important;
+          box-shadow: 0px 0px 24px rgba(200, 16, 46, 0.45) !important;
+        }
+        &:active {
+          background-color: #9E102A !important;
+          box-shadow: 0px 0px 10px rgba(200, 16, 46, 0.25) !important;
+        }
+      }
+    }
+  }
 }
