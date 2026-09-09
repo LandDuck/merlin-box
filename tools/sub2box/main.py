@@ -23,6 +23,7 @@
 import base64
 import ipaddress
 import json
+import os
 import re
 import socket
 import sys
@@ -536,7 +537,11 @@ if __name__ == "__main__":
         result = json.dumps(config, ensure_ascii=False, indent=2)
 
         if output_file:
-            with open(output_file, "w", encoding="utf-8") as f:
+            base_dir = os.path.realpath(os.getcwd())
+            resolved_path = os.path.realpath(os.path.join(base_dir, output_file))
+            if os.path.commonpath([base_dir, resolved_path]) != base_dir:
+                raise ValueError(f"非法输出路径: {output_file}")
+            with open(resolved_path, "w", encoding="utf-8") as f:
                 f.write(result)
             print_success(f"已保存到 {output_file}")
         else:
