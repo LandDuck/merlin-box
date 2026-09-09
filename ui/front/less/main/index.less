@@ -126,11 +126,18 @@
     padding: 32px 0;
     position: relative;
 
+    .theme-select {
+      width: 88px;
+      position: absolute;
+      right: 180px;
+      top: 10px;
+    }
+
     .logout-btn {
       position: absolute;
       right: 0;
       top: 10px;
-      padding: 8px 16px;
+      padding: 6px 14px;
       border-radius: 12px;
       background: rgba(255, 255, 255, .08);
       color: #DCE2F7;
@@ -142,7 +149,7 @@
       transition: .2s ease;
 
       &.change-pwd-btn {
-        right: 100px;
+        right: 90px;
       }
 
       &:hover {
@@ -1093,13 +1100,16 @@ body.rog-rapture {
     .tab-group {
       .tab-bar {
         border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+
         a {
           color: #C4C4CC !important;
           border-bottom-color: transparent !important;
+
           &:hover {
             color: #F2F2F4 !important;
             background-color: #18181C !important;
           }
+
           &.active {
             color: #FF7185 !important;
             border-bottom-color: #FF7185 !important;
@@ -1108,169 +1118,217 @@ body.rog-rapture {
         }
       }
     }
+
     .rt-gradient {
       background: radial-gradient(ellipse 70.71% 70.71% at 50.00% 50.00%, rgba(200, 16, 46, 0.10) 0%, rgba(200, 16, 46, 0) 70%) !important;
     }
+
     .lb-gradient {
       background: radial-gradient(ellipse 70.71% 70.71% at 50.00% 50.00%, rgba(200, 16, 46, 0.10) 0%, rgba(200, 16, 46, 0) 70%) !important;
     }
+
     .hero-header {
       .logout-btn {
         background-color: #1C1C20 !important;
         color: #F2F2F4 !important;
+
         &:hover {
           background-color: #29292E !important;
         }
       }
     }
+
     .hero-title {
       color: #F2F2F4 !important;
     }
+
     .hero-description {
       color: #C4C4CC !important;
     }
+
     .system-card {
       background-color: #1C1C20 !important;
       outline-color: rgba(255, 255, 255, .08) !important;
     }
+
     .stat-label {
       color: #C4C4CC !important;
     }
+
     .stat-value {
       color: #F2F2F4 !important;
+
       &.danger {
         color: #FFB4AB !important;
       }
     }
+
     .status-dot {
       background-color: #4AE176 !important;
     }
+
     .speed {
       color: #FF7185 !important;
     }
+
     .latency {
       color: #4AE176 !important;
     }
+
     .system-actions {
       border-top-color: rgba(255, 255, 255, .1) !important;
     }
+
     .btn-primary {
       background-color: #C8102E !important;
       color: #FFFFFF !important;
       box-shadow: 0 0 15px rgba(200, 16, 46, .3) !important;
+
       &:hover {
         background-color: #E32646 !important;
         box-shadow: 0 0 22px rgba(200, 16, 46, .45) !important;
       }
     }
+
     .btn-secondary {
       background-color: transparent !important;
       color: #F2F2F4 !important;
       border-color: rgba(255, 255, 255, .2) !important;
+
       &:hover {
         //background-color: #1C1C20 !important;
         background-color: rgba(255, 113, 133, 0.08) !important;
       }
     }
+
     .section-title {
       h2 {
         color: #F2F2F4 !important;
       }
     }
+
     .node-card {
       background-color: #1C1C20 !important;
       outline-color: rgba(255, 255, 255, .08) !important;
+
       &.node-active {
         outline-color: rgba(255, 113, 133, .3) !important;
         background-color: rgba(255, 113, 133, .08) !important;
       }
     }
+
     .node-icon {
       background-color: #18181C !important;
+
       &.active {
         background-color: rgba(255, 113, 133, .1) !important;
+
         span {
           background-color: transparent !important;
         }
       }
+
       span {
         background-color: transparent !important;
       }
     }
+
     .node-tag {
       color: #FFFFFF !important;
       background-color: #C8102E !important;
     }
+
     .node-name {
       color: #F2F2F4 !important;
     }
+
     .node-ip {
       color: #C4C4CC !important;
     }
+
     .node-action {
       color: #C4C4CC !important;
+
       &.primary {
         color: #FF7185 !important;
       }
     }
+
     .delete-icon {
       background-color: transparent !important;
     }
+
     .node-add {
       background-color: #1C1C20 !important;
       outline-color: rgba(255, 255, 255, .2) !important;
       color: #F2F2F4 !important;
+
       &:hover {
         background-color: #29292E !important;
       }
     }
+
     .add-icon {
       border-color: rgba(255, 255, 255, .3) !important;
+
       span {
         background-color: transparent !important;
       }
     }
+
     .domain-panel {
       background-color: #1C1C20 !important;
       outline-color: rgba(255, 255, 255, .08) !important;
     }
+
     .panel-title {
       h3 {
         color: #F2F2F4 !important;
       }
     }
+
     .title-icon {
       background-color: #C4C4CC !important;
     }
+
     .blacklist-icon {
       background-color: transparent !important;
     }
+
     .whitelist-icon {
       background-color: transparent !important;
     }
+
     .icon-host {
       background-color: transparent !important;
     }
+
     .base-config-icon {
       background-color: transparent !important;
     }
+
     .dns-config-icon {
       background-color: transparent !important;
     }
+
     .sinkhole-icon {
       background-color: transparent !important;
     }
+
     .domain-editor {
       color: #C4C4CC !important;
       background-color: rgba(10, 10, 12, .4) !important;
       border-color: rgba(255, 255, 255, .08) !important;
+
       &::placeholder {
         color: #888892 !important;
       }
+
       &:focus {
         border-color: rgba(255, 113, 133, .5) !important;
         box-shadow: 0 0 12px rgba(255, 113, 133, .15) !important;
       }
+
       &.error {
         border-color: rgba(255, 0, 0, .65) !important;
         background-color: rgba(255, 0, 0, .08) !important;
@@ -1278,51 +1336,64 @@ body.rog-rapture {
         box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25) !important;
       }
     }
+
     .hint {
       color: rgba(196, 196, 204, .6) !important;
     }
+
     .apply-button {
       background-color: #C8102E !important;
       color: #FFFFFF !important;
+
       &:hover {
         background-color: #E32646 !important;
       }
     }
+
     .device-control {
       background-color: #1C1C20 !important;
       outline-color: rgba(255, 255, 255, .08) !important;
     }
+
     .section-title {
       h2 {
         color: #F2F2F4 !important;
       }
     }
+
     .device-icon {
       background-color: transparent !important;
     }
+
     .device-hint {
       background-color: rgba(255, 113, 133, .08) !important;
       border-color: rgba(255, 113, 133, .2) !important;
+
       div {
         color: #C4C4CC !important;
       }
     }
+
     .device-group {
       label {
         color: #C4C4CC !important;
       }
     }
+
     .device-editor {
       background-color: rgba(10, 10, 12, .4) !important;
       border-color: rgba(255, 255, 255, .08) !important;
       color: #C4C4CC !important;
+
       &::placeholder {
         color: #888892 !important;
       }
+
       &:focus {
         border-color: rgba(255, 113, 133, .5) !important;
         box-shadow: 0 0 12px rgba(255, 113, 133, .15) !important;
       }
+
       &.error {
         border-color: rgba(255, 0, 0, .65) !important;
         background-color: rgba(255, 0, 0, .08) !important;
@@ -1330,12 +1401,15 @@ body.rog-rapture {
         box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 18px rgba(255, 0, 0, .25) !important;
       }
     }
+
     .device-footer {
       border-top-color: rgba(255, 255, 255, .05) !important;
     }
+
     .save-button {
       background-color: #C8102E !important;
       color: #FFFFFF !important;
+
       &:hover {
         background-color: #E32646 !important;
         box-shadow: 0 0 18px rgba(255, 113, 133, .35) !important;

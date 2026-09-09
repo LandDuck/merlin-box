@@ -26,10 +26,8 @@ class Storage {
      */
     constructor() {
         this.keys = {
-            signKey: "signKey",
             token: "token",
-            cipherText: "cipherText",
-            user: "user"
+            theme: "theme"
         }
     }
 

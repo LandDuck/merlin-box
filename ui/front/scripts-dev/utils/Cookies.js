@@ -61,9 +61,7 @@ class CookiesUtil {
      * @type {{}}
      */
     keys = {
-        signKey: "sign-key",
-        token: "token",
-        cipherText: "cipher-text"
+        token: "token"
     }
 }
 

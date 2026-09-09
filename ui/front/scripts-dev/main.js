@@ -62,7 +62,7 @@ window.React = React;
 import {Switch} from 'antd';
 import {Select} from 'antd';
 
-window.antd={};
+window.antd = {};
 window.antd.Switch = Switch;
 window.antd.Select = Select;
 
@@ -110,6 +110,16 @@ function main() {
     window.$http = http;
     React.Component.prototype.$http = http;
 
+    //主题
+    const theme = storage.get(storage.keys.theme);
+    try {
+        //console.log("当前主题: " + theme + "type: " + typeof theme);
+        if (parseInt(theme) === 1) {
+            $("body").addClass("rog-rapture");
+        }
+    } catch (e) {
+
+    }
     //全局初始化
     http.sendPost({
         url: config.apis.comm_init,

@@ -23,11 +23,25 @@ import DeviceControl from "./DeviceControl";
 import IPControl from "./IPControl";
 import BaseConfig from "./BaseConfig";
 import Copyright from "../comm/Copyright";
+import storage from "../../utils/Storage";
+import $ from "jquery";
 
 /**
  * ManagerPanel
  */
 class Main extends React.Component {
+
+
+    #themeOptions = [
+        {
+            "value": 0,
+            "label": "梅林蓝"
+        },
+        {
+            "value": 1,
+            "label": "电竞红"
+        }
+    ]
 
     /**
      * 构造方法
@@ -36,8 +50,17 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            theme: 0, //当前选中的主题
             current: "base" //当前选中的 tab
         };
+        //主题
+        const theme = storage.get(storage.keys.theme);
+        try {
+            if (parseInt(theme) === 1) {
+                this.state.theme = 1;
+            }
+        } catch (e) {
+        }
     }
 
     /**
@@ -58,6 +81,19 @@ class Main extends React.Component {
      */
     #changePassword() {
         this.$helper.showChangePwdLayer();
+    }
+
+    /**
+     * 设置主题
+     * @param theme
+     */
+    #setTheme(theme) {
+        this.$storage.set(this.$storage.keys.theme, theme.toString());
+        if (theme === 0) {
+            document.body.classList.remove("rog-rapture");
+        } else if (theme === 1) {
+            document.body.classList.add("rog-rapture");
+        }
     }
 
     /**
@@ -105,6 +141,17 @@ class Main extends React.Component {
                 <p className="hero-description">
                     基于 ASUSWRT-Merlin 路由器环境的 sing-box + smartdns 分流代理脚本方案。
                 </p>
+                <div className="theme-select">
+                    <antd.Select
+                        value={this.state.theme}
+                        style={{width: 88}}
+                        onChange={(val) => {
+                            this.setState({theme: val});
+                            this.#setTheme(val);
+                        }}
+                        options={this.#themeOptions}
+                    />
+                </div>
                 <a href="javascript:void(0);" className={"logout-btn change-pwd-btn"} onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
