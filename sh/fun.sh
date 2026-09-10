@@ -114,14 +114,22 @@ check_ipv6_support() {
 }
 
 # ==========================================
-# 检测并加载当前路由内核的 TPROXY 模块
+# 检测必要的 ipset 命令和 TPROXY 模块是否可用
 # 如果支持并加载成功返回0，否则返回1
 # 注意linux系统中，函数返回值为0表示成功，非0表示失败
 # ==========================================
 check_and_load_tproxy() {
-    print_normal "🔍 开始检测并加载 TPROXY 模块..."
+    print_normal "🔍 开始检测 ipset 命令并加载 TPROXY 模块..."
 
-    # 方法 A: 尝试直接加载 xt_TPROXY 模块
+    # 验证 ipset 是否存在，2026-9-11 01:54:46 测试一个官方固件时，发现 ipset 命令不存在
+    if type ipset >/dev/null 2>&1; then
+        print_success "✅ ipset 命令存在，继续检测 TPROXY 模块..."
+    else
+        print_error "❌ ipset 命令不存在，程序无法启动。"
+        return 1
+    fi
+
+    # 需要 xt_TPROXY 模块
     if modprobe xt_TPROXY >/dev/null 2>&1; then
         print_success "✅ xt_TPROXY 模块加载成功（或已处于加载状态），当前环境支持 TPROXY。"
         return 0
@@ -129,7 +137,7 @@ check_and_load_tproxy() {
 
     print_warning "⚠️ modprobe 直接加载失败，开始检查固件文件系统是否存在模块..."
 
-    # 方法 B: 检查文件系统中是否有 TPROXY 相关的 ko 文件
+    # 检查文件系统中是否有 TPROXY 相关的 ko 文件
     if find /lib/modules/$(uname -r) -type f -name '*TPROXY*' 2>/dev/null | grep -q .; then
         print_warning "⚠️ 找到 TPROXY 模块文件，但尝试加载时可能遇到内核版本不匹配或其他问题。"
     else

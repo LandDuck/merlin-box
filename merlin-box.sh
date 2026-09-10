@@ -317,6 +317,7 @@ test_debug() {
 
   #VERSION=$(get_github_latest_release "LandDuck/merlin-box")
   #print_warning "远程仓库最新版本: $VERSION"
+  #check_and_load_tproxy
 
 	:
 }
