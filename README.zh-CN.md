@@ -17,7 +17,15 @@
 
 > 💡 **点击下方缩略图观看视频演示：**
 
+- UI模式使用教程
+
+[![视频教程](https://img.youtube.com/vi/KaHPKXHDzBU/default.jpg)](https://youtu.be/KaHPKXHDzBU)
+
+- 脚本模式使用教程
+ 
 [![视频教程](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE&list=PLDyvs8NWsF2w)
+
+
 
 ---
 

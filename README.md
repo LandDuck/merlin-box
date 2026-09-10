@@ -18,7 +18,13 @@ This project aims to clearly separate responsibilities:
 
 > 💡 **Click the thumbnail below to watch the video demonstration:**
 
-[![Video Tutorial](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE&list=PLDyvs8NWsF2w)
+- Tutorial on Using WEB UI
+
+[![视频教程](https://img.youtube.com/vi/KaHPKXHDzBU/default.jpg)](https://youtu.be/KaHPKXHDzBU)
+
+- Tutorial on Using Script Mode
+
+[![视频教程](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE&list=PLDyvs8NWsF2w)
 
 ---
 
