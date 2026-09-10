@@ -39,7 +39,7 @@ class Helper {
 
     /**
      * setTheme
-     * value: 0-梅林蓝, 1-电竞红
+     * value: 0-梅林蓝, 1-电竞红, 2-暗夜黑, 3-晨曦白
      */
     setTheme(theme) {
         try {
@@ -49,6 +49,12 @@ class Helper {
             switch (theme) {
                 case 1:
                     $("body").attr("data-theme", "rog-rapture");
+                    break;
+                case 2:
+                    $("body").attr("data-theme", "dark-night");
+                    break;
+                case 3:
+                    $("body").attr("data-theme", "dawn-white");
                     break;
                 default :
                     $("body").attr("data-theme", "");//默认

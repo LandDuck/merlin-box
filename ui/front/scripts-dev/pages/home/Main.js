@@ -40,6 +40,14 @@ class Main extends React.Component {
         {
             "value": 1,
             "label": "电竞红"
+        },
+        {
+            "value": 2,
+            "label": "暗夜黑"
+        },
+        {
+            "value": 3,
+            "label": "晨曦白"
         }
     ]
 
@@ -54,10 +62,10 @@ class Main extends React.Component {
             current: "base" //当前选中的 tab
         };
         //主题
-        const theme = storage.get(storage.keys.theme);
         try {
-            if (parseInt(theme) === 1) {
-                this.state.theme = 1;
+            const theme = parseInt(storage.get(storage.keys.theme));
+            if (!isNaN(theme)) {
+                this.state.theme = theme;
             }
         } catch (e) {
         }
