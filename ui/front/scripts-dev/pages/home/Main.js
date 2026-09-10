@@ -89,11 +89,7 @@ class Main extends React.Component {
      */
     #setTheme(theme) {
         this.$storage.set(this.$storage.keys.theme, theme.toString());
-        if (theme === 0) {
-            document.body.classList.remove("rog-rapture");
-        } else if (theme === 1) {
-            document.body.classList.add("rog-rapture");
-        }
+        this.$helper.setTheme(theme)
     }
 
     /**

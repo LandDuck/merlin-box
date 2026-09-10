@@ -38,6 +38,27 @@ class Helper {
     }
 
     /**
+     * setTheme
+     * value: 0-梅林蓝, 1-电竞红
+     */
+    setTheme(theme) {
+        try {
+            if (theme === undefined || theme === null || isNaN(theme) || typeof (theme) !== "number") {
+                theme = parseInt($storage.get($storage.keys.theme));
+            }
+            switch (theme) {
+                case 1:
+                    $("body").attr("data-theme", "rog-rapture");
+                    break;
+                default :
+                    $("body").attr("data-theme", "");//默认
+                    break;
+            }
+        } catch (e) {
+        }
+    }
+
+    /**
      * 弹出添加节点弹窗
      * @param config
      */
@@ -399,13 +420,9 @@ class Helper {
         }
         let url = `${this.getBasePath()}scripts/pages/${controller}-${action}.js?v=${window.$config.data.version}`;
         $.ajax({
-            cache: true,
-            url: url,
-            dataType: "script",
-            success: () => {
+            cache: true, url: url, dataType: "script", success: () => {
                 this.runPage(params, 0);
-            },
-            error: () => {
+            }, error: () => {
                 this.loadPage("error", "404", params, ++count)
             }
         });

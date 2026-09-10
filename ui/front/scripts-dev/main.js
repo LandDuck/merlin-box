@@ -111,15 +111,8 @@ function main() {
     React.Component.prototype.$http = http;
 
     //主题
-    const theme = storage.get(storage.keys.theme);
-    try {
-        //console.log("当前主题: " + theme + "type: " + typeof theme);
-        if (parseInt(theme) === 1) {
-            $("body").addClass("rog-rapture");
-        }
-    } catch (e) {
+    helper.setTheme();
 
-    }
     //全局初始化
     http.sendPost({
         url: config.apis.comm_init,
