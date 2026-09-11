@@ -46,19 +46,35 @@ class Helper {
             if (theme === undefined || theme === null || isNaN(theme) || typeof (theme) !== "number") {
                 theme = parseInt($storage.get($storage.keys.theme));
             }
+            let themeColor = "#0C1322";
+            let colorScheme = "dark";
             switch (theme) {
                 case 1:
                     $("body").attr("data-theme", "rog-rapture");
+                    themeColor = "#0D0D0F";
                     break;
                 case 2:
                     $("body").attr("data-theme", "dark-night");
+                    themeColor = "#09090B";
                     break;
                 case 3:
                     $("body").attr("data-theme", "dawn-white");
+                    themeColor = "#F4F6FA";
+                    colorScheme = "light";
                     break;
                 default :
                     $("body").attr("data-theme", "");//默认
                     break;
+            }
+            // 地址栏配色与页面背景保持一致，同时同步浏览器原生控件的明暗风格。
+            for (const [name, content] of [["theme-color", themeColor], ["color-scheme", colorScheme]]) {
+                let meta = document.querySelector(`meta[name="${name}"]`);
+                if (!meta) {
+                    meta = document.createElement("meta");
+                    meta.name = name;
+                    document.head.appendChild(meta);
+                }
+                meta.content = content;
             }
         } catch (e) {
         }
