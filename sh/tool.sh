@@ -907,3 +907,241 @@ package() {
   print_success "✅ 打包完成: ${package_dir}/${package_name} 和 ${package_dir}/${package_name_noui}"
 
 }
+
+#=========================================
+# Merlin Box 环境兼容性检查
+#=========================================
+doctor() {
+
+    local ok_count=0
+    local warn_count=0
+    local fail_count=0
+
+    # 成功记数
+    check_ok() {
+        print_success "[OK]   $1"
+        ok_count=$((ok_count + 1))
+    }
+
+    # 警告记数
+    check_warn() {
+        print_warning "[WARN] $1"
+        warn_count=$((warn_count + 1))
+    }
+
+    # 失败记数
+    check_fail() {
+        print_error "[FAIL] $1"
+        fail_count=$((fail_count + 1))
+    }
+
+    print_normal ""
+    print_normal "System:"
+
+    # CPU 架构
+    local arch
+    arch="$(uname -m 2>/dev/null)"
+
+    case "$arch" in
+        aarch64|arm64)
+            check_ok "CPU架构: arm64"
+            ;;
+        armv7*|armv6*|arm)
+            check_ok "CPU架构: arm"
+            ;;
+        *)
+            check_warn "CPU架构: ${arch:-unknown}"
+            ;;
+    esac
+
+    # 内存
+    if [ -r /proc/meminfo ]; then
+        local mem_kb mem_mb
+        mem_kb="$(awk '/MemTotal:/ {print $2}' /proc/meminfo)"
+        mem_mb=$((mem_kb / 1024))
+
+        if [ "$mem_mb" -ge 900 ]; then
+            check_ok "内存: ${mem_mb} MB"
+        elif [ "$mem_mb" -ge 450 ]; then
+            check_warn "内存: ${mem_mb} MB (相对有限)"
+        else
+            check_fail "内存: ${mem_mb} MB (过低)"
+        fi
+    else
+        check_warn "内存: 无法检测"
+    fi
+
+    print_normal ""
+    print_normal "Commands:"
+
+    # iptables
+    if type iptables >/dev/null 2>&1; then
+        check_ok "iptables"
+    else
+        check_fail "未找到 iptables"
+    fi
+
+    # ip6tables
+    if type ip6tables >/dev/null 2>&1; then
+        check_ok "ip6tables"
+    else
+        check_warn "未找到 ip6tables"
+    fi
+
+    # ipset
+    if type ipset >/dev/null 2>&1; then
+        check_ok "ipset"
+    else
+        check_fail "未找到 ipset"
+    fi
+
+    # ip
+    if type ip >/dev/null 2>&1; then
+        check_ok "ip"
+    else
+        check_fail "未找到 ip 命令"
+    fi
+
+    # nvram
+    if type nvram >/dev/null 2>&1; then
+        check_ok "nvram"
+    else
+        check_warn "未找到 nvram"
+    fi
+
+    print_normal ""
+    print_normal "Netfilter:"
+
+    # xt_set / iptables set match
+    if type iptables >/dev/null 2>&1; then
+        if iptables -m set -h >/dev/null 2>&1; then
+            check_ok "iptables set match"
+        else
+            check_fail "不支持 iptables set match"
+        fi
+    fi
+
+    # TPROXY target
+    if type iptables >/dev/null 2>&1; then
+        if iptables -j TPROXY -h >/dev/null 2>&1; then
+            check_ok "TPROXY 支持"
+        else
+            check_fail "不支持 TPROXY"
+        fi
+    fi
+
+    # REDIRECT
+    if type iptables >/dev/null 2>&1; then
+        if iptables -j REDIRECT -h >/dev/null 2>&1; then
+            check_ok "REDIRECT 支持"
+        else
+            check_warn "不支持 REDIRECT"
+        fi
+    fi
+
+    # policy routing
+    if type ip >/dev/null 2>&1; then
+        if ip rule show >/dev/null 2>&1; then
+            check_ok "策略路由 (ip rule)"
+        else
+            check_fail "不支持策略路由"
+        fi
+    fi
+
+    print_normal ""
+    print_normal "Filesystem:"
+
+    # /jffs
+    if [ -d /jffs ]; then
+        if [ -w /jffs ]; then
+            check_ok "/jffs 可写"
+        else
+            check_fail "/jffs 存在但不可写"
+        fi
+    else
+        check_fail "/jffs 未找到"
+    fi
+
+    # /jffs/scripts
+    if [ -d /jffs/scripts ]; then
+        check_ok "/jffs/scripts"
+    else
+        check_warn "/jffs/scripts 未找到"
+    fi
+
+    print_normal ""
+    print_normal "Kernel:"
+
+    # IPv6
+    if [ -f /proc/net/if_inet6 ]; then
+        check_ok "IPv6 内核支持"
+    else
+        check_warn "IPv6 不可用"
+    fi
+
+    # TCP Fast Open
+    local kernel_version
+    local major
+    local minor
+    local tfo
+
+    kernel_version="$(uname -r 2>/dev/null)"
+    major="$(echo "$kernel_version" | cut -d. -f1)"
+    minor="$(echo "$kernel_version" | cut -d. -f2)"
+
+    # TCP_FASTOPEN_CONNECT requires Linux 4.11+
+    if [ "$major" -lt 4 ] || { [ "$major" -eq 4 ] && [ "$minor" -lt 11 ]; }; then
+        check_warn "TCP Fast Open: sing-box 不可用 (kernel ${kernel_version}, 需要 Linux 4.11+)"
+    else
+        check_ok "TCP Fast Open 内核支持 (kernel ${kernel_version})"
+        if [ -r /proc/sys/net/ipv4/tcp_fastopen ]; then
+            tfo="$(cat /proc/sys/net/ipv4/tcp_fastopen 2>/dev/null)"
+
+            if [ -n "$tfo" ]; then
+                check_ok "TCP Fast Open: ${tfo}"
+            else
+                check_warn "TCP Fast Open: 无法读取状态"
+            fi
+        else
+            check_warn "TCP Fast Open 不可用"
+        fi
+    fi
+
+    print_normal ""
+    print_normal "Firmware:"
+
+    # 打印路由器型号和固件版本信息
+    local buildno extendno
+    if type nvram >/dev/null 2>&1; then
+        local productid buildno extendno firmver
+        productid="$(nvram get productid 2>/dev/null)"
+        firmver="$(nvram get firmver 2>/dev/null)"
+        buildno="$(nvram get buildno 2>/dev/null)"
+        extendno="$(nvram get extendno 2>/dev/null)"
+
+        [ -n "$productid" ] && echo "型号: $productid"
+        [ -n "$firmver" ] && echo "固件: $firmver"
+        [ -n "$buildno" ] && echo "编译: $buildno"
+        [ -n "$extendno" ] && echo "扩展: $extendno"
+        if [ "$(nvram get 3rd-party 2>/dev/null)" = "merlin" ]; then
+            check_ok "检测到 Asuswrt-Merlin"
+        else
+            check_warn "无法确认 Asuswrt-Merlin"
+        fi
+    fi
+
+
+    print_normal ""
+    print_normal "Result"
+    print_success "OK:   $ok_count"
+    print_warning "WARN: $warn_count"
+    print_error "FAIL: $fail_count"
+
+    if [ "$fail_count" -eq 0 ]; then
+        print_success "环境与 Merlin Box 兼容。"
+        return 0
+    else
+        print_error "环境似乎存在兼容性问题。"
+        return 1
+    fi
+}

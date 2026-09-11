@@ -99,6 +99,7 @@ show_help() {
   remote_version  显示远程仓库最新版本
   install         设置 merlin-box 开机自启
   uninstall       卸载 merlin-box 开机自启
+  doctor          检查环境兼容性
   tool            工具命令
   test            测试命令
 
@@ -614,6 +615,9 @@ main() {
       ;;
     update)
       update
+      ;;
+    doctor)
+      doctor
       ;;
 		-h|--help)
 			show_help
