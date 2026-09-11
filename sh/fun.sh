@@ -550,16 +550,24 @@ setup_lan_tproxy()
         iptables -t mangle -A "$MB_PROXY_CHAIN" -p udp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
     fi
 
-    # 5. 主链去重清理与排除 DNS 53 - 保持不变
+    # 5. 主链去重清理并排除 DNS 53 / DHCP 67/68
+    # 53
     iptables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
     iptables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
+    # 67/68
+    iptables -t mangle -D PREROUTING -i br0 -p udp --dport 67:68 -j RETURN 2>/dev/null
+    # 代理流量
     iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null
-    #--
+
+    #排除 DNS
     iptables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
     #UDP 支持
     if [ "$MB_ENABLE_UDP" = "1" ]; then
         iptables -t mangle -A PREROUTING -i br0 -p udp --dport 53 -j RETURN
     fi
+    # 排除 DHCPv4
+    iptables -t mangle -A PREROUTING -i br0 -p udp --dport 67:68 -j RETURN
+    # 其余流量进入代理链
     iptables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN"
 
     #print_line "lan tproxy setup complete"
@@ -616,16 +624,24 @@ setup_lan_tproxy_ipv6()
         ip6tables -t mangle -A "$MB_PROXY_CHAIN_V6" -p udp -j TPROXY --on-port "$MB_TPROXY_PORT" --tproxy-mark "$MB_FWMARK"
     fi
 
-    # 5. 主链去重清理与排除 TCP DNS 53
+    # 5. 主链去重清理，并排除 DNS 53 / DHCPv6 546/547
+    # 53
     ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
     ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
+    # 546/547
+    ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 546:547 -j RETURN 2>/dev/null
+    # 代理流量
     ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
-    #--
+
+    # 排除 DNS
     ip6tables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
     # UDP 支持
     if [ "$MB_ENABLE_UDP" = "1" ]; then
         ip6tables -t mangle -A PREROUTING -i br0 -p udp --dport 53 -j RETURN
     fi
+    # 排除 DHCPv6
+    ip6tables -t mangle -A PREROUTING -i br0 -p udp --dport 546:547 -j RETURN
+    # 其余流量进入代理链
     ip6tables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6"
 
     #print_line "lan tproxy v6 setup complete"
