@@ -191,6 +191,19 @@
 <a href="ui/images/mac.webp">
   <img src="ui/images/mac.webp" width="120" alt="设备黑白名单">
 </a>
+<br />
+<a href="ui/images/merlin-blue.webp">
+  <img src="ui/images/merlin-blue.webp" width="120" alt="梅林蓝">
+</a>
+<a href="ui/images/rog-rapture.webp">
+  <img src="ui/images/rog-rapture.webp" width="120" alt="电竞红">
+</a>
+<a href="ui/images/dark-night.webp">
+  <img src="ui/images/dark-night.webp" width="120" alt="暗夜黑">
+</a>
+<a href="ui/images/dawn-white.webp">
+  <img src="ui/images/dawn-white.webp" width="120" alt="晨曦白">
+</a>
 
 ---
 
