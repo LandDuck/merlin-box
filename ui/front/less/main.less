@@ -493,6 +493,101 @@ body[data-theme="dawn-white"] {
   }
 }
 
+//兼容手机
+@media screen and (max-width: 768px) {
+  // 沿用桌面层次缩小尺寸；细边框保留，文字最小 12px。
+  .css-var-root {
+    --ant-select-selector-box-shadow: 0 0 0 2px rgba(0, 56, 92, 0.18) !important;
+  }
+
+  body {
+    padding: 0px;
+    margin: 0px;
+    font-size: 14px !important;
+  }
+
+  p {
+    margin: 0px 0px 0px 0px;
+  }
+
+  .height1 {
+    .size(100%, 1px);
+  }
+
+  .height5 {
+    .size(100%, 4px);
+  }
+
+  .height10 {
+    .size(100%, 8px);
+  }
+
+  .height15 {
+    .size(100%, 11px);
+  }
+
+  .height20 {
+    .size(100%, 15px);
+  }
+
+  .height25 {
+    .size(100%, 19px);
+  }
+
+  .height30 {
+    .size(100%, 23px);
+  }
+
+  .height35 {
+    .size(100%, 26px);
+  }
+
+  .height40 {
+    .size(100%, 30px);
+  }
+
+  .height45 {
+    .size(100%, 34px);
+  }
+
+  .height50 {
+    .size(100%, 38px);
+  }
+
+  .nodata {
+    padding-bottom: 11px;
+  }
+
+  .no-data {
+    padding-top: 23px;
+    padding-bottom: 23px;
+    font-size: 14px;
+  }
+
+  .copyright {
+    padding-top: 8px;
+    font-size: 12px;
+  }
+
+  body[data-theme="rog-rapture"] {
+    &.css-var-root, .css-var-root {
+      --ant-select-selector-box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.18) !important;
+    }
+  }
+
+  body[data-theme="dark-night"] {
+    &.css-var-root, .css-var-root {
+      --ant-select-selector-box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.18) !important;
+    }
+  }
+
+  body[data-theme="dawn-white"] {
+    &.css-var-root, .css-var-root {
+      --ant-select-selector-box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18) !important;
+    }
+  }
+}
+
 @import "./home/index";
 @import "./main/index";
 @import "./layer/index";

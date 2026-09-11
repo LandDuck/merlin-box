@@ -341,6 +341,9 @@
     cursor: pointer;
 
     transition: .2s ease;
+    span{
+      background-size: 100% 100%;
+    }
   }
 
 
@@ -2185,6 +2188,660 @@ body[data-theme="dawn-white"] {
     .btn-primary {
       .icon-play, .icon-reboot, .icon-update, .icon-check, .icon-stop {
         filter: brightness(0) invert(1) !important;
+      }
+    }
+  }
+}
+
+//兼容手机
+@media screen and (max-width: 768px) {
+  // 沿用桌面层次缩小尺寸；细边框保留，文字最小 12px。
+  .home-main {
+    padding: 0 12px;
+
+    .tab-group {
+      margin-bottom: 18px;
+      min-width: 0;
+
+      .tab-bar {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 15px;
+        gap: 3px;
+        justify-content: flex-start;
+        overflow-x: auto;
+
+        a {
+          font-size: 12px;
+          line-height: 20px;
+          border-bottom: 2px solid transparent;
+          margin-bottom: -1px;
+          border-radius: 3px 3px 0 0;
+          padding: 8px 12px;
+        }
+      }
+    }
+
+    .base-config {
+      .domain-editor {
+        height: auto;
+
+        .item {
+          margin-bottom: 12px;
+          height: auto;
+          min-height: 32px;
+          gap: 8px;
+
+          .item-name {
+            width: 84px;
+          }
+        }
+      }
+    }
+
+    .inner {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .mb-item {
+      margin-bottom: 18px;
+    }
+
+    .rt-gradient {
+      border-radius: 9999px;
+      width: 100%;
+      height: 320px;
+      right: 0;
+      top: 0;
+    }
+
+    .lb-gradient {
+      border-radius: 9999px;
+      width: 100%;
+      height: 320px;
+      left: 0;
+      bottom: 0;
+    }
+
+    .hero-header {
+      gap: 6px;
+      padding: 56px 0 24px;
+
+      .theme-select {
+        width: 80px;
+        right: 160px;
+        top: 8px;
+      }
+
+      .logout-btn {
+        border-radius: 9px;
+        top: 8px;
+        padding: 6px 10px;
+        font-size: 12px;
+        line-height: 20px;
+
+        &.change-pwd-btn {
+          right: 80px;
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+    }
+
+    .hero-title {
+      font-size: 28px;
+      line-height: 36px;
+      overflow-wrap: anywhere;
+    }
+
+    .hero-description {
+      font-size: 14px;
+      line-height: 20px;
+      width: 100%;
+    }
+
+    .system-card {
+      padding: 18px;
+      gap: 18px;
+      border-radius: 9px;
+      outline: 1px solid rgba(255, 255, 255, .08);
+      outline-offset: -1px;
+      backdrop-filter: blur(7px);
+    }
+
+    .system-status {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .system-stat {
+      gap: 3px;
+
+      &:nth-child(2) {
+        display: none;
+      }
+
+      &:last-child, &:nth-last-child(2), &:nth-last-child(3) {
+        width: auto;
+      }
+    }
+
+    .stat-label {
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: 0.6px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .status {
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+    }
+
+    .system-actions {
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, .1);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-primary, .btn-secondary {
+      border-radius: 9px;
+      height: 40px;
+      padding: 0 12px;
+      gap: 6px;
+      font-size: 12px;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      box-shadow: 0 0 11px rgba(14, 165, 255, .3);
+
+      &:hover {
+        box-shadow: 0 0 17px rgba(14, 165, 255, .45);
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+
+    .btn-secondary {
+      border: 1px solid rgba(255, 255, 255, .2);
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+
+    .icon-play {
+      width: 8px;
+      height: 9px;
+    }
+
+    .icon-reboot {
+      width: 10px;
+      height: 10px;
+    }
+
+    .icon-update {
+      width: 13px;
+      height: 10px;
+    }
+
+    .icon-check {
+      width: 15px;
+      height: 15px;
+    }
+
+    .icon-stop {
+      width: 10px;
+      height: 10px;
+    }
+
+    .node-network {
+      gap: 8px;
+    }
+
+    .section-title {
+      gap: 9px;
+
+      h2 {
+        font-size: 18px;
+        line-height: 24px;
+      }
+    }
+
+    .section-icon {
+      width: 18px;
+      height: 17px;
+    }
+
+    .node-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .node-card {
+      gap: 2px;
+      border-radius: 9px;
+      outline: 1px solid rgba(255, 255, 255, .08);
+      outline-offset: -1px;
+      backdrop-filter: blur(7px);
+      min-width: 0;
+      padding: 10px;
+    }
+
+    .node-top {
+      flex-wrap: wrap;
+      gap: 4px;
+
+      .tags {
+        gap: 3px;
+        flex-wrap: wrap;
+        min-width: 0;
+      }
+    }
+
+    .node-icon {
+      width: 21px;
+      height: 21px;
+      border-radius: 6px;
+      flex-shrink: 0;
+
+      span {
+        width: 11px;
+        height: 11px;
+      }
+    }
+
+    .node-tag {
+      border-radius: 3px;
+      font-size: 12px;
+      padding: 2px 4px;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .node-name {
+      padding-top: 5px;
+      font-size: 12px;
+      line-height: 17px;
+      overflow-wrap: anywhere;
+    }
+
+    .node-ip {
+      font-size: 12px;
+      line-height: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .node-actions {
+      padding-top: 6px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .node-action {
+      gap: 3px;
+      font-size: 12px;
+    }
+
+    .delete-icon {
+      width: 8px;
+      height: 9px;
+    }
+
+    .node-add {
+      gap: 6px;
+      padding: 9px;
+      border-radius: 9px;
+      outline: 1px solid rgba(255, 255, 255, .2);
+      outline-offset: -1px;
+      font-size: 12px;
+      min-width: 0;
+      min-height: 120px;
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+
+    .add-icon {
+      width: 24px;
+      height: 24px;
+      border: 1px dashed rgba(255, 255, 255, .3);
+
+      span {
+        width: 11px;
+        height: 11px;
+      }
+    }
+
+    .domain-config {
+      gap: 18px;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .domain-panel {
+      padding: 18px;
+      border-radius: 9px;
+      outline: 1px solid rgba(255, 255, 255, .08);
+      outline-offset: -1px;
+      backdrop-filter: blur(7px);
+      min-width: 0;
+    }
+
+    .panel-title {
+      gap: 9px;
+      padding-bottom: 12px;
+
+      h3 {
+        font-size: 16px;
+        line-height: 23px;
+      }
+    }
+
+    .blacklist-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .whitelist-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .icon-host {
+      width: 15px;
+      height: 15px;
+    }
+
+    .base-config-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .dns-config-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .sinkhole-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .domain-editor {
+      padding: 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      font-size: 12px;
+      line-height: 17px;
+      width: 100%;
+      min-width: 0;
+      height: 220px;
+
+      &:focus {
+        box-shadow: 0 0 9px rgba(151, 203, 255, .15);
+      }
+
+      &.error {
+        box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 14px rgba(255, 0, 0, .25);
+      }
+
+      &::-webkit-scrollbar {
+        width: 0px;
+        height: 0px;
+      }
+    }
+
+    .panel-footer {
+      padding-top: 9px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hint {
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .apply-button {
+      padding: 9px 18px;
+      border-radius: 9px;
+      font-size: 12px;
+      line-height: 16px;
+      min-width: 75px;
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+
+    .device-control {
+      padding: 18px;
+      gap: 18px;
+      border-radius: 9px;
+      outline: 1px solid rgba(255, 255, 255, .08);
+      outline-offset: -1px;
+      backdrop-filter: blur(7px);
+    }
+
+    .section-title {
+      gap: 9px;
+
+      h2 {
+        font-size: 18px;
+        line-height: 24px;
+      }
+    }
+
+    .device-icon {
+      width: 12px;
+      height: 15px;
+    }
+
+    .device-hint {
+      padding: 9px 12px;
+      border: 1px solid rgba(151, 203, 255, .2);
+      border-radius: 8px;
+      gap: 5px;
+
+      div {
+        font-size: 12px;
+        line-height: 16px;
+      }
+    }
+
+    .device-config {
+      gap: 15px;
+      flex-direction: column;
+    }
+
+    .device-group {
+      gap: 6px;
+      min-width: 0;
+
+      label {
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0.4px;
+      }
+    }
+
+    .device-editor {
+      padding: 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, .08);
+      font-size: 12px;
+      line-height: 16px;
+      width: 100%;
+      min-width: 0;
+      height: 192px;
+
+      &:focus {
+        box-shadow: 0 0 9px rgba(151, 203, 255, .15);
+      }
+
+      &.error {
+        box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 14px rgba(255, 0, 0, .25);
+      }
+
+      &::-webkit-scrollbar {
+        width: 0px;
+        height: 0px;
+      }
+    }
+
+    .device-footer {
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, .05);
+      flex-wrap: wrap;
+      row-gap: 8px;
+
+      button:nth-last-child(2) {
+        margin-right: 9px;
+      }
+    }
+
+    .save-button {
+      padding: 9px 24px;
+      border-radius: 9px;
+      font-size: 14px;
+      line-height: 20px;
+
+      &:hover {
+        box-shadow: 0 0 14px rgba(151, 203, 255, .35);
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+
+  body[data-theme="rog-rapture"] {
+    .home-main {
+      .btn-primary {
+        box-shadow: 0 0 11px rgba(200, 16, 46, .3) !important;
+
+        &:hover {
+          box-shadow: 0 0 17px rgba(200, 16, 46, .45) !important;
+        }
+      }
+
+      .domain-editor {
+        &:focus {
+          box-shadow: 0 0 9px rgba(255, 113, 133, .15) !important;
+        }
+
+        &.error {
+          box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 14px rgba(255, 0, 0, .25) !important;
+        }
+      }
+
+      .device-editor {
+        &:focus {
+          box-shadow: 0 0 9px rgba(255, 113, 133, .15) !important;
+        }
+
+        &.error {
+          box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 14px rgba(255, 0, 0, .25) !important;
+        }
+      }
+
+      .save-button {
+        &:hover {
+          box-shadow: 0 0 14px rgba(255, 113, 133, .35) !important;
+        }
+      }
+    }
+  }
+
+  body[data-theme="dark-night"] {
+    .home-main {
+      .btn-primary {
+        box-shadow: 0 0 11px rgba(99, 102, 241, .3) !important;
+
+        &:hover {
+          box-shadow: 0 0 17px rgba(99, 102, 241, .45) !important;
+        }
+      }
+
+      .domain-editor {
+        &:focus {
+          box-shadow: 0 0 9px rgba(165, 180, 252, .15) !important;
+        }
+
+        &.error {
+          box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 14px rgba(255, 0, 0, .25) !important;
+        }
+      }
+
+      .device-editor {
+        &:focus {
+          box-shadow: 0 0 9px rgba(165, 180, 252, .15) !important;
+        }
+
+        &.error {
+          box-shadow: 0 0 0 1px rgba(255, 0, 0, .25), 0 0 14px rgba(255, 0, 0, .25) !important;
+        }
+      }
+
+      .save-button {
+        &:hover {
+          box-shadow: 0 0 14px rgba(165, 180, 252, .35) !important;
+        }
+      }
+    }
+  }
+
+  body[data-theme="dawn-white"] {
+    .home-main {
+      .btn-primary {
+        box-shadow: 0 0 11px rgba(37, 99, 235, .3) !important;
+
+        &:hover {
+          box-shadow: 0 0 17px rgba(37, 99, 235, .45) !important;
+        }
+      }
+
+      .domain-editor {
+        &:focus {
+          box-shadow: 0 0 9px rgba(37, 99, 235, .15) !important;
+        }
+
+        &.error {
+          box-shadow: 0 0 0 1px rgba(220, 38, 38, .25), 0 0 14px rgba(220, 38, 38, .25) !important;
+        }
+      }
+
+      .device-editor {
+        &:focus {
+          box-shadow: 0 0 9px rgba(37, 99, 235, .15) !important;
+        }
+
+        &.error {
+          box-shadow: 0 0 0 1px rgba(220, 38, 38, .25), 0 0 14px rgba(220, 38, 38, .25) !important;
+        }
+      }
+
+      .save-button {
+        &:hover {
+          box-shadow: 0 0 14px rgba(37, 99, 235, .35) !important;
+        }
       }
     }
   }

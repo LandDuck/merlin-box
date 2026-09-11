@@ -70,12 +70,14 @@
     .animation-delay(0.3s);
   }
 }
+
 //----------红黑电竞风----------
 body[data-theme="rog-rapture"] {
   .custom-loading {
     &.mask {
       background-color: rgba(13, 13, 15, 0.6) !important;
     }
+
     span {
       background-color: #C8102E !important;
     }
@@ -88,6 +90,7 @@ body[data-theme="dark-night"] {
     &.mask {
       background-color: rgba(13, 13, 15, 0.6) !important;
     }
+
     span {
       background-color: #5558DB !important;
     }
@@ -100,8 +103,33 @@ body[data-theme="dawn-white"] {
     &.mask {
       background-color: rgba(244, 246, 250, 0.78) !important;
     }
+
     span {
       background-color: #2563EB !important;
+    }
+  }
+}
+
+//兼容手机
+@media screen and (max-width: 768px) {
+  // 沿用桌面层次缩小尺寸；细边框保留，文字最小 12px。
+  .custom-loading {
+    > div {
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    &.mask {
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+
+    span {
+      height: 11px;
+      width: 11px;
+      border-radius: 15px;
+      margin-right: 2px;
+      margin-left: 2px;
     }
   }
 }

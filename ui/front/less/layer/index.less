@@ -171,6 +171,47 @@ body[data-theme="dawn-white"] {
   }
 }
 
+//兼容手机
+@media screen and (max-width: 768px) {
+  // 沿用桌面层次缩小尺寸；细边框保留，文字最小 12px。
+  #ns-layer-out, .ns-layer-out {
+    left: 0px;
+    top: 0px;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .ns-layer {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding: 12px;
+
+    .nlc {
+      max-width: 100%;
+      min-width: 0;
+      max-height: calc(100dvh - 24px);
+      overflow-wrap: anywhere;
+
+      .comm-title {
+        font-size: 22px;
+        line-height: 28px;
+      }
+
+      .comm-close {
+        right: 27px;
+        width: 12px;
+        height: 12px;
+        top: 11px;
+
+        img {
+          width: 12px;
+          height: 12px;
+        }
+      }
+    }
+  }
+}
+
 @import "../dialog/alert-layer.less";
 @import "../dialog/input-layer.less";
 @import "../dialog/log-layer.less";
