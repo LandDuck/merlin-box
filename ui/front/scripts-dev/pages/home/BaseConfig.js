@@ -293,7 +293,7 @@ class BaseConfig extends React.Component {
                         <div className="item-comp">
                             <antd.Select
                                 value={this.state.tcpFastOpen}
-                                style={{width: 150}}
+                                style={{width: "100%"}}
                                 onChange={(val) => {
                                     this.setState({tcpFastOpen: val});
                                     this.#saveWith({tcpFastOpen: val});
@@ -317,7 +317,7 @@ class BaseConfig extends React.Component {
                         <div className="item-comp">
                             <antd.Select
                                 value={this.state.dnsChina1}
-                                style={{width: 230}}
+                                style={{width: "100%"}}
                                 onChange={(val) => {
                                     this.setState({dnsChina1: val});
                                     this.#saveWith({dnsChina1: val});
@@ -333,7 +333,7 @@ class BaseConfig extends React.Component {
                         <div className="item-comp">
                             <antd.Select
                                 value={this.state.dnsChina2}
-                                style={{width: 230}}
+                                style={{width: "100%"}}
                                 onChange={(val) => {
                                     this.setState({dnsChina2: val});
                                     this.#saveWith({dnsChina2: val});
@@ -349,7 +349,7 @@ class BaseConfig extends React.Component {
                         <div className="item-comp">
                             <antd.Select
                                 value={this.state.dnsForeign1}
-                                style={{width: 230}}
+                                style={{width: "100%"}}
                                 onChange={(val) => {
                                     this.setState({dnsForeign1: val});
                                     this.#saveWith({dnsForeign1: val});
@@ -365,7 +365,7 @@ class BaseConfig extends React.Component {
                         <div className="item-comp">
                             <antd.Select
                                 value={this.state.dnsForeign2}
-                                style={{width: 230}}
+                                style={{width: "100%"}}
                                 onChange={(val) => {
                                     this.setState({dnsForeign2: val});
                                     this.#saveWith({dnsForeign2: val});

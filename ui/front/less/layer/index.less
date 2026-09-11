@@ -48,9 +48,13 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding-left: 20px;
+  padding-right: 20px;
 
   .nlc {
-
+    max-height: 90vh;
+    overflow: hidden;
+    overflow-y: auto;
     position: relative;
     /*padding-left: 20px;
     padding-right: 20px;*/
@@ -105,10 +109,12 @@ body[data-theme="rog-rapture"] {
   #ns-layer-out, .ns-layer-out {
     background-color: rgb(0 0 0 / 0.72) !important;
   }
+
   .ns-layer {
     .nlc {
       .comm-title {
         color: #ffffff !important;
+
         &.dark {
           color: #F2F2F4 !important;
         }
@@ -122,10 +128,12 @@ body[data-theme="dark-night"] {
   #ns-layer-out, .ns-layer-out {
     background-color: rgb(0 0 0 / 0.72) !important;
   }
+
   .ns-layer {
     .nlc {
       .comm-title {
         color: #ffffff !important;
+
         &.dark {
           color: #F4F4F5 !important;
         }
@@ -139,10 +147,12 @@ body[data-theme="dawn-white"] {
   #ns-layer-out, .ns-layer-out {
     background-color: rgb(15 23 42 / 0.36) !important;
   }
+
   .ns-layer {
     .nlc {
       .comm-title {
         color: #1E293B !important;
+
         &.dark {
           color: #1E293B !important;
         }
@@ -153,7 +163,9 @@ body[data-theme="dawn-white"] {
   .ns-layer {
     .nlc {
       .comm-close {
-        img { filter: brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg) !important; }
+        img {
+          filter: brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg) !important;
+        }
       }
     }
   }

@@ -17,6 +17,7 @@
  */
 
 .home-main {
+  padding: 0 20px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -73,6 +74,7 @@
       height: auto;
 
       .item {
+        gap: 16px;
         height: 32px;
         align-self: stretch;
         justify-content: space-between;
@@ -83,6 +85,20 @@
         &:last-child {
           margin-bottom: 0;
         }
+
+        .item-name {
+          width: 105px;
+          flex-shrink: 0;
+        }
+
+        .item-comp {
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+          display: flex;
+          //往右
+          justify-content: flex-end;
+        }
       }
     }
   }
@@ -90,7 +106,8 @@
   .inner {
     margin-left: auto;
     margin-right: auto;
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
   }
 
   .mb-item {
@@ -306,8 +323,7 @@
   }
 
 
-  .btn-primary,
-  .btn-secondary {
+  .btn-primary, .btn-secondary {
 
     height: 50px;
 
@@ -667,7 +683,7 @@
     display: grid;
     gap: 24px;
     //两列布局
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
 
@@ -1092,6 +1108,34 @@
     }
   }
 
+}
+
+
+@media screen and (max-width: 940px) {
+  .home-main {
+
+    .hero-header {
+      padding-top: 50px;
+    }
+
+    .btn-primary, .btn-secondary {
+      height: 40px;
+      padding: 0 16px;
+      gap: 4px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .stat-value {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .node-list {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+  }
 }
 
 //----------红黑电竞风----------
@@ -2125,12 +2169,19 @@ body[data-theme="dawn-white"] {
     .dns-config-icon, .sinkhole-icon {
       filter: brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg) !important;
     }
+
     .node-icon {
-      span { filter: brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg) !important; }
+      span {
+        filter: brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg) !important;
+      }
     }
+
     .add-icon {
-      span { filter: brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg) !important; }
+      span {
+        filter: brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg) !important;
+      }
     }
+
     .btn-primary {
       .icon-play, .icon-reboot, .icon-update, .icon-check, .icon-stop {
         filter: brightness(0) invert(1) !important;
