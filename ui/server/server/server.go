@@ -22,10 +22,13 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/LandDuck/merlin-box/global"
 	"github.com/LandDuck/merlin-box/handlers"
@@ -34,6 +37,23 @@ import (
 
 	"github.com/go-chi/chi/v5"
 )
+
+// getLanIP 获取路由器的 LAN IPv4 地址
+func getLanIP() (string, error) {
+	out, err := exec.Command("nvram", "get", "lan_ipaddr").Output()
+	if err != nil {
+		return "", err
+	}
+
+	ip := strings.TrimSpace(string(out))
+	parsed := net.ParseIP(ip)
+
+	if parsed == nil || parsed.To4() == nil {
+		return "", fmt.Errorf("invalid LAN IPv4 address: %q", ip)
+	}
+
+	return ip, nil
+}
 
 // startHTTPServer 启动 HTTP 服务器
 func startHTTPServer(port int) {
@@ -87,12 +107,17 @@ func startHTTPServer(port int) {
 	router.Post("/api/load_node", handlers.LoadNode)
 	router.Post("/api/set_default_node", handlers.SetDefaultNode)
 
-	//router.Post("/api/save_path", handlers.SavePath)
-	//router.Post("/api/test", handlers.Test)
-
 	logger.Success("HTTP server is running on port ", port)
 
-	address := ":" + strconv.Itoa(port)
+	lanIP, err := getLanIP()
+	if err != nil {
+		//使用默认的 0.0.0.0
+		logger.Warn("Failed to get LAN IPv4 address, using 0.0.0.0")
+		lanIP = "0.0.0.0"
+	}
+
+	address := net.JoinHostPort(lanIP, strconv.Itoa(port))
+
 	if err := http.ListenAndServe(address, router); err != nil {
 		logger.Error("HTTP server failed: ", err)
 		os.Exit(1)
