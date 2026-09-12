@@ -469,12 +469,12 @@ setup_dns_hijack()
     iptables -t nat -A "$MB_DNS_CHAIN" -p tcp --dport 53 -j REDIRECT --to-ports 53
 
     # 2. 防御性清理：先从 PREROUTING 主链中删掉可能已存在的相同引流规则，防止重复叠加
-    iptables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null
-    iptables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null
+    iptables -t nat -D PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null
+    iptables -t nat -D PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null
 
-    # 3. 在 PREROUTING 主链中正式挂载引流规则：只拦截从 br0 进来的 53 端口流量
-    iptables -t nat -A PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN"
-    iptables -t nat -A PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN"
+    # 3. 在 PREROUTING 主链中正式挂载引流规则：只拦截从 br+ 进来的 53 端口流量
+    iptables -t nat -A PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN"
+    iptables -t nat -A PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN"
 
     #print_line "lan dns hijack setup complete"
 
@@ -494,11 +494,11 @@ setup_dns_hijack_ipv6()
     ip6tables -t nat -A "$MB_DNS_CHAIN_V6" -p tcp --dport 53 -j DNAT --to-destination [::1]:53
 
     # 主链去重与引流挂载
-    ip6tables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
-    ip6tables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
+    ip6tables -t nat -D PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
+    ip6tables -t nat -D PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
 
-    ip6tables -t nat -A PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6"
-    ip6tables -t nat -A PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6"
+    ip6tables -t nat -A PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN_V6"
+    ip6tables -t nat -A PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6"
 
     #print_line "lan dns v6 hijack setup complete"
 }
@@ -552,23 +552,23 @@ setup_lan_tproxy()
 
     # 5. 主链去重清理并排除 DNS 53 / DHCP 67/68
     # 53
-    iptables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
-    iptables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
+    iptables -t mangle -D PREROUTING -i br+ -p tcp --dport 53 -j RETURN 2>/dev/null
+    iptables -t mangle -D PREROUTING -i br+ -p udp --dport 53 -j RETURN 2>/dev/null
     # 67/68
-    iptables -t mangle -D PREROUTING -i br0 -p udp --dport 67:68 -j RETURN 2>/dev/null
+    iptables -t mangle -D PREROUTING -i br+ -p udp --dport 67:68 -j RETURN 2>/dev/null
     # 代理流量
-    iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null
+    iptables -t mangle -D PREROUTING -i br+ -j "$MB_PROXY_CHAIN" 2>/dev/null
 
     #排除 DNS
-    iptables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
+    iptables -t mangle -A PREROUTING -i br+ -p tcp --dport 53 -j RETURN
     #UDP 支持
     if [ "$MB_ENABLE_UDP" = "1" ]; then
-        iptables -t mangle -A PREROUTING -i br0 -p udp --dport 53 -j RETURN
+        iptables -t mangle -A PREROUTING -i br+ -p udp --dport 53 -j RETURN
     fi
     # 排除 DHCPv4
-    iptables -t mangle -A PREROUTING -i br0 -p udp --dport 67:68 -j RETURN
+    iptables -t mangle -A PREROUTING -i br+ -p udp --dport 67:68 -j RETURN
     # 其余流量进入代理链
-    iptables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN"
+    iptables -t mangle -A PREROUTING -i br+ -j "$MB_PROXY_CHAIN"
 
     #print_line "lan tproxy setup complete"
 
@@ -626,23 +626,23 @@ setup_lan_tproxy_ipv6()
 
     # 5. 主链去重清理，并排除 DNS 53 / DHCPv6 546/547
     # 53
-    ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null
-    ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null
+    ip6tables -t mangle -D PREROUTING -i br+ -p tcp --dport 53 -j RETURN 2>/dev/null
+    ip6tables -t mangle -D PREROUTING -i br+ -p udp --dport 53 -j RETURN 2>/dev/null
     # 546/547
-    ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 546:547 -j RETURN 2>/dev/null
+    ip6tables -t mangle -D PREROUTING -i br+ -p udp --dport 546:547 -j RETURN 2>/dev/null
     # 代理流量
-    ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
+    ip6tables -t mangle -D PREROUTING -i br+ -j "$MB_PROXY_CHAIN_V6" 2>/dev/null
 
     # 排除 DNS
-    ip6tables -t mangle -A PREROUTING -i br0 -p tcp --dport 53 -j RETURN
+    ip6tables -t mangle -A PREROUTING -i br+ -p tcp --dport 53 -j RETURN
     # UDP 支持
     if [ "$MB_ENABLE_UDP" = "1" ]; then
-        ip6tables -t mangle -A PREROUTING -i br0 -p udp --dport 53 -j RETURN
+        ip6tables -t mangle -A PREROUTING -i br+ -p udp --dport 53 -j RETURN
     fi
     # 排除 DHCPv6
-    ip6tables -t mangle -A PREROUTING -i br0 -p udp --dport 546:547 -j RETURN
+    ip6tables -t mangle -A PREROUTING -i br+ -p udp --dport 546:547 -j RETURN
     # 其余流量进入代理链
-    ip6tables -t mangle -A PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6"
+    ip6tables -t mangle -A PREROUTING -i br+ -j "$MB_PROXY_CHAIN_V6"
 
     #print_line "lan tproxy v6 setup complete"
 }
@@ -654,14 +654,14 @@ reset_iptables()
 {
     print_line "resetting IPv4 iptables and routing rules"
 
-    # INPUT 防护链：仅屏蔽 ppp0 进入的 TCP/UDP TPROXY 端口流量。
+    # INPUT 防护链：仅屏蔽 ppp+ 进入的 TCP/UDP TPROXY 端口流量。
     while iptables -D INPUT -j "$MB_INPUT_CHAIN" 2>/dev/null; do :; done
     if ! iptables -L "$MB_INPUT_CHAIN" >/dev/null 2>&1; then
         iptables -N "$MB_INPUT_CHAIN"
     fi
     iptables -F "$MB_INPUT_CHAIN"
-    iptables -A "$MB_INPUT_CHAIN" -i ppp0 -p tcp --dport "$MB_TPROXY_PORT" -j DROP
-    iptables -A "$MB_INPUT_CHAIN" -i ppp0 -p udp --dport "$MB_TPROXY_PORT" -j DROP
+    iptables -A "$MB_INPUT_CHAIN" -i ppp+ -p tcp --dport "$MB_TPROXY_PORT" -j DROP
+    iptables -A "$MB_INPUT_CHAIN" -i ppp+ -p udp --dport "$MB_TPROXY_PORT" -j DROP
     iptables -I INPUT 1 -j "$MB_INPUT_CHAIN"
 
     # ----------------------------------------------------------
@@ -827,14 +827,14 @@ reset_iptables_ipv6()
 
     print_line "resetting IPv6 iptables and routing rules"
 
-    # INPUT 防护链：仅屏蔽 ppp0 进入的 TCP/UDP TPROXY 端口流量。
+    # INPUT 防护链：仅屏蔽 ppp+ 进入的 TCP/UDP TPROXY 端口流量。
     while ip6tables -D INPUT -j "$MB_INPUT_CHAIN_V6" 2>/dev/null; do :; done
     if ! ip6tables -L "$MB_INPUT_CHAIN_V6" >/dev/null 2>&1; then
         ip6tables -N "$MB_INPUT_CHAIN_V6"
     fi
     ip6tables -F "$MB_INPUT_CHAIN_V6"
-    ip6tables -A "$MB_INPUT_CHAIN_V6" -i ppp0 -p tcp --dport "$MB_TPROXY_PORT" -j DROP
-    ip6tables -A "$MB_INPUT_CHAIN_V6" -i ppp0 -p udp --dport "$MB_TPROXY_PORT" -j DROP
+    ip6tables -A "$MB_INPUT_CHAIN_V6" -i ppp+ -p tcp --dport "$MB_TPROXY_PORT" -j DROP
+    ip6tables -A "$MB_INPUT_CHAIN_V6" -i ppp+ -p udp --dport "$MB_TPROXY_PORT" -j DROP
     ip6tables -I INPUT 1 -j "$MB_INPUT_CHAIN_V6"
 
     # ----------------------------------------------------------
@@ -959,18 +959,18 @@ clear_iptables()
     # ----------------------------------------------------------
 
     # DNS 重定向入口（nat）
-    while iptables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null; do :; done
-    while iptables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null; do :; done
+    while iptables -t nat -D PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null; do :; done
+    while iptables -t nat -D PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null; do :; done
 
     # DNS 放行入口（mangle）
-    while iptables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null; do :; done
-    while iptables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null; do :; done
+    while iptables -t mangle -D PREROUTING -i br+ -p tcp --dport 53 -j RETURN 2>/dev/null; do :; done
+    while iptables -t mangle -D PREROUTING -i br+ -p udp --dport 53 -j RETURN 2>/dev/null; do :; done
 
     # DHCPv4
-    while iptables -t mangle -D PREROUTING -i br0 -p udp --dport 67:68 -j RETURN 2>/dev/null; do :; done
+    while iptables -t mangle -D PREROUTING -i br+ -p udp --dport 67:68 -j RETURN 2>/dev/null; do :; done
 
     # 代理链入口
-    while iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null; do :; done
+    while iptables -t mangle -D PREROUTING -i br+ -j "$MB_PROXY_CHAIN" 2>/dev/null; do :; done
 
     # 路由器自身代理入口（OUTPUT）
     while iptables -t nat -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN" 2>/dev/null; do :; done
@@ -1038,18 +1038,18 @@ clear_iptables_ipv6()
     # ----------------------------------------------------------
 
     # DNS 重定向入口（nat）
-    while ip6tables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null; do :; done
-    while ip6tables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null; do :; done
+    while ip6tables -t nat -D PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null; do :; done
+    while ip6tables -t nat -D PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null; do :; done
 
     # DNS 放行入口（mangle）
-    while ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null; do :; done
-    while ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null; do :; done
+    while ip6tables -t mangle -D PREROUTING -i br+ -p tcp --dport 53 -j RETURN 2>/dev/null; do :; done
+    while ip6tables -t mangle -D PREROUTING -i br+ -p udp --dport 53 -j RETURN 2>/dev/null; do :; done
 
     # DHCPv6
-    while ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 546:547 -j RETURN 2>/dev/null; do :; done
+    while ip6tables -t mangle -D PREROUTING -i br+ -p udp --dport 546:547 -j RETURN 2>/dev/null; do :; done
 
     # 代理链入口
-    while ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null; do :; done
+    while ip6tables -t mangle -D PREROUTING -i br+ -j "$MB_PROXY_CHAIN_V6" 2>/dev/null; do :; done
 
     # 路由器自身代理入口（OUTPUT）
     while ip6tables -t nat -D OUTPUT -p tcp -j "$MB_ONESELF_CHAIN_V6" 2>/dev/null; do :; done
