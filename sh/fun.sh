@@ -654,6 +654,16 @@ reset_iptables()
 {
     print_line "resetting IPv4 iptables and routing rules"
 
+    # INPUT 防护链：仅屏蔽 ppp0 进入的 TCP/UDP TPROXY 端口流量。
+    while iptables -D INPUT -j "$MB_INPUT_CHAIN" 2>/dev/null; do :; done
+    if ! iptables -L "$MB_INPUT_CHAIN" >/dev/null 2>&1; then
+        iptables -N "$MB_INPUT_CHAIN"
+    fi
+    iptables -F "$MB_INPUT_CHAIN"
+    iptables -A "$MB_INPUT_CHAIN" -i ppp0 -p tcp --dport "$MB_TPROXY_PORT" -j DROP
+    iptables -A "$MB_INPUT_CHAIN" -i ppp0 -p udp --dport "$MB_TPROXY_PORT" -j DROP
+    iptables -I INPUT 1 -j "$MB_INPUT_CHAIN"
+
     # ----------------------------------------------------------
     # 1. 重置自定义链
     #    先清空链内容，解除对 ipset 的引用；
@@ -817,6 +827,16 @@ reset_iptables_ipv6()
 
     print_line "resetting IPv6 iptables and routing rules"
 
+    # INPUT 防护链：仅屏蔽 ppp0 进入的 TCP/UDP TPROXY 端口流量。
+    while ip6tables -D INPUT -j "$MB_INPUT_CHAIN_V6" 2>/dev/null; do :; done
+    if ! ip6tables -L "$MB_INPUT_CHAIN_V6" >/dev/null 2>&1; then
+        ip6tables -N "$MB_INPUT_CHAIN_V6"
+    fi
+    ip6tables -F "$MB_INPUT_CHAIN_V6"
+    ip6tables -A "$MB_INPUT_CHAIN_V6" -i ppp0 -p tcp --dport "$MB_TPROXY_PORT" -j DROP
+    ip6tables -A "$MB_INPUT_CHAIN_V6" -i ppp0 -p udp --dport "$MB_TPROXY_PORT" -j DROP
+    ip6tables -I INPUT 1 -j "$MB_INPUT_CHAIN_V6"
+
     # ----------------------------------------------------------
     # 1. 重置自定义链
     #    先清空链内容，解除对 ipset 的引用；
@@ -928,6 +948,11 @@ clear_iptables()
 {
     print_line "clear IPv4 iptables and routing rules"
 
+    # 先移除全部 INPUT 入口，再清空并删除防护链。
+    while iptables -D INPUT -j "$MB_INPUT_CHAIN" 2>/dev/null; do :; done
+    iptables -F "$MB_INPUT_CHAIN" 2>/dev/null
+    iptables -X "$MB_INPUT_CHAIN" 2>/dev/null
+
     # ----------------------------------------------------------
     # 1. 删除主链中的跳转规则（Jump）
     #    防止自定义链仍被引用，导致无法删除。
@@ -1001,6 +1026,11 @@ clear_iptables_ipv6()
     [ "$MB_ENABLE_IPV6" != "1" ] && return 0
 
     print_line "clear IPv6 iptables and routing rules"
+
+    # 先移除全部 INPUT 入口，再清空并删除防护链。
+    while ip6tables -D INPUT -j "$MB_INPUT_CHAIN_V6" 2>/dev/null; do :; done
+    ip6tables -F "$MB_INPUT_CHAIN_V6" 2>/dev/null
+    ip6tables -X "$MB_INPUT_CHAIN_V6" 2>/dev/null
 
     # ----------------------------------------------------------
     # 1. 删除主链中的跳转规则（Jump）

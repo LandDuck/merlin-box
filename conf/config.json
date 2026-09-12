@@ -8,8 +8,8 @@
   "inbounds": [
     {
       "type": "socks",
-      "tag": "socks-in",
-      "listen": "::",
+      "tag": "socks-in-v4",
+      "listen": "127.0.0.1",
       "listen_port": 65001
     },
     {
@@ -17,23 +17,31 @@
       "tag": "tproxy-in",
       "listen": "::",
       "listen_port": 65002
+    },
+    {
+      "type": "socks",
+      "tag": "socks-in-v6",
+      "listen": "::1",
+      "listen_port": 65001
     }
   ],
   "outbounds": [
     {
-      "type": "shadowsocks",
-      "server": "6.6.6.6",
+      "type": "anytls",
+      "server": "1.1.1.4",
       "server_port": 80,
-      "method": "2022-blake3-aes-128-gcm",
-      "password": "123456",
-      "udp_over_tcp": true,
+      "password": "888888",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloufflare.com"
+      },
       "tcp_fast_open": false,
-      "tag": "d83c3d97-abd5-4785-87e1-61c8b24004b3",
+      "tag": "637efc73-0ce1-4580-8b0a-b5ec787e6644",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "d83c3d97-abd5-4785-87e1-61c8b24004b3"
+    "final": "637efc73-0ce1-4580-8b0a-b5ec787e6644"
   }
 }

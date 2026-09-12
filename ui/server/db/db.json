@@ -42,7 +42,7 @@
   },
   "nodes": [
     {
-      "is_default": false,
+      "is_default": true,
       "name": "my_anytls",
       "password": "888888",
       "server": "1.1.1.4",
@@ -157,7 +157,7 @@
       "username": "123456"
     },
     {
-      "is_default": true,
+      "is_default": false,
       "method": "2022-blake3-aes-128-gcm",
       "name": "my_ss",
       "network": "",

@@ -579,28 +579,51 @@ func parseNode(data json.RawMessage, tag string) (string, error) {
 		return "{}", baseConfigErr
 	}
 
+	tproxyListen := "0.0.0.0"
+	if baseConfig.EnableIPv6 == 1 {
+		tproxyListen = "::"
+	}
+
 	inbounds := []singbox.Inbound{
 		{
 			Type:       "socks",
-			Tag:        "socks-in",
-			Listen:     "::",
+			Tag:        "socks-in-v4",
+			Listen:     "127.0.0.1",
 			ListenPort: 65001,
 		},
 		{
 			Type:       "tproxy",
 			Tag:        "tproxy-in",
-			Listen:     "::",
+			Listen:     tproxyListen,
 			ListenPort: 65002,
 		},
 	}
 
+	// ipv6支持,增加ipv6监听
+	if baseConfig.EnableIPv6 == 1 {
+		inbounds = append(inbounds, singbox.Inbound{
+			Type:       "socks",
+			Tag:        "socks-in-v6",
+			Listen:     "::1",
+			ListenPort: 65001,
+		})
+	}
+	// 开启了路由自身代理 监听 redirect
 	if baseConfig.RouteSelfProxy == 1 {
 		inbounds = append(inbounds, singbox.Inbound{
 			Type:       "redirect",
-			Tag:        "redirect-in",
-			Listen:     "::",
+			Tag:        "redirect-in-v4",
+			Listen:     "127.0.0.1",
 			ListenPort: 65003,
 		})
+		if baseConfig.EnableIPv6 == 1 {
+			inbounds = append(inbounds, singbox.Inbound{
+				Type:       "redirect",
+				Tag:        "redirect-in-v6",
+				Listen:     "::1",
+				ListenPort: 65003,
+			})
+		}
 	}
 
 	//组织config
