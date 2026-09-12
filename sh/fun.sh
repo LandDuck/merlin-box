@@ -937,9 +937,14 @@ clear_iptables()
     while iptables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null; do :; done
     while iptables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN" 2>/dev/null; do :; done
 
-    # 局域网代理入口（mangle）
+    # DNS 放行入口（mangle）
     while iptables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null; do :; done
     while iptables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null; do :; done
+
+    # DHCPv4
+    while iptables -t mangle -D PREROUTING -i br0 -p udp --dport 67:68 -j RETURN 2>/dev/null; do :; done
+
+    # 代理链入口
     while iptables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN" 2>/dev/null; do :; done
 
     # 路由器自身代理入口（OUTPUT）
@@ -1006,9 +1011,14 @@ clear_iptables_ipv6()
     while ip6tables -t nat -D PREROUTING -i br0 -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null; do :; done
     while ip6tables -t nat -D PREROUTING -i br0 -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null; do :; done
 
-    # 局域网代理入口（mangle）
+    # DNS 放行入口（mangle）
     while ip6tables -t mangle -D PREROUTING -i br0 -p tcp --dport 53 -j RETURN 2>/dev/null; do :; done
     while ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 53 -j RETURN 2>/dev/null; do :; done
+
+    # DHCPv6
+    while ip6tables -t mangle -D PREROUTING -i br0 -p udp --dport 546:547 -j RETURN 2>/dev/null; do :; done
+
+    # 代理链入口
     while ip6tables -t mangle -D PREROUTING -i br0 -j "$MB_PROXY_CHAIN_V6" 2>/dev/null; do :; done
 
     # 路由器自身代理入口（OUTPUT）
