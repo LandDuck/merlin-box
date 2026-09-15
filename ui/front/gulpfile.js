@@ -20,7 +20,7 @@ import * as esbuild from "esbuild";
 import glob from "fast-glob";
 import chokidar from "chokidar";
 import path from "path";
-import { fileURLToPath } from "url";
+import {fileURLToPath} from "url";
 import fs from "fs/promises";
 import less from "less";
 
@@ -64,6 +64,21 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
+ * 从../../merlin-box.sh中读取版本号
+ * @returns {string}
+ */
+async function getScriptVersion() {
+    let version = "";
+    const merlinBoxShPath = path.join(__dirname, "../../merlin-box.sh");
+    const merlinBoxShContent = await fs.readFile(merlinBoxShPath, "utf8");
+    const match = merlinBoxShContent.match(/SCRIPT_VERSION="([^"]+)"/);
+    if (match) {
+        version = match[1];
+    }
+    return version;
+}
+
+/**
  * 创建 esbuild 配置，并注入编译常量
  * @param {boolean} isDev
  * @returns {object}
@@ -71,13 +86,7 @@ const __dirname = path.dirname(__filename);
 async function createEsbuildConfig(isDev) {
     let version = "";
     if (!isDev) {
-        //从../../merlin-box.sh中读取版本号
-        const merlinBoxShPath = path.join(__dirname, "../../merlin-box.sh");
-        const merlinBoxShContent = await fs.readFile(merlinBoxShPath, "utf8");
-        const match = merlinBoxShContent.match(/SCRIPT_VERSION="([^"]+)"/);
-        if (match) {
-            version = match[1];
-        }
+        version = await getScriptVersion();
     }
     return {
         ...esbuildConfig,
@@ -377,7 +386,10 @@ export async function build() {
     //复制index.html和main.html, 同时替换里面的 '/merlin-box-ui/front/' 为 '/'
     const indexHtml = await fs.readFile("index.html", "utf8");
     //const mainHtml = await fs.readFile("main.html", "utf8");
-    await fs.writeFile(path.join(DIST, "index.html"), indexHtml.replace(/\/merlin-box-ui\/front\//g, "/"), "utf8");
+    const version = await getScriptVersion();
+    //替换index.html中的v=0.0.1为v=版本号
+    const indexHtmlWithVersion = indexHtml.replace(/v=0\.0\.1/g, `v=${version}`);
+    await fs.writeFile(path.join(DIST, "index.html"), indexHtmlWithVersion.replace(/\/merlin-box-ui\/front\//g, "/"), "utf8")
     //await fs.writeFile(path.join(DIST, "main.html"), mainHtml.replace(/\/merlin-box-ui\/front\//g, "/"), "utf8");
     //将dist目录下的文件拷贝到www目录
     await copyToWww();
