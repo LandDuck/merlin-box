@@ -266,6 +266,8 @@ sing-box（conf/config.json）配置参考：
 merlin-box/
 ├─ merlin-box.sh            # 主入口脚本（start/stop）
 ├─ start_merlin_box.sh      # 用于支持开机启动
+├─ install.sh               # KoolCenter 软件中心安装脚本
+├─ uninstall.sh             # KoolCenter 软件中心卸载脚本
 ├─ ui/                      # WEB UI 开发目录
 │  ├─ server                # WEB UI 后端
 │  └─ front                 # WEB UI 前端

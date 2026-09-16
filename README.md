@@ -265,6 +265,8 @@ sing-box (conf/config.json) configuration reference:
 merlin-box/
 ├─ merlin-box.sh            # Main entry script (start/stop)
 ├─ start_merlin_box.sh      # For boot startup support
+├─ install.sh               # KoolCenter Software Center installation script
+├─ uninstall.sh             # KoolCenter Software Center uninstallation script
 ├─ ui/                      # WEB UI Development Directory
 │  ├─ server                # WEB UI server
 │  └─ front                 # WEB UI front-end
