@@ -26,6 +26,8 @@ SCRIPT_NAME="$(basename "$0")"
 SCRIPT_VERSION="1.1.1"
 # PID
 PID_FILE="/tmp/merlin-box.pid"
+# Server PID
+SERVER_PID_FILE="/tmp/merlin-box-server.pid"
 
 # 全局防火墙链名定义
 readonly MB_INPUT_CHAIN="MERLINKBOX_INPUT"

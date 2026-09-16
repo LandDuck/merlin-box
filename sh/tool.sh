@@ -849,6 +849,7 @@ start_server(){
 
   if kill -0 "$server_pid" 2>/dev/null; then
       print_success "✅ WEBUI 服务已启动，端口: $port，PID: $server_pid"
+      echo "$server_pid" > "$SERVER_PID_FILE"
   else
       print_error "❌ WEBUI 服务启动失败，请检查日志: ${CUR_DIR}/logs/webui.log"
       exit 1
@@ -876,6 +877,12 @@ stop_server(){
   else
     print_normal "🔍 未发现运行中的 WEBUI 服务实例，无需停止。"
   fi
+
+  # 删除 PID 文件
+  if [ -f "$SERVER_PID_FILE" ]; then
+    rm -f "$SERVER_PID_FILE"
+  fi
+
 }
 
 # =========================================

@@ -147,6 +147,13 @@ This project aims to clearly separate responsibilities:
       </td>
     </tr>
     <tr>
+      <td>Software Center</td>
+      <td>⏳ Planned</td>
+      <td>
+        The package file supports installation in the KoolCenter Software Center.
+      </td>
+    </tr>
+    <tr>
       <td>Ping Proxy</td>
       <td>⏳ Not Supported</td>
       <td>

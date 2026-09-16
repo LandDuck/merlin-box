@@ -148,8 +148,15 @@
       </td>
     </tr>
     <tr>
+      <td>软件中心</td>
+      <td>⏳ 规划中</td>
+      <td>
+        打包文件支持在KoolCenter软件中心安装。
+      </td>
+    </tr>
+    <tr>
       <td>ping 代理</td>
-      <td>⏳ 暂不支持</td>
+      <td>⏳ 不支持</td>
       <td>
         不在当前代理范围内。
       </td>
