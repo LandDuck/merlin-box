@@ -839,13 +839,19 @@ start_server(){
   # 第一个参数是端口，如果没传入使用 8080
   local port="${1:-8080}"
 
+  print_normal "启动 WEBUI 服务，端口: $port"
+
   #启动命令 merlin-box server --port 8080. 注意后台运行
-  nohup "$server_bin" server --port "$port" > /dev/null 2>&1 &
-  if [ $? -eq 0 ]; then
-    print_success "✅ WEBUI 服务已启动，端口: $port"
+  nohup "$server_bin" server --port "$port" > "${CUR_DIR}/logs/webui.log" 2>&1 &
+  server_pid=$!
+
+  sleep 2
+
+  if kill -0 "$server_pid" 2>/dev/null; then
+      print_success "✅ WEBUI 服务已启动，端口: $port，PID: $server_pid"
   else
-    print_error "❌ WEBUI 服务启动失败，请检查 merlin-box 可执行文件"
-    exit 1
+      print_error "❌ WEBUI 服务启动失败，请检查日志: ${CUR_DIR}/logs/webui.log"
+      exit 1
   fi
 
 }
