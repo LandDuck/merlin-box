@@ -393,7 +393,7 @@ install() {
   # wan状态改变时触发的脚本路径
   local merlin_wan_event="/jffs/scripts/wan-event"
   local merlin_wan_event_cifs="/cifs2/scripts/wan-event" # 此脚本用于安装了 USB2JFFS v2.2.0 的路由，因jffs目录被迁移，有可能在未挂载时不执行，原版merlin应该没有这个。
-  # u盘挂载完成后触发的脚本路径
+  # WAN 接口起来之后 384.15 起已 deprecated
   local merlin_wan_start="/jffs/scripts/wan-start"
   local merlin_wan_start_cifs="/cifs2/scripts/wan-start" # 此脚本用于安装了 USB2JFFS v2.2.0 的路由，因jffs目录被迁移，有可能在未挂载时不执行，原版merlin应该没有这个。
 
@@ -413,7 +413,7 @@ install() {
     echo "#!/bin/sh" > "${merlin_wan_event}"
     chmod +x "${merlin_wan_event}"
   fi
-  if [ ! -f "${merlin_wan_event_cifs}" ]; then
+  if [ -d "/cifs2" ] && [ ! -f "${merlin_wan_event_cifs}" ]; then
     print_normal "创建 merlin wan-event 脚本 on cifs"
     echo "#!/bin/sh" > "${merlin_wan_event_cifs}" 2>/dev/null
     chmod +x "${merlin_wan_event_cifs}" 2>/dev/null
@@ -424,7 +424,7 @@ install() {
     echo "#!/bin/sh" > "${merlin_wan_start}"
     chmod +x "${merlin_wan_start}"
   fi
-  if [ ! -f "${merlin_wan_start_cifs}" ]; then
+  if [ -d "/cifs2" ] && [ ! -f "${merlin_wan_start_cifs}" ]; then
     print_normal "创建 merlin wan-start 脚本 on cifs"
     echo "#!/bin/sh" > "${merlin_wan_start_cifs}" 2>/dev/null
     chmod +x "${merlin_wan_start_cifs}" 2>/dev/null
@@ -434,14 +434,24 @@ install() {
 
   # 将脚本放入 wan-event 和 wan-start（先清理旧的历史写入）
   sed -i "\|${boot_script}|d" "${merlin_wan_event}"
-  sed -i "\|${boot_script}|d" "${merlin_wan_event_cifs}" 2>/dev/null
+  if [ -f "${merlin_wan_event_cifs}" ]; then
+    sed -i "\|${boot_script}|d" "${merlin_wan_event_cifs}" 2>/dev/null
+  fi
   sed -i "\|${boot_script}|d" "${merlin_wan_start}"
-  sed -i "\|${boot_script}|d" "${merlin_wan_start_cifs}" 2>/dev/null
-  # 将 $1 $2 作为参数传递给 boot_script，并在后台异步执行
+  if [ -f "${merlin_wan_start_cifs}" ]; then
+    sed -i "\|${boot_script}|d" "${merlin_wan_start_cifs}" 2>/dev/null
+  fi
+
+  # 执行脚本，将 $1 $2 作为参数传递给 wan_event 以便开机自动启动。$1 WAN unit、$2 事件类型
   echo "${boot_script} wan_event \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event}"
-  echo "${boot_script} wan_event \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event_cifs}" 2>/dev/null
+  if [ -f "${merlin_wan_event_cifs}" ]; then
+    echo "${boot_script} wan_event \"\$1\" \"\$2\" >/dev/null 2>&1 &" >> "${merlin_wan_event_cifs}" 2>/dev/null
+  fi
+  # 执行脚本，将 $1 作为参数传递给 wan_start 以便开机自动启动。$1 WAN unit
   echo "${boot_script} wan_start \"\$1\" >/dev/null 2>&1 &" >> "${merlin_wan_start}"
-  echo "${boot_script} wan_start \"\$1\" >/dev/null 2>&1 &" >> "${merlin_wan_start_cifs}" 2>/dev/null
+  if [ -f "${merlin_wan_start_cifs}" ]; then
+    echo "${boot_script} wan_start \"\$1\" >/dev/null 2>&1 &" >> "${merlin_wan_start_cifs}" 2>/dev/null
+  fi
 
   print_success "merlin-box启动脚本已设置完成，wan-event 和 wan-start 已配置。"
 }
