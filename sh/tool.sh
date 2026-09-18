@@ -841,6 +841,9 @@ start_server(){
 
   print_normal "启动 WEBUI 服务，端口: $port"
 
+  # 防止目录不存在
+  mkdir -p "${CUR_DIR}/logs"
+
   #启动命令 merlin-box server --port 8080. 注意后台运行
   nohup "$server_bin" server --port "$port" > "${CUR_DIR}/logs/webui.log" 2>&1 &
   server_pid=$!
