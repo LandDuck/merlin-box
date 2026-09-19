@@ -57,6 +57,8 @@ prepare(){
            -e '/servers-file/d' \
            -e '/resolv-file/d' "${CONFIG}"
 
+    mkdir -p "/jffs/configs/dnsmasq.d" || return 0
+
     # 3. 用 grep 静默模式检查，如果没有 conf-dir= 则追加
     if ! grep -q "conf-dir=" "${CONFIG}"; then
         echo "conf-dir=/jffs/configs/dnsmasq.d" >> "${CONFIG}"
