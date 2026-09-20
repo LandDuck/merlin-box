@@ -67,25 +67,29 @@ download_file() {
   print_normal "下载文件: $url 到 $target_path"
 
   if type curl >/dev/null 2>&1; then
-    print_normal "检测到 curl，使用 SOCKS5 代理(127.0.0.1:65001)下载文件"
-    curl --fail --silent --show-error --location --proxy "socks5h://127.0.0.1:65001" -o "$target_path" "$url"
-    if [ $? -ne 0 ]; then
-      print_error "下载 $url 失败"
-      return 1
-    fi
-  else
-    print_normal "未检测到 curl，使用 wget 直连下载规则文件"
-    wget --no-hsts -O "$target_path" "$url"
-    if [ $? -ne 0 ]; then
-      rm -rf "${tmp_dir}"
-      print_error "下载 $url 失败"
-      return 1
-    fi
+      print_normal "尝试使用 SOCKS5 代理(127.0.0.1:65001)下载文件"
+
+      if curl --fail --silent --show-error --location \
+          --proxy "socks5h://127.0.0.1:65001" \
+          -o "$target_path" "$url"; then
+
+          print_normal "使用 curl 下载成功"
+          return 0
+      fi
+
+      print_error "curl 下载失败或不支持代理，尝试使用 wget 直连下载"
   fi
 
-  print_success "下载完成: $target_path"
+  if type wget >/dev/null 2>&1; then
+      if wget --no-hsts -O "$target_path" "$url"; then
+          print_normal "使用 wget 下载成功"
+          return 0
+      fi
+  fi
 
-  return 0
+  rm -f "$target_path"
+  print_error "下载 $url 失败"
+  return 1
 }
 #=========================================
 # 更新 merlin-box
