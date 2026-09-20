@@ -19,14 +19,66 @@
 #
 
 readonly DIR=$(cd $(dirname $0); pwd)
-readonly APP_NAME="merlin-box"
-readonly INSTALL_DIR="/jffs/merlin-box"
+readonly MODULE="merlinbox"
+readonly APP_NAME="Merlin Box"
+# 默认安装到 JFFS
+INSTALL_DIR="/jffs/merlin-box"
+# 脚本版本(编译时自动修改)
+SCRIPT_VERSION="0.0.1"
 
 #=========================================
 # 在 Koolshare Merlin 固件上使用软件中心安装
 #=========================================
-install(){
+install_to_softcenter(){
+
+  # 检查 /dev/sda 是否存在并已挂载
+  if [ -e "/dev/sda" ]; then
+      MOUNT_POINT="$(mount | awk '$1 == "/dev/sda" {print $3; exit}')"
+      if [ -n "$MOUNT_POINT" ] && [ -d "$MOUNT_POINT" ]; then
+          INSTALL_DIR="${MOUNT_POINT}/merlin-box"
+      fi
+  fi
+
+  echo "开始安装 Merlin Box ${DIR} 到 ${INSTALL_DIR}"
+  mkdir -p "${INSTALL_DIR}"
+
+  # 列出 dir 目录
+  # echo "安装目录内容:"
+  # ls -l "${DIR}"
+
+  # 复制软件中心必要文件
+  cp -rf "${DIR}/webs/." /koolshare/webs/
+  cp -f "${DIR}/wwwroot/images/icon-merlinbox.png" /koolshare/res/icon-merlinbox.png
+
+  # 复制全部程序文件
+  cp -rf "${DIR}/." "${INSTALL_DIR}/"
+
+  # 设置脚本权限
+  chmod +x "${INSTALL_DIR}/merlin-box.sh"
+  chmod +x "${INSTALL_DIR}/start_merlin_box.sh"
+  chmod +x "${INSTALL_DIR}/scripts/dnsmasq.postconf"
+  chmod +x "${INSTALL_DIR}/bin/sing-box"
+  chmod +x "${INSTALL_DIR}/bin/smartdns"
+  chmod +x "${INSTALL_DIR}/bin/merlin-box"
+  # 删除一些不需要的文件 webs install.sh uninstall.sh
+  rm -rf "${INSTALL_DIR}/webs"
+  rm -rf "${INSTALL_DIR}/install.sh"
+  rm -rf "${INSTALL_DIR}/uninstall.sh"
+
+  # 注册到列表中
+  dbus set softcenter_module_${MODULE}_name="${MODULE}"
+  dbus set softcenter_module_${MODULE}_title="${APP_NAME}"
+  dbus set softcenter_module_${MODULE}_description="专为 ASUSWRT-Merlin 打造的轻量级透明代理与智能分流工具，以简单、高效的方式实现强大功能，助你轻松连接更广阔的世界"
+  dbus set softcenter_module_${MODULE}_version="${SCRIPT_VERSION}"
+  dbus set softcenter_module_${MODULE}_install="4"
+
+  # 复制卸载脚本
+  cp -f "$DIR/uninstall.sh" "/koolshare/scripts/uninstall_${MODULE}.sh"
+  chmod 755 "/koolshare/scripts/uninstall_${MODULE}.sh"
+
+  echo "Merlin Box 安装完成"
+
   :
 }
 
-install
+install_to_softcenter
