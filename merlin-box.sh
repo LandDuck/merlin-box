@@ -373,7 +373,11 @@ init() {
       read -p "请输入WEBUI端口号 (默认: 8080): " webui_port
       webui_port="${webui_port:-8080}"
       start_server "$webui_port"
-      print_success "WEBUI服务已启动，请访问 http://<路由器IP>:${webui_port} 来访问WEBUI。"
+      local router_ip
+      if ! router_ip="$(get_router_lan_ip)"; then
+        router_ip="<路由IP>"
+      fi
+      print_success "WEBUI服务已启动，请访问 http://${router_ip}:${webui_port} 来访问WEBUI。"
     else
       print_warning "未启动WEBUI服务，请手动执行 'merlin-box.sh server' 来启动WEBUI。"
     fi

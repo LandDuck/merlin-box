@@ -1161,3 +1161,24 @@ doctor() {
         return 1
     fi
 }
+
+#=========================================
+# 获取路由自身局域网IP
+# nvram get lan_ipaddr
+#=========================================
+get_router_lan_ip() {
+  if type nvram >/dev/null 2>&1; then
+    local lan_ip
+    lan_ip="$(nvram get lan_ipaddr 2>/dev/null)"
+    if [ -n "$lan_ip" ]; then
+      echo "$lan_ip"
+      return 0
+    else
+      print_warning "无法获取路由器局域网IP"
+      return 1
+    fi
+  else
+    print_warning "nvram 命令不可用，无法获取路由器局域网IP"
+    return 1
+  fi
+}
