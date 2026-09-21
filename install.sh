@@ -67,8 +67,8 @@ install_to_softcenter(){
   # 更新时保留已有数据、配置和资源，首次安装复制全部文件
   if [ "$exists" = 1 ]; then
       local entry
-      for entry in "${DIR}"/* "${DIR}"/.[!.]* "${DIR}"/..?*; do
-          [ -e "$entry" ] || [ -L "$entry" ] || continue
+      for entry in "${DIR}"/*; do
+          [ -e "$entry" ] || continue
           case "${entry##*/}" in
               db|conf|res) continue ;;
           esac
