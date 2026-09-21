@@ -64,6 +64,8 @@ install_to_softcenter(){
   cp -f "${DIR}/wwwroot/images/icon-merlinbox.png" /koolshare/res/icon-merlinbox.png
   chmod +x /koolshare/scripts/merlinbox_webui.sh
 
+  echo "正在复制文件到安装目录 ${INSTALL_DIR}，请稍候..."
+
   # 更新时保留已有数据、配置和资源，首次安装复制全部文件
   if [ "$exists" = 1 ]; then
       local entry
