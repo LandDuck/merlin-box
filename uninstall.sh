@@ -39,10 +39,11 @@ uninstall(){
   fi
 
   # 停止 merlin-box 服务
-  echo "停止 merlin-box 服务"
+  echo "停止 merlin-box 服务并卸载开机自启"
   if [ -f "${INSTALL_DIR}/merlin-box.sh" ]; then
       sh "${INSTALL_DIR}/merlin-box.sh" stop
       sh "${INSTALL_DIR}/merlin-box.sh" server stop
+      sh "${INSTALL_DIR}/merlin-box.sh" uninstall
   fi
 
   # 删除安装目录

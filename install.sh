@@ -43,9 +43,15 @@ install_to_softcenter(){
   mkdir -p "${INSTALL_DIR}"
 
   echo "检测并停止 merlin-box 服务"
+
+  local exists=0
   if [ -f "${INSTALL_DIR}/merlin-box.sh" ]; then
+      echo "检测到已安装的 merlin-box，停止服务"
+      exists=1
       sh "${INSTALL_DIR}/merlin-box.sh" stop
       sh "${INSTALL_DIR}/merlin-box.sh" server stop
+  else
+      echo "未检测到已安装的 merlin-box，继续安装"
   fi
 
   # 列出 dir 目录
@@ -58,8 +64,19 @@ install_to_softcenter(){
   cp -f "${DIR}/wwwroot/images/icon-merlinbox.png" /koolshare/res/icon-merlinbox.png
   chmod +x /koolshare/scripts/merlinbox_webui.sh
 
-  # 复制全部程序文件
-  cp -rf "${DIR}/." "${INSTALL_DIR}/"
+  # 更新时保留已有数据、配置和资源，首次安装复制全部文件
+  if [ "$exists" = 1 ]; then
+      local entry
+      for entry in "${DIR}"/* "${DIR}"/.[!.]* "${DIR}"/..?*; do
+          [ -e "$entry" ] || [ -L "$entry" ] || continue
+          case "${entry##*/}" in
+              db|conf|res) continue ;;
+          esac
+          cp -rf "$entry" "${INSTALL_DIR}/"
+      done
+  else
+      cp -rf "${DIR}/." "${INSTALL_DIR}/"
+  fi
 
   # 设置脚本权限
   chmod +x "${INSTALL_DIR}/merlin-box.sh"

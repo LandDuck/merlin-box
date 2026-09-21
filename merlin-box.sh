@@ -417,7 +417,7 @@ install() {
     echo "#!/bin/sh" > "${merlin_wan_event}"
     chmod +x "${merlin_wan_event}"
   fi
-  if [ -d "/cifs2" ] && [ ! -f "${merlin_wan_event_cifs}" ]; then
+  if grep -qsE '^[^ ]+ /cifs2 ' /proc/mounts && [ ! -f "${merlin_wan_event_cifs}" ]; then
     print_normal "创建 merlin wan-event 脚本 on cifs"
     echo "#!/bin/sh" > "${merlin_wan_event_cifs}" 2>/dev/null
     chmod +x "${merlin_wan_event_cifs}" 2>/dev/null
@@ -428,7 +428,7 @@ install() {
     echo "#!/bin/sh" > "${merlin_wan_start}"
     chmod +x "${merlin_wan_start}"
   fi
-  if [ -d "/cifs2" ] && [ ! -f "${merlin_wan_start_cifs}" ]; then
+  if grep -qsE '^[^ ]+ /cifs2 ' /proc/mounts && [ ! -f "${merlin_wan_start_cifs}" ]; then
     print_normal "创建 merlin wan-start 脚本 on cifs"
     echo "#!/bin/sh" > "${merlin_wan_start_cifs}" 2>/dev/null
     chmod +x "${merlin_wan_start_cifs}" 2>/dev/null
