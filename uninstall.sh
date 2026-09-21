@@ -19,7 +19,8 @@
 #
 
 MODULE="merlinbox"
-INSTALL_DIR="/jffs/merlin-box"
+INSTALL_DIR="$(dbus get merlinbox_install_dir)"
+INSTALL_DIR="${INSTALL_DIR:-/jffs/merlin-box}"
 
 
 #=========================================
@@ -59,7 +60,10 @@ uninstall(){
   dbus remove softcenter_module_${MODULE}_version
   dbus remove softcenter_module_${MODULE}_install
 
+  dbus remove merlinbox_install_dir
+
   # 删除卸载脚本
+  rm -f /koolshare/scripts/merlinbox_webui.sh
   rm -f "/koolshare/scripts/uninstall_${MODULE}.sh"
   # 删除asp文件和图标
   rm -f "/koolshare/webs/Module_${MODULE}.asp"

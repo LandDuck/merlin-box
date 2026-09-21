@@ -43,8 +43,13 @@
 
 <script type="text/javascript">
 
+var webui_busy = false;
+var webui_timer;
+
 function init() {
 	show_menu(menu_hook);
+
+	webui_request("status");
 }
 
 /*
@@ -55,20 +60,65 @@ function menu_hook(title, tab) {
 	tablink[tablink.length - 1] = new Array("", "Module_merlinbox.asp");
 }
 
-/*
- * 启动 WEBUI。
- * 当前仅保留接口，暂不执行任何操作。
- */
-function start_webui() {
-	alert("启动 WEBUI");
+// /_api/ executes /koolshare/scripts/merlinbox_webui.sh.
+function webui_request(action) {
+	if (webui_busy) return;
+	clearTimeout(webui_timer);
+	webui_busy = true;
+	$("#webui_start, #webui_stop").prop("disabled", true);
+	if (action != "status") {
+		$("#webui_status").text(action == "start" ? "正在启动…" : "正在停止…");
+	}
+	$.ajax({
+		type: "POST",
+		url: "/_api/",
+		cache: false,
+		dataType: "json",
+		timeout: 15000,
+		data: JSON.stringify({
+			id: Math.floor(Math.random() * 100000000),
+			method: "merlinbox_webui.sh",
+			params: [action],
+			fields: {}
+		}),
+		success: function(response) {
+			var parts = String(response.result || "").split("@@");
+			var port = Number(parts[1]);
+			if (!/^[01]$/.test(parts[0]) || !/^\d+$/.test(parts[1]) || port < 1 || port > 65535 || parts.length != 3) {
+				webui_unavailable();
+				return;
+			}
+			var running = parts[0] == "1";
+			$("#webui_status").text(running ? "运行中" : "未启动");
+			$("#webui_start").toggle(!running);
+			$("#webui_link, #webui_stop").toggle(running);
+			var host = window.location.hostname;
+			if (host.indexOf(":") >= 0 && host.charAt(0) != "[") host = "[" + host + "]";
+			$("#webui_link").attr("href", "http://" + host + ":" + port + "/");
+			if (parts[2] != "ok") {
+				$("#webui_status").append(document.createTextNode(parts[2] == "missing" ? "（未找到安装文件）" : "（操作失败，请检查 /tmp/merlinbox_webui.log）"));
+			}
+		},
+		error: webui_unavailable,
+		complete: function() {
+			webui_busy = false;
+			$("#webui_start, #webui_stop").prop("disabled", false);
+			webui_timer = setTimeout(function() { webui_request("status"); }, 5000);
+		}
+	});
 }
 
-/*
- * 停止 WEBUI。
- * 当前仅保留接口，暂不执行任何操作。
- */
+function webui_unavailable() {
+	$("#webui_status").text("状态读取失败，稍后自动重试");
+	$("#webui_start, #webui_link, #webui_stop").hide();
+}
+
+function start_webui() {
+	webui_request("start");
+}
+
 function stop_webui() {
-	alert("停止 WEBUI");
+	webui_request("stop");
 }
 
 </script>
@@ -164,13 +214,14 @@ function stop_webui() {
 
 											<td>
 												<span id="webui_status">
-													未启动
+													正在读取状态…
 												</span>
 
 												&nbsp;&nbsp;
 
 												<input
 													id="webui_start"
+													style="display:none;"
 													class="button_gen"
 													type="button"
 													value="启动"
@@ -179,7 +230,8 @@ function stop_webui() {
 												&nbsp;&nbsp;
 
 												<a id="webui_link"
-												   href="http://192.168.50.1:8080"
+												   href="#"
+												   rel="noopener noreferrer"
 												   target="_blank"
 												   style="display:none;">
 													打开 WEBUI
@@ -187,16 +239,22 @@ function stop_webui() {
 
 												&nbsp;&nbsp;
 
-												<a id="webui_stop"
-												   href="javascript:void(0);"
+												<input id="webui_stop" class="button_gen" type="button" value="停止"
 												   onclick="stop_webui();"
-												   style="display:none;">
-													停止 WEBUI
-												</a>
+												   style="display:none;" />
 											</td>
 										</tr>
 
 									</table>
+
+									<div style="margin:16px 5px;line-height:1.8;">
+										点击“启动”即可启动 Merlin Box 专属管理端，然后点击“打开 WEBUI”进入管理页面。<br />
+										所有配置与管理操作均在专属 Web 页面中完成。
+									</div>
+
+									<div style="margin:20px 5px 10px;text-align:center;font-size:12px;color:#ccc;">
+										&copy; 2026 <a href="https://github.com/LandDuck" target="_blank" rel="noopener noreferrer" style="color:inherit;">LandDuck</a> &middot; merlin-box &middot; Licensed under GPL-3.0
+									</div>
 
 								</td>
 							</tr>

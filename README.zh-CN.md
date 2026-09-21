@@ -268,6 +268,7 @@ merlin-box/
 ├─ start_merlin_box.sh      # 用于支持开机启动
 ├─ install.sh               # KoolCenter 软件中心安装脚本
 ├─ uninstall.sh             # KoolCenter 软件中心卸载脚本
+├─ webs                     # KoolCenter 软件中心网页文件
 ├─ ui/                      # WEB UI 开发目录
 │  ├─ server                # WEB UI 后端
 │  └─ front                 # WEB UI 前端
@@ -282,6 +283,7 @@ merlin-box/
 │  ├─ config.json           # sing-box 配置
 │  └─ smartdns.conf         # smartdns 配置
 ├─ scripts/
+│  ├─ merlinbox_webui.sh    # KoolCenter 软件中心后端脚本
 │  └─ dnsmasq.postconf      # dnsmasq 后处理脚本（接管 53 端口时使用）
 ├─ sh/
 │  ├─ fun.sh                # 核心逻辑

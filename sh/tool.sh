@@ -856,6 +856,8 @@ start_server(){
 
   if kill -0 "$server_pid" 2>/dev/null; then
       print_success "✅ WEBUI 服务已启动，端口: $port，PID: $server_pid"
+      #echo "DEBUG SERVER_PID_FILE=[$SERVER_PID_FILE]"
+      #echo "DEBUG server_pid=[$server_pid]"
       echo "$server_pid" > "$SERVER_PID_FILE"
   else
       print_error "❌ WEBUI 服务启动失败，请检查日志: ${CUR_DIR}/logs/webui.log"
@@ -921,8 +923,8 @@ package() {
   local package_dir="${CUR_DIR}/dist"
 
   mkdir -p "$package_dir"
-  tar -czf "${package_dir}/${package_name}" -C "${CUR_DIR}" --exclude='conf/logs' bin conf db res scripts sh wwwroot *.sh LICENSE *.md
-  tar -czf "${package_dir}/${package_name_noui}" --exclude='bin/merlin-box' --exclude='conf/logs' -C "${CUR_DIR}" bin conf res scripts sh *.sh LICENSE *.md
+  tar -czf "${package_dir}/${package_name}" -C "${CUR_DIR}" --exclude='conf/logs' --exclude='install.sh' --exclude='uninstall.sh' --exclude='scripts/merlinbox_webui.sh' bin conf db res scripts sh wwwroot ./*.sh LICENSE ./*.md
+  tar -czf "${package_dir}/${package_name_noui}" -C "${CUR_DIR}" --exclude='bin/merlin-box' --exclude='conf/logs' --exclude='install.sh' --exclude='uninstall.sh' --exclude='scripts/merlinbox_webui.sh' bin conf res scripts sh ./*.sh LICENSE ./*.md
 
   print_success "✅ 打包完成: ${package_dir}/${package_name} 和 ${package_dir}/${package_name_noui}"
 

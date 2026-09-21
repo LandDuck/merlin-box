@@ -267,6 +267,7 @@ merlin-box/
 ├─ start_merlin_box.sh      # For boot startup support
 ├─ install.sh               # KoolCenter Software Center installation script
 ├─ uninstall.sh             # KoolCenter Software Center uninstallation script
+├─ webs                     # KoolCenter Software Center web page files
 ├─ ui/                      # WEB UI Development Directory
 │  ├─ server                # WEB UI server
 │  └─ front                 # WEB UI front-end
@@ -281,6 +282,7 @@ merlin-box/
 │  ├─ config.json           # sing-box configuration
 │  └─ smartdns.conf         # smartdns configuration
 ├─ scripts/
+│  ├─ merlinbox_webui.sh    # KoolCenter Software Center backend script
 │  └─ dnsmasq.postconf      # dnsmasq post-processing script (used when taking over port 53)
 ├─ sh/
 │  ├─ fun.sh                # Core logic
