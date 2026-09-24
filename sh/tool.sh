@@ -917,6 +917,9 @@ package() {
   print_normal " 准备处理 merlinbox "
   build_ui "$arch"
 
+  #进入当前目录
+  cd "$CUR_DIR" || exit 1
+
   print_normal " 打包为 tar.gz 文件 "
   local package_name="merlin-box-${arch}_${SCRIPT_VERSION}.tar.gz"
   local package_name_noui="merlin-box-noui-${arch}_${SCRIPT_VERSION}.tar.gz"
