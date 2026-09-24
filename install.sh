@@ -23,8 +23,8 @@ readonly MODULE="merlinbox"
 readonly APP_NAME="Merlin Box"
 # 默认安装到 JFFS
 INSTALL_DIR="/jffs/merlin-box"
-# 脚本版本(编译时自动修改)
-SCRIPT_VERSION="0.0.1"
+# 脚本版本
+SCRIPT_VERSION="1.0.0"
 
 #=========================================
 # 在 Koolshare Merlin 固件上使用软件中心安装

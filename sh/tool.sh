@@ -923,10 +923,41 @@ package() {
   local package_dir="${CUR_DIR}/dist"
 
   mkdir -p "$package_dir"
-  tar -czf "${package_dir}/${package_name}" -C "${CUR_DIR}" --exclude='conf/logs' --exclude='install.sh' --exclude='uninstall.sh' --exclude='scripts/merlinbox_webui.sh' bin conf db res scripts sh wwwroot ./*.sh LICENSE ./*.md
-  tar -czf "${package_dir}/${package_name_noui}" -C "${CUR_DIR}" --exclude='bin/merlin-box' --exclude='conf/logs' --exclude='install.sh' --exclude='uninstall.sh' --exclude='scripts/merlinbox_webui.sh' bin conf res scripts sh ./*.sh LICENSE ./*.md
+  tar -czf "${package_dir}/${package_name}" -C "${CUR_DIR}" --exclude='conf/logs' --exclude='install.sh' --exclude='uninstall.sh' --exclude='scripts/merlinbox_webui.sh' bin conf db res scripts sh wwwroot *.sh LICENSE *.md
+  tar -czf "${package_dir}/${package_name_noui}" -C "${CUR_DIR}" --exclude='bin/merlin-box' --exclude='conf/logs' --exclude='install.sh' --exclude='uninstall.sh' --exclude='scripts/merlinbox_webui.sh' bin conf res scripts sh *.sh LICENSE *.md
 
-  print_success "✅ 打包完成: ${package_dir}/${package_name} 和 ${package_dir}/${package_name_noui}"
+  local valids=""
+
+  if [ "$arch" = "arm64" ]; then
+    valids="hnd_v8 ipq64 qca"
+  elif [ "$arch" = "arm" ]; then
+    valids="hnd arm ipq32 qca"
+  fi
+
+  for valid in $valids; do
+      # 创建当前平台标识
+      echo "$valid" > "${CUR_DIR}/.valid"
+
+      local package_name_koolcenter="merlin-box-koolcenter-${valid}-${arch}_${SCRIPT_VERSION}.tar.gz"
+
+      tar -czf "${package_dir}/${package_name_koolcenter}" \
+          -C "${CUR_DIR}" \
+          --exclude='conf/logs' \
+          --transform='s,^,merlinbox/,' \
+          webs bin conf db res scripts sh wwwroot *.sh LICENSE *.md .valid
+
+      if [ $? -ne 0 ]; then
+          print_error "❌ ${valid} 打包失败"
+          rm -f "${CUR_DIR}/.valid"
+          return 1
+      fi
+
+  done
+
+  #删除 .valid 文件
+  rm -f "${CUR_DIR}/.valid"
+
+  print_success "✅ 打包完成。"
 
 }
 

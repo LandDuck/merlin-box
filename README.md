@@ -148,7 +148,7 @@ This project aims to clearly separate responsibilities:
     </tr>
     <tr>
       <td>Software Center</td>
-      <td>⏳ Planned</td>
+      <td>✅ Supported</td>
       <td>
         The package file supports installation in the KoolCenter Software Center.
       </td>
