@@ -489,14 +489,36 @@ setup_dns_hijack_ipv6()
     [ "$MB_ENABLE_IPV6" != "1" ] && return 0
     print_line "setting up lan dns v6 hijack"
 
-    # 🌟 核心避坑：ip6tables 没有 REDIRECT 动作，必须用 DNAT 转发到本地回环地址 [::1]
-    ip6tables -t nat -A "$MB_DNS_CHAIN_V6" -p udp --dport 53 -j DNAT --to-destination [::1]:53
-    ip6tables -t nat -A "$MB_DNS_CHAIN_V6" -p tcp --dport 53 -j DNAT --to-destination [::1]:53
+    # 实际创建临时链测试当前系统是否支持 IPv6 REDIRECT
+    local test_chain="MB_TEST_REDIRECT"
+    ip6tables -t nat -F "$test_chain" 2>/dev/null
+    ip6tables -t nat -X "$test_chain" 2>/dev/null
 
-    # 主链去重与引流挂载
+    if ! ip6tables -t nat -N "$test_chain" 2>/dev/null; then
+        print_line "failed to create IPv6 REDIRECT test chain, skip dns v6 hijack"
+        return 0
+    fi
+
+    if ! ip6tables -t nat -A "$test_chain" -p udp --dport 53 -j REDIRECT --to-ports 53 2>/dev/null; then
+        ip6tables -t nat -F "$test_chain" 2>/dev/null
+        ip6tables -t nat -X "$test_chain" 2>/dev/null
+        print_line "IPv6 REDIRECT is not supported, skip dns v6 hijack"
+        return 0
+    fi
+
+    # 测试成功，清理临时链
+    ip6tables -t nat -F "$test_chain" 2>/dev/null
+    ip6tables -t nat -X "$test_chain" 2>/dev/null
+
+    # IPv6 DNS 劫持到路由器本机 53 端口
+    ip6tables -t nat -A "$MB_DNS_CHAIN_V6" -p udp --dport 53 -j REDIRECT --to-ports 53
+    ip6tables -t nat -A "$MB_DNS_CHAIN_V6" -p tcp --dport 53 -j REDIRECT --to-ports 53
+
+    # 主链去重
     ip6tables -t nat -D PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
     ip6tables -t nat -D PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6" 2>/dev/null
 
+    # 从 LAN bridge 引流 DNS 到自定义链
     ip6tables -t nat -A PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN_V6"
     ip6tables -t nat -A PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN_V6"
 
