@@ -27,21 +27,31 @@
   ],
   "outbounds": [
     {
-      "type": "anytls",
-      "server": "1.1.1.4",
-      "server_port": 80,
-      "password": "888888",
+      "type": "hysteria2",
+      "server": "2.2.2.2",
+      "server_port": 90,
+      "password": "124",
+      "up_mbps": 10,
+      "down_mbps": 20,
+      "network": "tcp",
+      "obfs": {
+        "type": "gecko",
+        "password": "123"
+      },
       "tls": {
         "enabled": true,
-        "server_name": "www.cloufflare.com"
+        "server_name": "www.cloudflare.com",
+        "alpn": [
+          "h3"
+        ]
       },
       "tcp_fast_open": false,
-      "tag": "637efc73-0ce1-4580-8b0a-b5ec787e6644",
+      "tag": "ada981dd-6c07-4030-869e-694df72c9d19",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "637efc73-0ce1-4580-8b0a-b5ec787e6644"
+    "final": "ada981dd-6c07-4030-869e-694df72c9d19"
   }
 }

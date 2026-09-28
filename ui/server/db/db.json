@@ -42,7 +42,7 @@
   },
   "nodes": [
     {
-      "is_default": true,
+      "is_default": false,
       "name": "my_anytls",
       "password": "888888",
       "server": "1.1.1.4",
@@ -117,27 +117,27 @@
       "version": 6
     },
     {
-      "down_mbps": 100,
-      "is_default": false,
       "name": "my_hy2",
-      "network": "tcp",
-      "obfs": {
-        "password": "123",
-        "type": "gecko"
-      },
-      "password": "124",
+      "tag": "ada981dd-6c07-4030-869e-694df72c9d19",
+      "type": "hysteria2",
+      "is_default": true,
       "server": "2.2.2.2",
       "server_port": 90,
-      "tag": "ada981dd-6c07-4030-869e-694df72c9d19",
+      "up_mbps": 10,
+      "down_mbps": 20,
+      "password": "124",
+      "network": "tcp",
+      "obfs": {
+        "type": "gecko",
+        "password": "123"
+      },
       "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com",
         "alpn": [
           "h3"
-        ],
-        "enabled": true,
-        "server_name": "www.cloudflare.com"
-      },
-      "type": "hysteria2",
-      "up_mbps": 100
+        ]
+      }
     },
     {
       "is_default": false,

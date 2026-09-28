@@ -55,8 +55,8 @@ type Hysteria2Outbound struct {
 	Server      string           `json:"server"`
 	ServerPort  int              `json:"server_port"`
 	Password    string           `json:"password"`
-	UpMbps      int              `json:"up_mbps"`
-	DownMbps    int              `json:"down_mbps"`
+	UpMbps      int              `json:"up_mbps,omitempty"`
+	DownMbps    int              `json:"down_mbps,omitempty"`
 	Network     string           `json:"network,omitempty"`
 	Obfs        db.Hysteria2Obfs `json:"obfs"`
 	Tls         db.Hysteria2Tls  `json:"tls"`
