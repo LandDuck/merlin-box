@@ -766,21 +766,47 @@ get_github_latest_release() {
 
     # 1. 发送请求提取 tag_name
     local tag
+    local release_json
+    local api_url="https://api.github.com/repos/${repo}/releases/latest"
 
     # 是否在路由器中
     if is_running_on_router; then
-      print_normal "在路由器中运行，使用本机sock5代理">&2
-      tag=$(curl -fsS --proxy "socks5h://127.0.0.1:65001" "https://api.github.com/repos/${repo}/releases/latest" \
-              | grep -o '"tag_name": *"[^"]*"' \
-              | head -n 1 \
-              | sed 's/"tag_name": *"\([^"]*\)"/\1/')
+        print_normal "在路由器中运行，尝试使用本机 SOCKS5 代理" >&2
+
+        # curl 可能不支持 proxy，失败后自动使用 wget
+        if type curl >/dev/null 2>&1; then
+            release_json=$(curl -fsS \
+                --proxy "socks5h://127.0.0.1:65001" \
+                "$api_url" 2>/dev/null)
+        fi
+
+        if [ -z "$release_json" ]; then
+            print_normal "curl 代理请求失败，尝试使用 wget 直连" >&2
+
+            if type wget >/dev/null 2>&1; then
+                release_json=$(wget --no-hsts -qO- "$api_url")
+            fi
+        fi
     else
-      print_normal "在PC上运行，使用本机直连">&2
-      tag=$(curl -fsS  "https://api.github.com/repos/${repo}/releases/latest" \
-              | grep -o '"tag_name": *"[^"]*"' \
-              | head -n 1 \
-              | sed 's/"tag_name": *"\([^"]*\)"/\1/')
+        print_normal "在PC上运行，使用本机直连" >&2
+
+        if type curl >/dev/null 2>&1; then
+            release_json=$(curl -fsS "$api_url" 2>/dev/null)
+        fi
+
+        if [ -z "$release_json" ]; then
+            print_normal "curl 请求失败，尝试使用 wget" >&2
+
+            if type wget >/dev/null 2>&1; then
+                release_json=$(wget --no-hsts -qO- "$api_url")
+            fi
+        fi
     fi
+
+    tag=$(printf '%s' "$release_json" \
+        | grep -o '"tag_name": *"[^"]*"' \
+        | head -n 1 \
+        | sed 's/"tag_name": *"\([^"]*\)"/\1/')
 
     # 2. 纯数字版本号清洗 (去除 Release、v 等字母前缀/后缀，仅保留数字和 .)
     local version
