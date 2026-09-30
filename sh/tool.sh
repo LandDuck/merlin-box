@@ -958,9 +958,9 @@ package() {
   local valids=""
 
   if [ "$arch" = "arm64" ]; then
-    valids="hnd_v8 ipq64 qca"
+    valids="hnd_v8 ipq64 qca mtk"
   elif [ "$arch" = "arm" ]; then
-    valids="hnd arm ipq32 qca"
+    valids="hnd arm ipq32 qca mtk"
   fi
 
   for valid in $valids; do
