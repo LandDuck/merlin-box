@@ -27,10 +27,14 @@ import React from "react";
  *   "server": "127.0.0.1",                 //普通 input  必须输入  ip4或ip6, 注意这里不能填写域名.
  *   "server_name" : "example.com",        //普通 input  必须输入 域名.   这个不是标准属性, 最终会填入 tls.server_name
  *   "server_port": 1080,                 //普通 input 只能输入数字  1->65535
+ *
+ *   "enable_hop": 0,                    //antd select, 端口跳跃(enable_hop), 开启（1）/关闭（0）。默认是关闭的。 2026-10-3 03:18:53 实现.
  *   "server_ports": [
- *     "2080:3000"
- *   ],                                  //一期不不实现端口范围
- *   "hop_interval": "",                 //不实现
+ *       "2080:3000",
+ *       "4000:5000"
+ *   ],                                  //普通 input 2026-10-3 03:18:04 实现 端口范围，格式为 ‘1000:2000,3000:4000’  逗号分隔多组，每组必须是端口范围
+ *   "hop_interval": "",                 //普通 input 只能输入数字  2026年10月3日03:18:08 实现  跳跃间隔，单位为秒， 默认30
+ *
  *   "hop_interval_max": "",             //不实现
  *   "up_mbps": 100,                     //普通 input 只能输入数字  10->10000  注意单位
  *   "down_mbps": 100,                   //普通 input 只能输入数字  10->10000  注意单位
@@ -101,6 +105,11 @@ class Hysteria2Form extends React.Component {
             obfsPassword: "", // 混淆密码
             password: "", // Hysteria2 密码
             network: "", // 网络协议
+            enableHop: 0, // 端口跳跃
+            serverPorts: "", // 端口范围，如 1000:2000,3000:4000
+            hopInterval: "30", // 跳跃间隔(秒)
+            serverPortsError: false,
+            hopIntervalError: false,
             nameError: false,
             serverError: false,
             serverNameError: false,
@@ -125,6 +134,9 @@ class Hysteria2Form extends React.Component {
             this.state.obfsPassword = (editData.obfs && editData.obfs.password) || "";
             this.state.password = editData.password || "";
             this.state.network = editData.network || "";
+            this.state.enableHop = Number(editData.enable_hop) === 1 ? 1 : 0;
+            this.state.serverPorts = editData.server_ports || "";
+            this.state.hopInterval = editData.hop_interval ? String(editData.hop_interval) : "30";
         }
     }
 
@@ -151,7 +163,7 @@ class Hysteria2Form extends React.Component {
      * @returns
      */
     #buildValue(state) {
-        return {
+        const value = {
             tag: this.#uuid,
             is_default: this.#isDefault,
             type: "hysteria2",
@@ -172,6 +184,28 @@ class Hysteria2Form extends React.Component {
                 alpn: ["h3"]
             }
         };
+        if (Number(state.enableHop) === 1) {
+            value.enable_hop = 1;
+            value.server_ports = state.serverPorts.trim();
+            value.hop_interval = Number(state.hopInterval);
+        } else {
+            value.enable_hop = 0;
+        }
+        return value;
+    }
+
+    /**
+     * 验证端口范围，每组必须是 起始:结束，如 1000:2000,3000:4000
+     */
+    #isPortsValid(value) {
+        if (!value || !value.trim()) {
+            return false;
+        }
+        const inRange = (s) => /^\d+$/.test(s) && Number(s) >= 1 && Number(s) <= 65535;
+        return value.split(",").map(s => s.trim()).every(item => {
+            const parts = item.split(":");
+            return parts.length === 2 && inRange(parts[0]) && inRange(parts[1]) && Number(parts[0]) <= Number(parts[1]);
+        });
     }
 
     /**
@@ -188,7 +222,7 @@ class Hysteria2Form extends React.Component {
     }
 
     #validate() {
-        const {name, server, serverName, serverPort, upMbps, downMbps, obfsPassword, password} = this.state;
+        const {name, server, serverName, serverPort, upMbps, downMbps, obfsPassword, password, enableHop, serverPorts, hopInterval} = this.state;
         const nameError = !name || !name.trim();
         const serverError = !server || !(server.trim().isIPv4() || server.trim().isIPv6());
         const serverNameError = !serverName || !serverName.trim().isDomain();
@@ -198,7 +232,13 @@ class Hysteria2Form extends React.Component {
         const obfsPasswordError = !obfsPassword || !obfsPassword.trim();
         const passwordError = !password || !password.trim();
 
+        const hopOn = Number(enableHop) === 1;
+        const serverPortsError = hopOn && !this.#isPortsValid(serverPorts);
+        const hopIntervalError = hopOn && !(/^\d+$/.test(String(hopInterval)) && Number(hopInterval) >= 1);
+
         this.setState({
+            serverPortsError,
+            hopIntervalError,
             nameError,
             serverError,
             serverNameError,
@@ -208,7 +248,7 @@ class Hysteria2Form extends React.Component {
             obfsPasswordError,
             passwordError,
         });
-        return !nameError && !serverError && !serverNameError && !serverPortError && !upMbpsError && !downMbpsError && !obfsPasswordError && !passwordError;
+        return !serverPortsError && !hopIntervalError && !nameError && !serverError && !serverNameError && !serverPortError && !upMbpsError && !downMbpsError && !obfsPasswordError && !passwordError;
     }
 
     /**
@@ -272,8 +312,56 @@ class Hysteria2Form extends React.Component {
                                    this.#validate();
                                }}/>
                     </div>
+                    <div className="form-help-tag">
+                        开启端口跳跃后, 忽略此值
+                    </div>
                 </div>
             </div>
+            <div className="form-item">
+                <label>端口跳跃</label>
+                <div className="form-field">
+                    <antd.Select
+                        value={this.state.enableHop}
+                        style={{width: "100%"}}
+                        onChange={(val) => {
+                            this.state.enableHop = val;
+                            this.setState({enableHop: val}, () => this.#validate());
+                        }}
+                        options={[{label: "关闭", value: 0}, {label: "开启", value: 1}]}
+                    />
+                </div>
+            </div>
+            {Number(this.state.enableHop) === 1 && <>
+                <div className="form-item">
+                    <label>跳跃端口</label>
+                    <div className="form-field">
+                        <div className={`nlc-input ${this.state.serverPortsError ? "error" : ""}`}>
+                            <input type="text" placeholder="如 1000:2000,3000:4000，逗号分隔" value={this.state.serverPorts}
+                                   onChange={(e) => {
+                                       this.state.serverPorts = e.target.value;
+                                       this.setState({serverPorts: this.state.serverPorts});
+                                       this.#validate();
+                                   }}/>
+                        </div>
+                    </div>
+                </div>
+                <div className="form-item">
+                    <label>跳跃间隔</label>
+                    <div className="form-field">
+                        <div className={`nlc-input ${this.state.hopIntervalError ? "error" : ""}`}>
+                            <input type="number" min="1" placeholder="默认 30" value={this.state.hopInterval}
+                                   onChange={(e) => {
+                                       this.state.hopInterval = e.target.value;
+                                       this.setState({hopInterval: this.state.hopInterval});
+                                       this.#validate();
+                                   }}/>
+                        </div>
+                        <div className="form-help-tag">
+                            秒
+                        </div>
+                    </div>
+                </div>
+            </>}
             <div className="form-item">
                 <label>上行带宽</label>
                 <div className="form-field">

@@ -780,7 +780,7 @@ func shadowsocksNodeToOutbound(n dbModel.ShadowsocksNode) singbox.ShadowsocksOut
 
 // hysteria2NodeToOutbound 将 Hysteria2 节点转换为 Singbox 出站配置
 func hysteria2NodeToOutbound(n dbModel.Hysteria2Node) singbox.Hysteria2Outbound {
-	return singbox.Hysteria2Outbound{
+	var config = singbox.Hysteria2Outbound{
 		Type:        n.Type,
 		Server:      n.Server,
 		ServerPort:  n.ServerPort,
@@ -793,6 +793,15 @@ func hysteria2NodeToOutbound(n dbModel.Hysteria2Node) singbox.Hysteria2Outbound 
 		Tag:         n.Tag,
 		RoutingMark: 169,
 	}
+	if n.EnableHop == 1 {
+		for _, p := range strings.Split(n.ServerPorts, ",") {
+			if p = strings.TrimSpace(p); p != "" {
+				config.ServerPorts = append(config.ServerPorts, p)
+			}
+		}
+		config.HopInterval = fmt.Sprintf("%ds", n.HopInterval)
+	}
+	return config
 }
 
 // anytlsNodeToOutbound 将 Anytls 节点转换为 Singbox 出站配置

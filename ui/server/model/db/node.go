@@ -138,6 +138,12 @@ type Hysteria2Obfs struct {
 // Hysteria2Node 节点基础信息结构体，继承 NodeBase
 type Hysteria2Node struct {
 	NodeBase
+	// EnableHop 是否启用端口跳跃，1 启用，0 禁用
+	EnableHop int `json:"enable_hop"`
+	// ServerPorts 跳跃端口
+	ServerPorts string `json:"server_ports"`
+	// HopInterval 跳跃间隔，单位 秒
+	HopInterval int `json:"hop_interval"`
 	// UpMbps 节点上行带宽限制，单位 Mbps
 	UpMbps int `json:"up_mbps"`
 	// DownMbps 节点下行带宽限制，单位 Mbps

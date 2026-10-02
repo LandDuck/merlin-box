@@ -51,9 +51,13 @@ type ShadowsocksOutbound struct {
 
 // Hysteria2Outbound 出站配置结构体
 type Hysteria2Outbound struct {
-	Type        string           `json:"type"`
-	Server      string           `json:"server"`
-	ServerPort  int              `json:"server_port"`
+	Type       string `json:"type"`
+	Server     string `json:"server"`
+	ServerPort int    `json:"server_port"`
+	// ServerPorts 跳跃端口
+	ServerPorts []string `json:"server_ports,omitempty"`
+	// HopInterval 跳跃间隔, 例如 30s
+	HopInterval string           `json:"hop_interval,omitempty"`
 	Password    string           `json:"password"`
 	UpMbps      int              `json:"up_mbps,omitempty"`
 	DownMbps    int              `json:"down_mbps,omitempty"`
