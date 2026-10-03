@@ -107,6 +107,11 @@ func startHTTPServer(port int) {
 	router.Post("/api/load_node", handlers.LoadNode)
 	router.Post("/api/set_default_node", handlers.SetDefaultNode)
 
+	router.Post("/api/save_subscription", handlers.SaveSubscription)
+	router.Post("/api/load_subscription_list", handlers.GetSubscriptionList)
+	router.Post("/api/delete_subscription", handlers.DeleteSubscription)
+	router.Post("/api/load_subscription", handlers.LoadSubscription)
+
 	logger.Success("HTTP server is running on port ", port)
 
 	lanIP, err := getLanIP()

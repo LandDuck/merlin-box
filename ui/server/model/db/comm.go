@@ -36,6 +36,8 @@ type Database struct {
 	IP6 IPControlInfo `json:"ip6"`
 	// Domain 域名控制信息
 	Domain DomainControlInfo `json:"domain"`
+	// Subscriptions 订阅列表
+	Subscriptions []Subscription `json:"subscriptions"`
 	// Nodes 节点列表，每个元素为原始 JSON（支持多种节点类型）
 	Nodes []json.RawMessage `json:"nodes"`
 }

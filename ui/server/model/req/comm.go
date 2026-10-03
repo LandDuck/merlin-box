@@ -80,6 +80,22 @@ type SaveNode struct {
 	Data string `json:"data" validate:"required"`
 }
 
+// SaveSubscription 保存订阅请求结构体
+type SaveSubscription struct {
+	// Guid 订阅唯一标识
+	Guid string `json:"guid" validate:"required"`
+	// Name 订阅名称
+	Name string `json:"name" validate:"required"`
+	// Link 订阅地址
+	Link string `json:"link" validate:"required"`
+}
+
+// SubscriptionGuidRequest 订阅 guid 请求结构体，用于删除、加载单个订阅
+type SubscriptionGuidRequest struct {
+	// Guid 订阅唯一标识
+	Guid string `json:"guid" validate:"required"`
+}
+
 // NodeTagRequest 节点 tag 请求结构体，用于删除、设为默认等单节点操作
 type NodeTagRequest struct {
 	// Tag 节点唯一标识

@@ -20,7 +20,6 @@ export default {
     comm_init: 'api/init',
     comm_login: 'api/login',
     comm_changePassword: 'api/change_password',
-    comm_saveSubscription: 'api/save_subscription',
     comm_status: 'api/status',
     comm_delay: 'api/delay',
     comm_remoteVersion: 'api/remote_version',
@@ -47,6 +46,10 @@ export default {
     comm_deleteNode: 'api/delete_node',
     comm_loadNode: 'api/load_node',
     comm_setDefaultNode: 'api/set_default_node',
+    comm_saveSubscription: 'api/save_subscription',
+    comm_loadSubscriptionList: 'api/load_subscription_list',
+    comm_deleteSubscription: 'api/delete_subscription',
+    comm_loadSubscription: 'api/load_subscription',
 }
 
 

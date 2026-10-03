@@ -40,6 +40,18 @@
     "whitelist": "# 域名白名单，强制不走代理\n*.mysql.rds.aliyuncs.com",
     "hostlist": "# 自定义解析\n192.168.50.111 haha.com"
   },
+  "subscriptions": [
+    {
+      "name": "test",
+      "guid": "693ff394-8398-42bc-84fd-df321c645393",
+      "link": "https://www.cloudflare.com"
+    },
+    {
+      "name": "test2",
+      "guid": "7426fb5a-24cd-42ad-bbb5-843ce1dd1e1b",
+      "link": "https://www.google.com"
+    }
+  ],
   "nodes": [
     {
       "is_default": false,

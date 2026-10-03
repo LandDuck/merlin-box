@@ -547,3 +547,74 @@ func GetDefaultNode() (json.RawMessage, error) {
 	}
 	return nil, fmt.Errorf("default node not found")
 }
+
+// writeFile 持久化数据库
+func writeFile(file dbModel.Database) error {
+	content, err := json.MarshalIndent(file, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(global.DbPath, content, 0o644)
+}
+
+// SaveSubscription 保存订阅：guid 已存在则更新，否则追加
+func SaveSubscription(sub dbModel.Subscription) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	found := false
+	for i := range file.Subscriptions {
+		if file.Subscriptions[i].Guid == sub.Guid {
+			file.Subscriptions[i] = sub
+			found = true
+			break
+		}
+	}
+	if !found {
+		file.Subscriptions = append(file.Subscriptions, sub)
+	}
+	return writeFile(file)
+}
+
+// GetSubscriptionList 获取订阅列表
+func GetSubscriptionList() ([]dbModel.Subscription, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return nil, err
+	}
+	if file.Subscriptions == nil {
+		return []dbModel.Subscription{}, nil
+	}
+	return file.Subscriptions, nil
+}
+
+// DeleteSubscription 删除指定 guid 的订阅
+func DeleteSubscription(guid string) error {
+	file, err := ReadFile()
+	if err != nil {
+		return err
+	}
+	subs := make([]dbModel.Subscription, 0, len(file.Subscriptions))
+	for _, s := range file.Subscriptions {
+		if s.Guid != guid {
+			subs = append(subs, s)
+		}
+	}
+	file.Subscriptions = subs
+	return writeFile(file)
+}
+
+// GetSubscriptionByGuid 根据 guid 获取订阅
+func GetSubscriptionByGuid(guid string) (dbModel.Subscription, error) {
+	file, err := ReadFile()
+	if err != nil {
+		return dbModel.Subscription{}, err
+	}
+	for _, s := range file.Subscriptions {
+		if s.Guid == guid {
+			return s, nil
+		}
+	}
+	return dbModel.Subscription{}, fmt.Errorf("subscription not found: %s", guid)
+}

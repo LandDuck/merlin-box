@@ -184,7 +184,7 @@ class NodeList extends React.Component {
      */
     render() {
         const components = [];
-        //components.push(<SubscriptionList key="subscription-list"/>);
+        components.push(<SubscriptionList key="subscription-list"/>);
         components.push(<section className="node-network mb-item" key="node-list">
             <div className="section-title">
                 <span className="section-icon"/>

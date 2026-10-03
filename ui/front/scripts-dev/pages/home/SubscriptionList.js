@@ -76,19 +76,21 @@ class SubscriptionList extends React.Component {
 
     /**
      * 删除订阅
-     * @param {string} tag
+     * @param {string} guid
      */
-    #deleteSubscription(tag) {
+    #deleteSubscription(guid) {
         this.$helper.showAlertLayer({
             title: "操作提示",
-            content: "确认删除该订阅？",
+            content: "确认删除该订阅？对应的节点也会一并删除，请确认！",
             onCancel: () => {
-                this.$helper.warning("已取消删除订阅操作。");
+                this.$helper.warning("已取消删除操作。");
             },
             onOk: () => {
                 this.$http.sendPost({
                     url: this.$config.apis.comm_deleteSubscription,
-                    data: {tag},
+                    data: {
+                        guid
+                    },
                     success: () => {
                         this.$helper.success('删除成功');
                         this.#loadSubscriptionList();
@@ -100,12 +102,14 @@ class SubscriptionList extends React.Component {
 
     /**
      * 编辑订阅
-     * @param tag
+     * @param guid
      */
-    #editSubscription(tag) {
+    #editSubscription(guid) {
         this.$http.sendPost({
             url: this.$config.apis.comm_loadSubscription,
-            data: {tag},
+            data: {
+                guid: guid
+            },
             success: (data) => {
                 this.$helper.showAddSubscriptionDialog({
                     data,
@@ -142,9 +146,39 @@ class SubscriptionList extends React.Component {
                     <div className="col-actions">操作</div>
                 </div>
                 <div className="table-body">
-                    <div className="subscription-empty">
-                        暂无订阅
-                    </div>
+                    {(!this.state.subscriptionList || this.state.subscriptionList.length === 0)
+                        ? <div className="subscription-empty">
+                            暂无订阅
+                        </div>
+                        : this.state.subscriptionList.map((item, index) =>
+                            <div className="subscription-item" key={item.guid}>
+                                <div className="col-index">{String(index + 1).padStart(2, '0')}</div>
+                                <div className="col-name">
+                                    <span className="name">{item.name}</span>
+                                </div>
+                                <div className="col-url">
+                                    <span className="url" title={item.link}>{item.link}</span>
+                                </div>
+                                <div className="col-actions">
+                                    <div className="actions">
+                                        <button className="action update">
+                                            <span className="icon"></span>
+                                            <span>更新</span>
+                                        </button>
+                                        <button className="action edit"
+                                                onClick={() => this.#editSubscription(item.guid)}>
+                                            <span className="icon"></span>
+                                            <span>编辑</span>
+                                        </button>
+                                        <button className="action delete"
+                                                onClick={() => this.#deleteSubscription(item.guid)}>
+                                            <span className="icon"></span>
+                                            <span>删除</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     {/*<div className="subscription-item">
                         <div className="col-index">01</div>
                         <div className="col-name">

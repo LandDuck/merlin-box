@@ -40,5 +40,6 @@
     "whitelist": "# 域名白名单，强制不走代理\n*.mysql.rds.aliyuncs.com",
     "hostlist": "# 自定义解析\n192.168.50.111 haha.com"
   },
+  "subscriptions": [],
   "nodes": []
 }

@@ -66,7 +66,7 @@ class SubscriptionDialog extends DialogBase {
             url: this.$config.apis.comm_saveSubscription,
             data: {guid, name: name.trim(), link: link.trim()},
             success: () => {
-                this.$helper.success("订阅保存成功。");
+                this.$helper.success("保存成功，在列表中点击【更新】按钮即可拉取节点。");
                 if (typeof this.#config.onOk === "function") {
                     this.#config.onOk();
                 }
