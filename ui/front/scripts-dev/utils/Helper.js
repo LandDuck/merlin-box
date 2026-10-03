@@ -20,6 +20,7 @@ import AlertDialog from "./dialog/AlertDialog";
 import InputDialog from "./dialog/InputDialog";
 import LogDialog from "./dialog/LogDialog";
 import ChangePwdDialog from "./dialog/ChangePwdDialog";
+import SubscriptionDialog from "./dialog/SubscriptionDialog";
 import AddNodeDialog from "./dialog/AddNodeDialog";
 import {message} from 'antd';
 
@@ -132,6 +133,19 @@ class Helper {
             let element = this.getLayerOutEle();
             const root = window.createRoot(element);
             root.render(<ChangePwdDialog config={config}/>);
+        });
+    }
+
+    /**
+     * 弹出添加/编辑订阅对话框
+     * @param config {data?: {guid, name, link}, onOk?: Function} data 存在时为回显（编辑）模式
+     */
+    showAddSubscriptionDialog(config) {
+        config = config || {};
+        this.closeLayer(() => {
+            let element = this.getLayerOutEle();
+            const root = window.createRoot(element);
+            root.render(<SubscriptionDialog config={config}/>);
         });
     }
 

@@ -129,7 +129,7 @@ class SubscriptionList extends React.Component {
                     <span className="title-icon"></span>
                     <span className="title-text">节点订阅</span>
                 </div>
-                <button className="add-subscription">
+                <button className="add-subscription" onClick={() => this.#addSubscription()}>
                     <span className="icon"></span>
                     <span>添加订阅</span>
                 </button>
@@ -145,7 +145,7 @@ class SubscriptionList extends React.Component {
                     <div className="subscription-empty">
                         暂无订阅
                     </div>
-                    <div className="subscription-item">
+                    {/*<div className="subscription-item">
                         <div className="col-index">01</div>
                         <div className="col-name">
                             <span className="name">HK-Special-HighSpeedHK-Special-HighSpeedHK-Special-HighSpeed</span>
@@ -198,7 +198,7 @@ class SubscriptionList extends React.Component {
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div>*/}
                 </div>
             </div>
         </section>

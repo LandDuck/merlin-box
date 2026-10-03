@@ -20,6 +20,7 @@ export default {
     comm_init: 'api/init',
     comm_login: 'api/login',
     comm_changePassword: 'api/change_password',
+    comm_saveSubscription: 'api/save_subscription',
     comm_status: 'api/status',
     comm_delay: 'api/delay',
     comm_remoteVersion: 'api/remote_version',
