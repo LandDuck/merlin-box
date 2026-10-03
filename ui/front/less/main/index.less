@@ -1442,7 +1442,6 @@
     }
   }
 
-
 }
 
 
@@ -1473,9 +1472,151 @@
   }
 }
 
+// 订阅列表沿用各主题的面板、文字和强调色，SVG 固定填色通过滤镜适配。
+.subscription-theme(@panel; @text; @muted; @hint; @accent; @button; @button-hover; @border; @divider; @row-hover; @success; @accent-filter; @muted-filter; @success-filter) {
+  .subscription-list {
+    background-color: @panel !important;
+    outline-color: @border !important;
+
+    .subscription-header {
+      .subscription-title {
+        .title-icon {
+          color: @accent !important;
+          background-color: transparent !important;
+          filter: @accent-filter !important;
+        }
+
+        .title-text {
+          color: @text !important;
+        }
+      }
+
+      .add-subscription {
+        color: @accent !important;
+        background-color: fade(@accent, 10%) !important;
+        outline-color: fade(@accent, 30%) !important;
+
+        &:hover {
+          background-color: fade(@accent, 20%) !important;
+          outline-color: fade(@accent, 60%) !important;
+        }
+
+        &:active {
+          background-color: fade(@accent, 28%) !important;
+        }
+
+        .icon {
+          color: @accent !important;
+          filter: @accent-filter !important;
+        }
+      }
+    }
+
+    .subscription-table {
+      .subscription-empty {
+        color: @hint !important;
+      }
+
+      .subscription-item:hover {
+        background-color: @row-hover !important;
+      }
+
+      .table-header {
+        color: @muted !important;
+        border-bottom-color: @border !important;
+      }
+
+      .table-body {
+        .subscription-item {
+          + .subscription-item {
+            border-top-color: @divider !important;
+          }
+
+          .col-index {
+            color: @muted !important;
+          }
+
+          .col-name {
+            .status-dot {
+              background-color: @success !important;
+            }
+
+            .name {
+              color: @text !important;
+            }
+          }
+
+          .col-url {
+            .url {
+              color: @accent !important;
+              background-color: fade(@accent, 10%) !important;
+              outline-color: fade(@accent, 20%) !important;
+            }
+          }
+
+          .col-actions {
+            .actions {
+              .action {
+                color: @muted !important;
+
+                &.update {
+                  color: @success !important;
+                  background-color: fade(@success, 10%) !important;
+
+                  .icon {
+                    filter: @success-filter !important;
+                  }
+                }
+
+                &.edit {
+                  color: @accent !important;
+
+                  .icon {
+                    filter: @accent-filter !important;
+                  }
+                }
+
+                &.delete {
+                  color: @muted !important;
+
+                  .icon {
+                    filter: @muted-filter !important;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .subscription-footer {
+      border-top-color: @divider !important;
+
+      .tips {
+        color: @hint !important;
+      }
+
+      .update-all {
+        color: #FFFFFF !important;
+        background-color: @button !important;
+
+        &:hover {
+          background-color: @button-hover !important;
+        }
+      }
+    }
+  }
+}
+
 //----------红黑电竞风----------
-body[data-theme=" rog-rapture"] {
+body[data-theme="rog-rapture"] {
   .home-main {
+    .subscription-theme(#1C1C20; #F2F2F4; #C4C4CC; #888892; #FF7185; #C8102E; #E32646; rgba(255, 255, 255, .08); rgba(255, 255, 255, .05); #29292E; #4AE176;
+      brightness(0) saturate(100%) invert(57%) sepia(43%) saturate(1500%) hue-rotate(310deg);
+      brightness(0) saturate(100%) invert(80%) sepia(7%) saturate(230%) hue-rotate(202deg);
+      none);
+
     .tab-group {
       .tab-bar {
         border-bottom-color: rgba(255, 255, 255, 0.08) !important;
@@ -1819,6 +1960,11 @@ body[data-theme=" rog-rapture"] {
 //----------暗夜黑----------
 body[data-theme="dark-night"] {
   .home-main {
+    .subscription-theme(#18181C; #F4F4F5; #C4C4CD; #91919D; #A5B4FC; #5558DB; #6366E8; rgba(255, 255, 255, .08); rgba(255, 255, 255, .05); #27272E; #4AE176;
+      brightness(0) saturate(100%) invert(77%) sepia(21%) saturate(1317%) hue-rotate(192deg);
+      brightness(0) saturate(100%) invert(80%) sepia(7%) saturate(230%) hue-rotate(202deg);
+      none);
+
     .tab-group {
       .tab-bar {
         border-bottom-color: rgba(255, 255, 255, 0.08) !important;
@@ -2160,6 +2306,11 @@ body[data-theme="dark-night"] {
 //----------晨曦白----------
 body[data-theme="dawn-white"] {
   .home-main {
+    .subscription-theme(#FFFFFF; #1E293B; #475569; #64748B; #2563EB; #2563EB; #1D4ED8; rgba(71, 85, 105, .16); rgba(71, 85, 105, .1); #F8FAFC; #16A34A;
+      brightness(0) saturate(100%) invert(32%) sepia(94%) saturate(2473%) hue-rotate(216deg);
+      brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg);
+      brightness(0) saturate(100%) invert(45%) sepia(90%) saturate(700%) hue-rotate(90deg));
+
     .tab-group {
       .tab-bar {
         border-bottom-color: rgba(71, 85, 105, 0.16) !important;
