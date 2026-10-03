@@ -17,6 +17,8 @@
  */
 
 
+import SubscriptionList from "./SubscriptionList";
+
 /**
  * NodeList
  */
@@ -181,96 +183,9 @@ class NodeList extends React.Component {
      * @return
      */
     render() {
-        const r = [];
-        r.push(<section className="subscription-list mb-item">
-            <div className="subscription-header">
-                <div className="subscription-title">
-                    <span className="title-icon"></span>
-                    <span className="title-text">节点订阅</span>
-                </div>
-                <button className="add-subscription">
-                    <span className="icon"></span>
-                    <span>添加订阅</span>
-                </button>
-            </div>
-            <div className="subscription-table">
-                <div className="table-header">
-                    <div className="col-index">序号</div>
-                    <div className="col-name">名称</div>
-                    <div className="col-url">链接</div>
-                    <div className="col-actions">操作</div>
-                </div>
-                <div className="table-body">
-                    <div className="subscription-empty">
-                        暂无订阅
-                    </div>
-                    <div className="subscription-item">
-                        <div className="col-index">01</div>
-                        <div className="col-name">
-                            <span className="name">HK-Special-HighSpeedHK-Special-HighSpeedHK-Special-HighSpeed</span>
-                        </div>
-                        <div className="col-url">
-                              <span className="url" title="https://sub.stellaros.io/v1/sub?token=7f90c3ae4b29">
-                                https://sub.stellaros.io/v1/sub?token=7f90c3ae4b29https://sub.stellaros.io/v1/sub?token=7f90c3ae4b29https://sub.stellaros.io/v1/sub?token=7f90c3ae4b29
-                              </span>
-                        </div>
-                        <div className="col-actions">
-                            <div className="actions">
-                                <button className="action update">
-                                    <span className="icon"></span>
-                                    <span>更新</span>
-                                </button>
-                                <button className="action edit">
-                                    <span className="icon"></span>
-                                    <span>编辑</span>
-                                </button>
-                                <button className="action delete">
-                                    <span className="icon"></span>
-                                    <span>删除</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="subscription-item">
-                        <div className="col-index">02</div>
-                        <div className="col-name">
-
-                            <span className="name">Tokyo-Gaming-Relay</span>
-                        </div>
-                        <div className="col-url">
-                          <span className="url">
-                            https://sub.stellaros.io/
-                          </span>
-                        </div>
-                        <div className="col-actions">
-                            <div className="actions">
-                                <button className="action update">
-                                    <span className="icon"></span>
-                                    <span>更新</span>
-                                </button>
-                                <button className="action edit">
-                                    <span className="icon"></span>
-                                    <span>编辑</span>
-                                </button>
-                                <button className="action delete">
-                                    <span className="icon"></span>
-                                    <span>删除</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {/*<div className="subscription-footer">
-                <div className="tips">
-                    支持 Base64、Clash 及 V2Ray 订阅格式。
-                </div>
-                <button className="update-all">
-                    全部更新
-                </button>
-            </div>*/}
-        </section>)
-        r.push(<section className="node-network mb-item">
+        const components = [];
+        //components.push(<SubscriptionList key="subscription-list"/>);
+        components.push(<section className="node-network mb-item" key="node-list">
             <div className="section-title">
                 <span className="section-icon"/>
                 <h2>节点列表</h2>
@@ -289,7 +204,7 @@ class NodeList extends React.Component {
                 </div>
             </div>
         </section>)
-        return r;
+        return components;
     }
 }
 
