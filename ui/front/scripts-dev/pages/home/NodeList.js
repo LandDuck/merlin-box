@@ -218,7 +218,7 @@ class NodeList extends React.Component {
                             <div className="actions">
                                 <button className="action update">
                                     <span className="icon"></span>
-                                    <span>更新节点</span>
+                                    <span>更新</span>
                                 </button>
                                 <button className="action edit">
                                     <span className="icon"></span>
@@ -239,14 +239,14 @@ class NodeList extends React.Component {
                         </div>
                         <div className="col-url">
                           <span className="url">
-                            https://sub.stellaros.io/v2/game?token=8a4120ec01d7
+                            https://sub.stellaros.io/
                           </span>
                         </div>
                         <div className="col-actions">
                             <div className="actions">
                                 <button className="action update">
                                     <span className="icon"></span>
-                                    <span>更新节点</span>
+                                    <span>更新</span>
                                 </button>
                                 <button className="action edit">
                                     <span className="icon"></span>

@@ -1209,13 +1209,12 @@
         }
 
         .col-url {
-          width: 355px;
-          flex-shrink: 0;
+          flex: 1;
         }
 
         .col-actions {
-          flex: 1;
-          min-width: 253px;
+          width: 242px;
+          flex-shrink: 0;
         }
       }
 
@@ -1298,10 +1297,12 @@
 
           .col-url {
             padding: 14px 16px;
+            min-width: 0;
 
             .url {
-              display: inline-block;
-              max-width: 340px;
+              display: block;
+              width: contain;
+              /*max-width: 100%;*/
               padding: 4px 10px;
 
               overflow: hidden;
@@ -1317,6 +1318,8 @@
               font-weight: 400;
               line-height: 16px;
 
+              /*white-space: normal;
+              overflow-wrap: anywhere;*/
               white-space: nowrap;
               text-overflow: ellipsis;
             }
@@ -1448,6 +1451,28 @@
 @media screen and (max-width: 940px) {
   .home-main {
 
+    .subscription-list {
+      .subscription-empty {
+        padding: 10px 0 !important;
+      }
+
+      .subscription-table {
+        .table-header, .subscription-item {
+          .col-index, .col-name, .col-url, .col-actions {
+            padding: 10px !important;
+          }
+
+          .col-name {
+            width: 180px;
+
+            .name {
+              font-size: 12px !important;
+            }
+          }
+        }
+      }
+    }
+
     .hero-header {
       padding-top: 50px;
     }
@@ -1468,6 +1493,7 @@
     .node-list {
       grid-template-columns: repeat(3, 1fr);
     }
+
 
   }
 }
@@ -1612,10 +1638,7 @@
 //----------红黑电竞风----------
 body[data-theme="rog-rapture"] {
   .home-main {
-    .subscription-theme(#1C1C20; #F2F2F4; #C4C4CC; #888892; #FF7185; #C8102E; #E32646; rgba(255, 255, 255, .08); rgba(255, 255, 255, .05); #29292E; #4AE176;
-      brightness(0) saturate(100%) invert(57%) sepia(43%) saturate(1500%) hue-rotate(310deg);
-      brightness(0) saturate(100%) invert(80%) sepia(7%) saturate(230%) hue-rotate(202deg);
-      none);
+    .subscription-theme(#1C1C20; #F2F2F4; #C4C4CC; #888892; #FF7185; #C8102E; #E32646; rgba(255, 255, 255, .08); rgba(255, 255, 255, .05); #29292E; #4AE176; brightness(0) saturate(100%) invert(57%) sepia(43%) saturate(1500%) hue-rotate(310deg); brightness(0) saturate(100%) invert(80%) sepia(7%) saturate(230%) hue-rotate(202deg); none);
 
     .tab-group {
       .tab-bar {
@@ -1960,10 +1983,7 @@ body[data-theme="rog-rapture"] {
 //----------暗夜黑----------
 body[data-theme="dark-night"] {
   .home-main {
-    .subscription-theme(#18181C; #F4F4F5; #C4C4CD; #91919D; #A5B4FC; #5558DB; #6366E8; rgba(255, 255, 255, .08); rgba(255, 255, 255, .05); #27272E; #4AE176;
-      brightness(0) saturate(100%) invert(77%) sepia(21%) saturate(1317%) hue-rotate(192deg);
-      brightness(0) saturate(100%) invert(80%) sepia(7%) saturate(230%) hue-rotate(202deg);
-      none);
+    .subscription-theme(#18181C; #F4F4F5; #C4C4CD; #91919D; #A5B4FC; #5558DB; #6366E8; rgba(255, 255, 255, .08); rgba(255, 255, 255, .05); #27272E; #4AE176; brightness(0) saturate(100%) invert(77%) sepia(21%) saturate(1317%) hue-rotate(192deg); brightness(0) saturate(100%) invert(80%) sepia(7%) saturate(230%) hue-rotate(202deg); none);
 
     .tab-group {
       .tab-bar {
@@ -2306,10 +2326,7 @@ body[data-theme="dark-night"] {
 //----------晨曦白----------
 body[data-theme="dawn-white"] {
   .home-main {
-    .subscription-theme(#FFFFFF; #1E293B; #475569; #64748B; #2563EB; #2563EB; #1D4ED8; rgba(71, 85, 105, .16); rgba(71, 85, 105, .1); #F8FAFC; #16A34A;
-      brightness(0) saturate(100%) invert(32%) sepia(94%) saturate(2473%) hue-rotate(216deg);
-      brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg);
-      brightness(0) saturate(100%) invert(45%) sepia(90%) saturate(700%) hue-rotate(90deg));
+    .subscription-theme(#FFFFFF; #1E293B; #475569; #64748B; #2563EB; #2563EB; #1D4ED8; rgba(71, 85, 105, .16); rgba(71, 85, 105, .1); #F8FAFC; #16A34A; brightness(0) saturate(100%) invert(32%) sepia(94%) saturate(2473%) hue-rotate(216deg); brightness(0) saturate(100%) invert(33%) sepia(14%) saturate(884%) hue-rotate(176deg); brightness(0) saturate(100%) invert(45%) sepia(90%) saturate(700%) hue-rotate(90deg));
 
     .tab-group {
       .tab-bar {
@@ -2681,6 +2698,35 @@ body[data-theme="dawn-white"] {
   // 沿用桌面层次缩小尺寸；细边框保留，文字最小 12px。
   .home-main {
     padding: 0 12px;
+
+    .subscription-list {
+      padding: 18px !important;
+      border-radius: 9px !important;
+
+      .subscription-table {
+        .table-header, .subscription-item {
+          .col-url {
+            display: none !important;
+          }
+
+          .col-name {
+            flex: 1;
+            width: auto;
+          }
+
+          .col-actions {
+            width: 80px;
+
+            .actions {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-end !important;
+            }
+          }
+        }
+      }
+    }
+
 
     .tab-group {
       margin-bottom: 18px;
