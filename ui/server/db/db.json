@@ -42,12 +42,12 @@
   },
   "subscriptions": [
     {
-      "name": "test",
+      "name": "大机场",
       "guid": "693ff394-8398-42bc-84fd-df321c645393",
       "link": "https://www.cloudflare.com"
     },
     {
-      "name": "test2",
+      "name": "小机场",
       "guid": "7426fb5a-24cd-42ad-bbb5-843ce1dd1e1b",
       "link": "https://www.google.com"
     }

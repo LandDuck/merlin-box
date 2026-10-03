@@ -123,6 +123,14 @@ class SubscriptionList extends React.Component {
     }
 
     /**
+     * 更新订阅节点
+     * @param guid
+     */
+    #updateSubscriptionNodes(guid) {
+        this.$helper.toast("功能还在开发中，敬请期待！");
+    }
+
+    /**
      * 渲染方法
      * @return
      */
@@ -161,7 +169,7 @@ class SubscriptionList extends React.Component {
                                 </div>
                                 <div className="col-actions">
                                     <div className="actions">
-                                        <button className="action update">
+                                        <button className="action update" onClick={() => this.#updateSubscriptionNodes(item.guid)}>
                                             <span className="icon"></span>
                                             <span>更新</span>
                                         </button>
