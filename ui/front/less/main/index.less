@@ -158,7 +158,6 @@
       border-radius: 12px;
       background: rgba(255, 255, 255, .08);
       color: #DCE2F7;
-      font-family: Inter, sans-serif;
       font-size: 14px;
       font-weight: 600;
       line-height: 20px;
@@ -185,7 +184,6 @@
 
     color: #DCE2F7;
 
-    font-family: Inter, sans-serif;
     font-size: 48px;
     font-weight: 700;
     line-height: 56px;
@@ -200,7 +198,6 @@
 
     color: #BEC7D4;
 
-    font-family: Inter, sans-serif;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -253,7 +250,6 @@
   .stat-label {
     color: #BEC7D4;
 
-    font-family: Geist, sans-serif;
     font-size: 12px;
     font-weight: 600;
     line-height: 16px;
@@ -269,7 +265,6 @@
 
     color: #DCE2F7;
 
-    font-family: Inter, sans-serif;
     font-size: 20px;
     font-weight: 600;
     line-height: 28px;
@@ -727,7 +722,6 @@
 
       color: #DCE2F7;
 
-      font-family: Inter, sans-serif;
       font-size: 18px;
       font-weight: 400;
       line-height: 27px;
@@ -737,7 +731,7 @@
 
   .title-icon {
     display: block;
-    background: #BEC7D4;
+    /*background: #BEC7D4;*/
   }
 
   .blacklist-icon {
@@ -819,7 +813,6 @@
 
     outline: none;
 
-    font-family: Geist, sans-serif;
     font-size: 14px;
     line-height: 20px;
 
@@ -867,8 +860,6 @@
 
     color: rgba(190, 199, 212, .6);
 
-    font-family: Geist, sans-serif;
-
     font-size: 12px;
     line-height: 16px;
   }
@@ -887,8 +878,6 @@
     background: #97CBFF;
 
     color: #00385C;
-
-    font-family: Nimbus Sans, sans-serif;
 
     font-size: 12px;
     font-weight: 700;
@@ -971,7 +960,6 @@
 
     div {
       color: #BEC7D4;
-      font-family: Geist, sans-serif;
       font-size: 12px;
       line-height: 18px;
     }
@@ -994,8 +982,6 @@
 
     label {
       color: #BEC7D4;
-
-      font-family: Geist, sans-serif;
 
       font-size: 16px;
       line-height: 24px;
@@ -1029,8 +1015,6 @@
 
 
     color: #BEC7D4;
-
-    font-family: Geist, sans-serif;
 
     font-size: 12px;
 
@@ -1094,9 +1078,6 @@
 
     color: #00385C;
 
-
-    font-family: Nimbus Sans, sans-serif;
-
     font-size: 16px;
 
     font-weight: 700;
@@ -1118,6 +1099,349 @@
       transform: translateY(1px);
     }
   }
+
+
+  .subscription-list {
+    align-self: stretch;
+    padding: 24px;
+    border-radius: 12px;
+    outline: 1px solid rgba(255, 255, 255, 0.08);
+    outline-offset: -1px;
+    backdrop-filter: blur(9px);
+    background-color: rgba(255, 255, 255, 0.08);
+    outline-color: rgba(255, 255, 255, .08) !important;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .subscription-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .subscription-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .title-icon {
+          width: 17px;
+          height: 17px;
+          //background: #97cbff;
+          color: #97cbff;
+          background-size: 100% 100%;
+          background-image: url("../../images/icon-subscription.svg");
+        }
+
+        .title-text {
+          color: #dce2f7;
+          font-size: 20px;
+          font-weight: 600;
+          line-height: 28px;
+        }
+      }
+
+      .add-subscription {
+        padding: 6px 16px;
+
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        color: #97cbff;
+        background: rgba(151, 203, 255, 0.1);
+        border: 0;
+        border-radius: 12px;
+        outline: 1px solid rgba(151, 203, 255, 0.3);
+        outline-offset: -1px;
+
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 16px;
+
+        cursor: pointer;
+        transition: background 0.2s ease, outline-color 0.2s ease, transform 0.1s ease;
+
+        &:hover {
+          background: rgba(151, 203, 255, 0.2);
+          outline-color: rgba(151, 203, 255, 0.6);
+        }
+
+        &:active {
+          background: rgba(151, 203, 255, 0.28);
+          transform: translateY(1px);
+        }
+
+        .icon {
+          width: 10.5px;
+          height: 10.5px;
+          //background: #97cbff;
+          color: #97cbff;
+          background-size: 100% 100%;
+          background-image: url("../../images/icon-add-subscription.svg");
+        }
+      }
+    }
+
+    .subscription-table {
+      padding-top: 8px;
+      overflow: hidden;
+
+      .subscription-empty {
+        text-align: center;
+        color: rgba(190, 199, 212, 0.6);
+        padding: 24px 0;
+      }
+
+      .table-header, .subscription-item {
+        display: flex;
+        align-items: center;
+        transition: background 0.2s ease;
+
+        .col-index {
+          width: 50px;
+          flex-shrink: 0;
+        }
+
+        .col-name {
+          width: 202px;
+          flex-shrink: 0;
+        }
+
+        .col-url {
+          width: 355px;
+          flex-shrink: 0;
+        }
+
+        .col-actions {
+          flex: 1;
+          min-width: 253px;
+        }
+      }
+
+      .subscription-item {
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+        }
+      }
+
+      .table-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        color: #bec7d4;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 16.5px;
+        letter-spacing: 0.55px;
+        text-transform: uppercase;
+        /*.col-index {
+          padding: 10px 12px;
+          text-align: center;
+        }*/
+
+        .col-index,
+        .col-name,
+        .col-url,
+        .col-actions {
+          padding: 10px 12px;
+          text-align: center;
+        }
+
+        /*.col-actions {
+          text-align: right;
+        }*/
+      }
+
+
+      .table-body {
+
+        .subscription-item {
+          min-height: 59px;
+
+          + .subscription-item {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+          }
+
+          .col-index {
+            padding: 19.5px 12px;
+
+            color: #bec7d4;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 16px;
+            text-align: center;
+          }
+
+          .col-name {
+            padding: 14px 16px;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .status-dot {
+              width: 6px;
+              height: 6px;
+              flex-shrink: 0;
+
+              background: #4ae176;
+              border-radius: 50%;
+            }
+
+            .name {
+              color: #dce2f7;
+              font-size: 14px;
+              font-weight: 600;
+              line-height: 20px;
+            }
+          }
+
+          .col-url {
+            padding: 14px 16px;
+
+            .url {
+              display: inline-block;
+              max-width: 340px;
+              padding: 4px 10px;
+
+              overflow: hidden;
+
+              color: rgba(151, 203, 255, 0.8);
+              background: rgba(151, 203, 255, 0.1);
+
+              border-radius: 4px;
+              outline: 1px solid rgba(151, 203, 255, 0.2);
+              outline-offset: -1px;
+
+              font-size: 12px;
+              font-weight: 400;
+              line-height: 16px;
+
+              white-space: nowrap;
+              text-overflow: ellipsis;
+            }
+          }
+
+          .col-actions {
+            padding: 15.25px 16px;
+
+            display: flex;
+            justify-content: flex-end;
+
+            .actions {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .action {
+                padding: 4px 8px;
+
+                display: flex;
+                align-items: center;
+                gap: 4px;
+
+                color: #bec7d4;
+                background: transparent;
+                border: 0;
+                border-radius: 4px;
+
+                font-size: 12px;
+                font-weight: 400;
+                line-height: 16px;
+
+                cursor: pointer;
+
+                .icon {
+                  width: 11px;
+                  height: 11px;
+                  //background: currentColor;
+                }
+
+                &:hover {
+                  opacity: 0.8;
+                }
+
+                &.update {
+                  padding: 4px 10px;
+
+                  color: #4ae176;
+                  background: rgba(74, 225, 118, 0.1);
+
+                  font-weight: 600;
+
+                  .icon {
+                    width: 10px;
+                    height: 10px;
+                    background-size: 100% 100%;
+                    background-image: url("../../images/icon-refresh-subscription.svg");
+                  }
+                }
+
+                &.edit {
+                  color: #97CBFF;
+
+                  .icon {
+                    background-size: 100% 100%;
+                    background-image: url("../../images/icon-edit-subscription.svg");
+                  }
+                }
+
+                &.delete {
+                  color: #BEC7D4;
+
+                  .icon {
+                    background-size: 100% 100%;
+                    background-image: url("../../images/icon-delete-subscription.svg");
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .subscription-footer {
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .tips {
+        color: rgba(190, 199, 212, 0.6);
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 16.5px;
+      }
+
+      .update-all {
+        padding: 12px 24px;
+
+        color: #00385c;
+        background: #97cbff;
+        border: 0;
+        border-radius: 12px;
+
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px;
+
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.1s ease;
+
+        &:hover {
+          background: #85bdf3;
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+    }
+  }
+
 
 }
 
@@ -1150,7 +1474,7 @@
 }
 
 //----------红黑电竞风----------
-body[data-theme="rog-rapture"] {
+body[data-theme=" rog-rapture"] {
   .home-main {
     .tab-group {
       .tab-bar {
