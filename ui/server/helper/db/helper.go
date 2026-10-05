@@ -618,3 +618,22 @@ func GetSubscriptionByGuid(guid string) (dbModel.Subscription, error) {
 	}
 	return dbModel.Subscription{}, fmt.Errorf("subscription not found: %s", guid)
 }
+
+// DeleteNodesByCategory 删除指定分类的所有节点
+func DeleteNodesByCategory(category string) {
+	file, err := ReadFile()
+	if err != nil {
+		return
+	}
+	nodes := make([]json.RawMessage, 0, len(file.Nodes))
+	for _, n := range file.Nodes {
+		var base struct {
+			Category string `json:"category"`
+		}
+		if err := json.Unmarshal(n, &base); err == nil && base.Category != category {
+			nodes = append(nodes, n)
+		}
+	}
+	file.Nodes = nodes
+	_ = writeFile(file)
+}

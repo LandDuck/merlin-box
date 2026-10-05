@@ -430,6 +430,38 @@ subscription_to_singbox_config() {
 }
 
 #=========================================
+# 将订阅链接转换为 sing-box 节点列表
+#=========================================
+subscription_to_nodes() {
+
+  local subscription_url="$1"
+  local category="$2"
+
+  if [ -z "$subscription_url" ]; then
+    print_error "错误: 订阅链接不能为空"
+    exit 1
+  fi
+  if [ -z "$category" ]; then
+    print_error "错误: 节点分组标识不能为空"
+    exit 1
+  fi
+
+  # merlin-box 可执行文件路径
+  local merlinbox_bin="${CUR_DIR}/bin/merlin-box"
+  if [ ! -f "$merlinbox_bin" ]; then
+    print_error "merlin-box 可执行文件不存在，请确认使用的是完整版 merlin-box"
+    exit 1
+  fi
+
+  print_normal "开始调用 merlin-box 将订阅链接转换为 sing-box 节点列表，Url=$subscription_url, Category=$category"
+
+  "$merlinbox_bin" tool sub2nodes --url "$subscription_url" --category "$category"
+
+  print_success "命令执行完成"
+
+}
+
+#=========================================
 # 构建 sing-box 可执行文件
 #=========================================
 build_singbox() {
@@ -612,6 +644,28 @@ build_singbox() {
   compress_singbox
 
   print_success "sing-box 可执行文件构建完成: ${file_path}"
+}
+
+#=========================================
+# 构建 merlin-box 可执行文件(用于测试)
+#=========================================
+build_merlinbox(){
+
+    # Server源码目录
+    local server_src_dir="${CUR_DIR}/ui/server" #main.go
+
+    # Server输出目录
+    local server_output_bin="${CUR_DIR}/bin/merlin-box"
+
+    print_line "构建 merlin-box 可执行文件"
+
+    # 构建服务器端
+    (
+      cd "$server_src_dir" || exit 1
+      #将 SCRIPT_VERSION 传递给 go build
+      GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/LandDuck/merlin-box/global.Version=${SCRIPT_VERSION}" -o "$server_output_bin" .
+    )
+
 }
 
 # =========================================

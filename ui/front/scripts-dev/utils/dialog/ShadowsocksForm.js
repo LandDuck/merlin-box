@@ -26,7 +26,7 @@ import React from "react";
  *   "type": "shadowsocks",
  *   "tag": "ss-out",                         //这个东西添加的时候自动生成一个uuid
  *
- *   "server": "127.0.0.1",                   //普通 input  必须输入  ip4或ip6或域名
+ *   "server": "127.0.0.1",                   //普通 input  必须输入  ip4或ip6
  *   "server_port": 1080,                     //普通 input 只能输入数字  1->65535
  *   "method": "2022-blake3-aes-128-gcm",     //使用antd.Select 列出所有 Encryption 和 Legacy encryption  默认使用 2022-blake3-aes-128-gcm
  *   "password": "8JCsPssfgS8tiRwiMlhARg==",  // 普通 input  必须输入
@@ -173,6 +173,7 @@ class ShadowsocksForm extends React.Component {
         }
         this.#uuid = this.$helper.getUUid();
         this.state = {
+            category: "UI",
             name: "", // 节点名称
             server: "", // 服务器地址
             serverPort: "", // 端口
@@ -190,6 +191,7 @@ class ShadowsocksForm extends React.Component {
             this.#uuid = editData.tag || this.#uuid;
             this.#isDefault = editData.is_default || false;
             console.log("ShadowsocksForm editData", editData);
+            this.state.category = editData.category || "UI";
             this.state.name = editData.name || "";
             this.state.server = editData.server || "";
             this.state.serverPort = editData.server_port.toString() || "";
@@ -220,6 +222,7 @@ class ShadowsocksForm extends React.Component {
 
     #buildValue(state) {
         return {
+            category: state.category,
             tag: this.#uuid,
             is_default: this.#isDefault,
             type: "shadowsocks",
@@ -273,7 +276,7 @@ class ShadowsocksForm extends React.Component {
                 <label>服务器</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
-                        <input type="text" placeholder="IP或域名" value={this.state.server} onChange={(e) => {
+                        <input type="text" placeholder="IPv4或IPv6" value={this.state.server} onChange={(e) => {
                             this.state.server = e.target.value;
                             this.setState({
                                 server: this.state.server

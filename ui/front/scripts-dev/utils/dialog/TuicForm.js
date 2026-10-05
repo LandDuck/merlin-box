@@ -80,6 +80,7 @@ class TuicForm extends React.Component {
         }
         this.#uuid = this.$helper.getUUid();
         this.state = {
+            category: "UI",
             name: "", // 节点名称
             server: "", // 服务器地址，支持 IPv4 / IPv6 / 域名
             serverName: "", // TLS Server Name（必填）
@@ -101,6 +102,7 @@ class TuicForm extends React.Component {
             this.#uuid = editData.tag || this.#uuid;
             this.#isDefault = editData.is_default || false;
             console.log("TuicForm editData", editData);
+            this.state.category = editData.category || "UI";
             this.state.name = editData.name || "";
             this.state.server = editData.server || "";
             this.state.serverName = (editData.tls && editData.tls.server_name) || "";
@@ -138,6 +140,7 @@ class TuicForm extends React.Component {
      */
     #buildValue(state) {
         return {
+            category: state.category,
             tag: this.#uuid,
             is_default: this.#isDefault,
             type: "tuic",
@@ -211,7 +214,7 @@ class TuicForm extends React.Component {
                 <label>服务器</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
-                        <input type="text" placeholder="IPv4、IPv6 或域名" value={this.state.server} onChange={(e) => {
+                        <input type="text" placeholder="IPv4或IPv6" value={this.state.server} onChange={(e) => {
                             this.state.server = e.target.value;
                             this.setState({server: this.state.server});
                             this.#validate();

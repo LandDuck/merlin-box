@@ -26,7 +26,7 @@ import React from "react";
  *   "type": "vless",
  *   "tag": "vless-out",
  *
- *   "server": "127.0.0.1",                 //普通 input  必须输入  ip4或ip6或域名
+ *   "server": "127.0.0.1",                 //普通 input  必须输入  ip4或ip6
  *   "server_name" : "example.com",        //普通 input   这个不是标准属性, 最终会填入 tls.server_name  (可以为空,如果为空的情况下, tls.enabled=false)
  *   "server_port": 1080,                   //普通 input 只能输入数字  1->65535
  *   "uuid": "bf000d23-0752-40b4-affe-68f7707a9661", //普通 input  必须输入  uuid
@@ -120,6 +120,7 @@ class VlessForm extends React.Component {
         this.#uuid = this.$helper.getUUid();
 
         this.state = {
+            category: "UI",
             name: "",       // 节点名称
             server: "",     // 服务器地址，支持 IPv4 / IPv6 / 域名
             serverName: "", // TLS Server Name（可选，空则不启用 TLS）
@@ -150,6 +151,7 @@ class VlessForm extends React.Component {
             this.#uuid = editData.tag || this.#uuid;
             this.#isDefault = editData.is_default || false;
             console.log("VlessForm editData", editData);
+            this.state.category = editData.category || "UI";
             this.state.name = editData.name || "";
             this.state.server = editData.server || "";
             this.state.serverName = (editData.tls && editData.tls.server_name) || "";
@@ -250,6 +252,7 @@ class VlessForm extends React.Component {
         }
 
         return {
+            category: state.category,
             tag: this.#uuid,
             is_default: this.#isDefault,
             type: "vless",
@@ -558,7 +561,7 @@ class VlessForm extends React.Component {
                         <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
                             <input
                                 type="text"
-                                placeholder="IPv4、IPv6 或域名"
+                                placeholder="IPv4或IPv6"
                                 value={this.state.server}
                                 onChange={(e) => {
                                     this.state.server = e.target.value;

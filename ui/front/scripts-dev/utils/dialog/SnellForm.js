@@ -101,6 +101,7 @@ class SnellForm extends React.Component {
         this.#uuid = this.$helper.getUUid();
 
         this.state = {
+            category: "UI",
             name: "",       // 节点名称
             server: "",     // 服务器地址，支持 IPv4 / IPv6 / 域名
             serverPort: "", // 端口
@@ -124,6 +125,7 @@ class SnellForm extends React.Component {
             this.#uuid = editData.tag || this.#uuid;
             this.#isDefault = editData.is_default || false;
             console.log("SnellForm editData", editData);
+            this.state.category = editData.category || "UI";
             this.state.name = editData.name || "";
             this.state.server = editData.server || "";
             this.state.serverPort = editData.server_port.toString() || "";
@@ -163,6 +165,7 @@ class SnellForm extends React.Component {
      */
     #buildValue(state) {
         const value = {
+            category: state.category,
             tag: this.#uuid,
             is_default: this.#isDefault,
             type: "snell",
@@ -268,7 +271,7 @@ class SnellForm extends React.Component {
                         <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
                             <input
                                 type="text"
-                                placeholder="IPv4、IPv6 或域名"
+                                placeholder="IPv4或IPv6"
                                 value={this.state.server}
                                 onChange={(e) => {
                                     this.state.server = e.target.value;

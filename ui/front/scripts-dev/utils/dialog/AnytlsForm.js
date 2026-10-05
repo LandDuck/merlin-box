@@ -60,6 +60,7 @@ class AnytlsForm extends React.Component {
         }
         this.#uuid = this.$helper.getUUid();
         this.state = {
+            category: "UI",
             name: "", // 节点名称
             server: "", // 服务器地址，仅支持 IPv4 / IPv6
             serverName: "", // TLS Server Name
@@ -76,6 +77,7 @@ class AnytlsForm extends React.Component {
             this.#uuid = editData.tag || this.#uuid;
             this.#isDefault = editData.is_default || false;
             console.log("AnytlsForm editData", editData);
+            this.state.category = editData.category || "UI";
             this.state.name = editData.name || "";
             this.state.server = editData.server || "";
             this.state.serverName = (editData.tls && editData.tls.server_name) || "";
@@ -108,6 +110,7 @@ class AnytlsForm extends React.Component {
      */
     #buildValue(state) {
         return {
+            category: state.category,
             tag: this.#uuid,
             is_default: this.#isDefault,
             type: "anytls",

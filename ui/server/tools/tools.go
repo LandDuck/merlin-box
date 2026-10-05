@@ -70,6 +70,43 @@ func init() {
 
 		return nil
 	}
+
+	toolRegistry["sub2nodes"] = func(args []string) error {
+		if len(args) < 2 {
+			return fmt.Errorf("tool sub2nodes requires --url and --category arguments")
+		}
+
+		// 读取 --url 参数
+		var url string
+		for i, arg := range args {
+			if arg == "--url" && i+1 < len(args) {
+				url = args[i+1]
+				break
+			}
+		}
+		if url == "" {
+			logger.Error("tool sub2nodes requires --url argument")
+			return fmt.Errorf("tool sub2nodes requires --url argument")
+		}
+
+		// 读取 --category 参数
+		var category string
+		for i, arg := range args {
+			if arg == "--category" && i+1 < len(args) {
+				category = args[i+1]
+				break
+			}
+		}
+		if category == "" {
+			logger.Error("tool sub2nodes requires --category argument")
+			return fmt.Errorf("tool sub2nodes requires --category argument")
+		}
+
+		// 调用 Sub2nodes 函数进行转换
+		Sub2nodes(url, category)
+
+		return nil
+	}
 }
 
 // printToolUsage 打印工具使用说明
@@ -98,7 +135,7 @@ func RunTool(args []string) error {
 	toolName := args[0]
 	tool, ok := toolRegistry[toolName]
 	if !ok {
-		logger.Error("unknown tool: ", toolName, "\nAvailable tools: ", toolNames())
+		//logger.Error("unknown tool: ", toolName, "\nAvailable tools: ", toolNames())
 		return fmt.Errorf("unknown tool: %s\nAvailable tools: %s", toolName, toolNames())
 	}
 

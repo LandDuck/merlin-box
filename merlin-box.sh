@@ -602,19 +602,30 @@ main() {
         sub2box)
           subscription_to_singbox_config "$3"
           ;;
+        sub2nodes)
+          if [ -z "$3" ] || [ -z "$4" ]; then
+            print_error "错误: sub2nodes 子命令需要两个参数: <订阅链接> <分组标识>"
+            print_normal "用法: $SCRIPT_NAME tool sub2nodes https://www.cloudflare.com/xxxx cloudflare"
+            exit 1
+          fi
+          subscription_to_nodes "$3" "$4"
+          ;;
         build_ui)
           build_ui
+          ;;
+        build_merlinbox)
+          build_merlinbox
           ;;
         package)
           package "$3"
           ;;
         -h|--help|"")
           print_normal "用法: $SCRIPT_NAME tool <subcommand>"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, build_ui, package"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, sub2nodes, build_ui, build_merlinbox, package"
           ;;
         *)
           print_error "错误: 不支持的工具子命令 '$2'"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, build_ui, package"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, sub2nodes, build_ui, build_merlinbox, package"
           exit 1
           ;;
       esac

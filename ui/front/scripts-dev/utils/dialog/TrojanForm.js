@@ -135,6 +135,7 @@ class TrojanForm extends React.Component {
         this.#uuid = this.$helper.getUUid();
 
         this.state = {
+            category: "UI",
             name: "",               // 节点名称
             server: "",             // 服务器地址，支持 IPv4 / IPv6 / 域名
             serverName: "",         // TLS Server Name
@@ -160,6 +161,7 @@ class TrojanForm extends React.Component {
             this.#uuid = editData.tag || this.#uuid;
             this.#isDefault = editData.is_default || false;
             console.log("TrojanForm editData", editData);
+            this.state.category = editData.category || "UI";
             this.state.name = editData.name || "";
             this.state.server = editData.server || "";
             this.state.serverName = (editData.tls && editData.tls.server_name) || "";
@@ -249,6 +251,7 @@ class TrojanForm extends React.Component {
         }
 
         const value = {
+            category: state.category,
             tag: this.#uuid,
             is_default: this.#isDefault,
             type: "trojan",
@@ -563,7 +566,7 @@ class TrojanForm extends React.Component {
                         <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
                             <input
                                 type="text"
-                                placeholder="IP或域名"
+                                placeholder="IPv4或IPv6"
                                 value={this.state.server}
                                 onChange={(e) => {
                                     this.state.server = e.target.value;

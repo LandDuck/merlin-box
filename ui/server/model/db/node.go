@@ -20,6 +20,8 @@ package db
 
 // NodeBase 节点基础信息结构体
 type NodeBase struct {
+	// Category 节点分类
+	Category string `json:"category"`
 	// Name 节点名称
 	Name string `json:"name"`
 	// Tag 节点标签 唯一标识

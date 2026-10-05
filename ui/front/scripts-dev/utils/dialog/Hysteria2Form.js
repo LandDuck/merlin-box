@@ -95,6 +95,7 @@ class Hysteria2Form extends React.Component {
         }
         this.#uuid = this.$helper.getUUid();
         this.state = {
+            category: "UI",
             name: "", // 节点名称
             server: "", // 服务器地址，仅支持 IPv4 / IPv6
             serverName: "", // TLS Server Name
@@ -124,6 +125,7 @@ class Hysteria2Form extends React.Component {
             this.#uuid = editData.tag || this.#uuid;
             this.#isDefault = editData.is_default || false;
             console.log("Hysteria2Form editData", editData);
+            this.state.category = editData.category || "UI";
             this.state.name = editData.name || "";
             this.state.server = editData.server || "";
             this.state.serverName = (editData.tls && editData.tls.server_name) || "";
@@ -164,6 +166,7 @@ class Hysteria2Form extends React.Component {
      */
     #buildValue(state) {
         const value = {
+            category: state.category,
             tag: this.#uuid,
             is_default: this.#isDefault,
             type: "hysteria2",
