@@ -19,6 +19,8 @@
 package tools
 
 import (
+	"regexp"
+
 	logger "github.com/LandDuck/merlin-box/helper/log"
 
 	"encoding/base64"
@@ -27,12 +29,9 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"gopkg.in/yaml.v3"
 )
 
 // buildTransport
@@ -398,143 +397,6 @@ func parseURI(uri string) map[string]any {
 	return nil
 }
 
-// parseClashYAML 解析 Clash YAML 的 proxies 并转换为 sing-box outbounds。
-func parseClashYAML(content string) []map[string]any {
-	var data map[string]any
-	if err := yaml.Unmarshal([]byte(content), &data); err != nil {
-		logger.Warn("Clash YAML 解析失败: " + err.Error())
-		return nil
-	}
-
-	proxiesAny, ok := data["proxies"]
-	if !ok {
-		return nil
-	}
-	proxies, ok := proxiesAny.([]any)
-	if !ok {
-		return nil
-	}
-
-	outbounds := make([]map[string]any, 0, len(proxies))
-	for _, item := range proxies {
-		p, ok := item.(map[string]any)
-		if !ok {
-			continue
-		}
-		t := asString(p["type"])
-		tag := withDefault(asString(p["name"]), "unnamed")
-		server := firstNonEmpty(asString(p["server"]), asString(p["host"]), asString(p["address"]))
-
-		if server != "" && isLocalIP(server) {
-			logger.Warn(fmt.Sprintf("跳过本地 IP 节点: %s (%s)", tag, server))
-			continue
-		}
-
-		switch t {
-		case "ss":
-			port, err := toInt(p["port"])
-			if err != nil {
-				continue
-			}
-			outbounds = append(outbounds, map[string]any{
-				"type":        "shadowsocks",
-				"tag":         tag,
-				"server":      server,
-				"server_port": port,
-				"method":      withDefault(asString(p["cipher"]), "aes-256-gcm"),
-				"password":    asString(p["password"]),
-			})
-		case "vmess":
-			port, err := toInt(p["port"])
-			if err != nil {
-				continue
-			}
-			ob := map[string]any{
-				"type":        "vmess",
-				"tag":         tag,
-				"server":      server,
-				"server_port": port,
-				"uuid":        asString(p["uuid"]),
-				"security":    withDefault(asString(p["cipher"]), "auto"),
-				"alter_id":    mustIntDefault(p["alterId"], 0),
-			}
-			if asBool(p["tls"]) {
-				ob["tls"] = map[string]any{
-					"enabled":     true,
-					"server_name": firstNonEmpty(asString(p["servername"]), server),
-				}
-			}
-			if asString(p["network"]) == "ws" {
-				wsOpts := asMap(p["ws-opts"])
-				headers := asMap(wsOpts["headers"])
-				if headers == nil {
-					headers = map[string]any{}
-				}
-				ob["transport"] = map[string]any{
-					"type":    "ws",
-					"path":    withDefault(asString(wsOpts["path"]), "/"),
-					"headers": headers,
-				}
-			}
-			outbounds = append(outbounds, ob)
-		case "trojan":
-			port, err := toInt(p["port"])
-			if err != nil {
-				continue
-			}
-			outbounds = append(outbounds, map[string]any{
-				"type":        "trojan",
-				"tag":         tag,
-				"server":      server,
-				"server_port": port,
-				"password":    asString(p["password"]),
-				"tls": map[string]any{
-					"enabled":     true,
-					"server_name": firstNonEmpty(asString(p["sni"]), server),
-				},
-			})
-		case "vless":
-			port, err := toInt(p["port"])
-			if err != nil {
-				continue
-			}
-			ob := map[string]any{
-				"type":        "vless",
-				"tag":         tag,
-				"server":      server,
-				"server_port": port,
-				"uuid":        asString(p["uuid"]),
-				"flow":        asString(p["flow"]),
-			}
-			if asBool(p["tls"]) {
-				tls := map[string]any{
-					"enabled":     true,
-					"server_name": firstNonEmpty(asString(p["servername"]), server),
-				}
-				reality := asMap(p["reality"])
-				if len(reality) > 0 {
-					ob["tag"] = asString(ob["tag"]) + "（不安全）"
-					tls["utls"] = map[string]any{
-						"enabled":     true,
-						"fingerprint": "chrome",
-					}
-					tls["reality"] = map[string]any{
-						"enabled":    true,
-						"public_key": asString(reality["public_key"]),
-						"short_id":   asString(reality["short_id"]),
-					}
-					logger.Warn("检测到 Reality 配置，已为节点启用 uTLS: " + asString(ob["tag"]))
-				}
-				ob["tls"] = tls
-			}
-			outbounds = append(outbounds, ob)
-		default:
-			logger.Warn("跳过不支持的 Clash 协议: " + t)
-		}
-	}
-	return outbounds
-}
-
 // buildSingboxConfig 将解析后的 outbounds 组装成完整 sing-box 配置。
 func buildSingboxConfig(outbounds []map[string]any) (map[string]any, error) {
 	filtered := make([]map[string]any, 0, len(outbounds))
@@ -598,36 +460,31 @@ func convert(subscriptionURL string) (map[string]any, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	outbounds := make([]map[string]any, 0)
-	if strings.HasPrefix(content, "proxies:") || strings.Contains(left(content, 200), "proxies:") {
-		logger.Success("检测到 Clash YAML 格式")
-		outbounds = parseClashYAML(content)
+
+	normalized := strings.ReplaceAll(content, "\n", "")
+	base64Like, _ := regexp.MatchString(`^[A-Za-z0-9+/=]+$`, normalized)
+	if isBase64(content) || base64Like {
+		logger.Success("检测到 Base64 格式")
+		uris, err := decodeBase64Sub(content)
+		if err != nil {
+			return nil, err
+		}
+		logger.Success(fmt.Sprintf("共解析到 %d 条 URI", len(uris)))
+		for _, uri := range uris {
+			if ob := parseURI(uri); ob != nil {
+				outbounds = append(outbounds, ob)
+			}
+		}
 	} else {
-		normalized := strings.ReplaceAll(content, "\n", "")
-		base64Like, _ := regexp.MatchString(`^[A-Za-z0-9+/=]+$`, normalized)
-		if isBase64(content) || base64Like {
-			logger.Success("检测到 Base64 格式")
-			uris, err := decodeBase64Sub(content)
-			if err != nil {
-				return nil, err
+		logger.Success("尝试按行解析 URI")
+		for _, line := range strings.Split(content, "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
 			}
-			logger.Success(fmt.Sprintf("共解析到 %d 条 URI", len(uris)))
-			for _, uri := range uris {
-				if ob := parseURI(uri); ob != nil {
-					outbounds = append(outbounds, ob)
-				}
-			}
-		} else {
-			logger.Success("尝试按行解析 URI")
-			for _, line := range strings.Split(content, "\n") {
-				line = strings.TrimSpace(line)
-				if line == "" {
-					continue
-				}
-				if ob := parseURI(line); ob != nil {
-					outbounds = append(outbounds, ob)
-				}
+			if ob := parseURI(line); ob != nil {
+				outbounds = append(outbounds, ob)
 			}
 		}
 	}
