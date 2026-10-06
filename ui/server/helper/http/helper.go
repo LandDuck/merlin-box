@@ -21,16 +21,21 @@ package http
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"sync"
 	"time"
 
+	logger "github.com/LandDuck/merlin-box/helper/log"
 	"github.com/LandDuck/merlin-box/model/resp"
 
 	"golang.org/x/net/proxy"
 )
+
+var socks5ProxyCache sync.Map // key: proxyURL, value: *http.Transport
 
 // ResponseResult 返回统一的响应结构体，包含状态码、消息和数据
 // T 是一个具体的业务数据，当code为0时，应该返回Data
@@ -74,17 +79,13 @@ func ResponseRequireLogin(response http.ResponseWriter) {
 	})
 }
 
-var socks5ProxyCache sync.Map // key: proxyURL, value: *http.Transport
-
 // TestDelay 用于测试到一个域名的延时, 到达即可,  不需要下载数据. 同时支持使用 socks 代理
 func TestDelay(url string, useProxy bool) int {
-	// 只测试连接和首包响应头，不下载 body
 	client := &http.Client{
 		Timeout: 6 * time.Second,
 	}
 	if useProxy {
-		proxyUrl := "socks5://127.0.0.1:65001"
-		proxyTransport, err := getSocks5Proxy(proxyUrl)
+		proxyTransport, err := getSocks5Proxy()
 		if err != nil {
 			return -1
 		}
@@ -97,17 +98,96 @@ func TestDelay(url string, useProxy bool) int {
 	if err != nil {
 		return -1
 	}
-	resp, err := client.Do(req)
+	testResp, err := client.Do(req)
 	if err != nil {
 		return -1
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := testResp.Body.Close(); err != nil {
+			logger.Warn("关闭 response body 失败: " + err.Error())
+		}
+	}()
 	// 记录结束时间
 	duration := time.Since(start)
 	return int(duration.Milliseconds())
 }
 
-func getSocks5Proxy(proxyURL string) (*http.Transport, error) {
+// DownloadFileToPath 下载文件到指定路径，同时支持使用 socks5 代理
+func DownloadFileToPath(url string, path string, useProxy bool) error {
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+	if useProxy {
+		proxyTransport, err := getSocks5Proxy()
+		if err != nil {
+			return err
+		}
+		client.Transport = proxyTransport
+	}
+
+	downloadResp, err := client.Get(url)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := downloadResp.Body.Close(); err != nil {
+			logger.Warn("关闭 response body 失败: " + err.Error())
+		}
+	}()
+
+	out, err := createFile(path)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := out.Close(); err != nil {
+			logger.Warn("关闭文件失败: " + err.Error())
+		}
+	}()
+
+	_, err = io.Copy(out, downloadResp.Body)
+	return err
+}
+
+// GetHttpTextResponse 获取 HTTP 响应的文本内容，同时支持使用 socks5 代理
+func GetHttpTextResponse(url string, useProxy bool) (string, error) {
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+	if useProxy {
+		proxyTransport, err := getSocks5Proxy()
+		if err != nil {
+			return "", err
+		}
+		client.Transport = proxyTransport
+	}
+
+	getResp, err := client.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		if err := getResp.Body.Close(); err != nil {
+			logger.Warn("关闭 response body 失败: " + err.Error())
+		}
+	}()
+
+	body, err := io.ReadAll(getResp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
+}
+
+// DownloadFile 下载文件到临时目录，同时支持使用 socks5 代理
+func createFile(path string) (*os.File, error) {
+	return os.Create(path)
+}
+
+// getSocks5Proxy 获取一个支持 socks5 代理的 http.Transport，如果已经存在则直接返回缓存中的实例
+func getSocks5Proxy() (*http.Transport, error) {
+	proxyURL := "socks5://127.0.0.1:65001"
 	if transport, ok := socks5ProxyCache.Load(proxyURL); ok {
 		return transport.(*http.Transport), nil
 	}
