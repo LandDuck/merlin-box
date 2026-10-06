@@ -27,19 +27,21 @@
   ],
   "outbounds": [
     {
-      "type": "shadowsocks",
+      "type": "trojan",
       "server": "1.1.1.1",
-      "server_port": 80,
-      "method": "2022-blake3-aes-128-gcm",
-      "password": "123465",
-      "udp_over_tcp": false,
+      "server_port": 2,
+      "password": "3",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com"
+      },
       "tcp_fast_open": false,
-      "tag": "f5dfc2f3-2664-4391-9cbf-0c4eb05f14de",
+      "tag": "2009cb0a-44a1-45c1-babb-c888e12adeb1",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "f5dfc2f3-2664-4391-9cbf-0c4eb05f14de"
+    "final": "2009cb0a-44a1-45c1-babb-c888e12adeb1"
   }
 }

@@ -407,6 +407,7 @@
   }
 
   .node-card {
+    position: relative;
     min-width: 0;
     padding: 12px 16px;
     display: flex;
@@ -483,19 +484,32 @@
     font-size: 14px;
     line-height: 20px;
     overflow-wrap: anywhere;
+    //只能两行
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .node-ip {
     color: #BEC7D4;
     font-size: 13px;
     line-height: 18px;
+    //超出显示...
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-bottom: 24px;
   }
 
   .node-actions {
-    padding-top: 8px;
+    //padding-top: 8px;
     display: flex;
     align-items: center;
     gap: 12px;
+    position: absolute;
+    bottom: 12px;
   }
 
   .node-action {
@@ -2758,6 +2772,7 @@ body[data-theme="dawn-white"] {
       padding-top: 6px;
       flex-wrap: wrap;
       gap: 8px;
+      bottom: 10px;
     }
 
     .node-action {

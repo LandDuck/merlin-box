@@ -52,5 +52,42 @@
       "link": "https://www.google.com"
     }
   ],
-  "nodes": []
+  "nodes": [
+    {
+      "category": "UI",
+      "is_default": true,
+      "name": "名字很长很长名字很长很长名字很长很长名字很长很长名字很长很长名字很长很长名字很长很长名字很长很长名字很长很长名字很长很长",
+      "network": "",
+      "password": "3",
+      "server": "1.1.1.1",
+      "server_port": 2,
+      "tag": "2009cb0a-44a1-45c1-babb-c888e12adeb1",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com"
+      },
+      "transport": {
+        "type": ""
+      },
+      "type": "trojan"
+    },
+    {
+      "category": "UI",
+      "name": "名字很短",
+      "tag": "b1754963-1c19-49e4-8daf-9afe3a095235",
+      "type": "naive",
+      "is_default": false,
+      "server": "2.2.2.2",
+      "server_port": 90,
+      "username": "1",
+      "password": "1",
+      "udp_over_tcp": false,
+      "quic": false,
+      "quic_congestion_control": "",
+      "tls": {
+        "enabled": true,
+        "server_name": "www.cloudflare.com"
+      }
+    }
+  ]
 }

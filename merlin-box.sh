@@ -110,11 +110,14 @@ show_help() {
 tool 子命令:
   compress_singbox   压缩 sing-box 可执行文件
   compress_smartdns  压缩 smartdns 可执行文件
+  compress_merlinbox 压缩 merlin-box 可执行文件
   show_devices       显示局域网 DHCP 设备列表
   update_rules       更新规则文件 (chn-ip4/ip6/site)
   build_singbox      编译构建 sing-box 可执行文件
   download_smartdns  下载 smartdns 可执行文件
   sub2box            将订阅链接转换为 sing-box 配置文件
+  sub2nodes          将订阅链接转换为节点列表
+  build_merlinbox    编译构建 merlin-box 可执行文件
   build_ui           构建 web-ui
   package            打包为tar.gz文件
 
@@ -565,6 +568,9 @@ main() {
         compress_smartdns)
           compress_smartdns
           ;;
+        compress_merlinbox)
+          compress_merlinbox
+          ;;
         show_devices)
           print_dhcp_devices
           ;;
@@ -621,11 +627,11 @@ main() {
           ;;
         -h|--help|"")
           print_normal "用法: $SCRIPT_NAME tool <subcommand>"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, sub2nodes, build_ui, build_merlinbox, package"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, compress_merlinbox, show_devices, update_rules, build_singbox, download_smartdns, sub2box, sub2nodes, build_ui, build_merlinbox, package"
           ;;
         *)
           print_error "错误: 不支持的工具子命令 '$2'"
-          print_normal "可用子命令: compress_singbox, compress_smartdns, show_devices, update_rules, build_singbox, download_smartdns, sub2box, sub2nodes, build_ui, build_merlinbox, package"
+          print_normal "可用子命令: compress_singbox, compress_smartdns, compress_merlinbox, show_devices, update_rules, build_singbox, download_smartdns, sub2box, sub2nodes, build_ui, build_merlinbox, package"
           exit 1
           ;;
       esac

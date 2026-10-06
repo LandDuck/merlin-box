@@ -158,8 +158,8 @@ class NodeList extends React.Component {
                     {node.type && <span className="node-tag">{node.type}</span>}
                 </div>
             </div>
-            <div className="node-name">{node.name}</div>
-            <div className="node-ip">{node.server}</div>
+            <div className="node-name" title={node.name}>{node.name}</div>
+            <div className="node-ip" title={node.server}>{node.server}</div>
             {!isDefault ? <div className="node-actions">
                 <button className="node-action primary" onClick={() => this.#setDefault(node.tag)}>
                     设为默认

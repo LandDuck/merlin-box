@@ -50,6 +50,22 @@ compress_smartdns() {
 }
 
 #=========================================
+#调用 compress_executable_with_upx 压缩merlin-box 可执行文件
+#=========================================
+compress_merlinbox() {
+
+  # 验证一下是否在路由器中， 如果在， 不执行，给出警告
+  if is_running_on_router; then
+    print_warning "在路由器中运行，跳过压缩 merlin-box 可执行文件，请在 PC 或服务器上运行此脚本以构建 merlin-box"
+    return
+  fi
+
+  local merlinbox_path="${CUR_DIR}/bin/merlin-box"
+  compress_executable_with_upx "$merlinbox_path"
+}
+
+
+#=========================================
 #下载一个文件
 # 参数1: 下载的URL
 # 参数2: 保存的目标路径
