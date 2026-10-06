@@ -402,11 +402,12 @@
 
   .node-list {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
   }
 
   .node-card {
+    min-width: 0;
     padding: 12px 16px;
     display: flex;
     flex-direction: column;
@@ -481,6 +482,7 @@
     color: #DCE2F7;
     font-size: 14px;
     line-height: 20px;
+    overflow-wrap: anywhere;
   }
 
   .node-ip {
