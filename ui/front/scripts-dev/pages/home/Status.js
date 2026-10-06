@@ -31,9 +31,6 @@ class Status extends React.Component {
     //WebSocket 实例
     #ws = null;
 
-    //日志变量（传给弹层的 getter 用）
-    #log = "";
-
     /**
      * 构造方法
      * @param props
@@ -79,7 +76,7 @@ class Status extends React.Component {
             const line = (event.data || "")
                 .replace(/\x1b\[[0-9;]*m/g, "")
                 .replace(/\r\n|\r|\n/g, "<br/>");
-            this.#log += line;
+            window.$wslog += line;
         };
 
         ws.onerror = (e) => {
@@ -182,7 +179,7 @@ class Status extends React.Component {
      * @param {string} title   弹层标题
      */
     #runAction(apiUrl, title) {
-        this.#log = "";
+        window.$wslog = "";
         this.$http.sendPost({
             url: apiUrl,
             success: () => {
@@ -191,7 +188,7 @@ class Status extends React.Component {
                     okText: "关闭",
                     onOk: () => {
                     },
-                    content: () => this.#log
+                    content: () => window.$wslog
                 });
             }
         });

@@ -73,7 +73,6 @@ class SubscriptionList extends React.Component {
         });
     }
 
-
     /**
      * 删除订阅
      * @param {string} guid
@@ -94,6 +93,9 @@ class SubscriptionList extends React.Component {
                     success: () => {
                         this.$helper.success('删除成功');
                         this.#loadSubscriptionList();
+                        if (this.props.onUpdate) {
+                            this.props.onUpdate();
+                        }
                     }
                 });
             },
@@ -123,11 +125,50 @@ class SubscriptionList extends React.Component {
     }
 
     /**
+     * 执行操作并展示日志弹层
+     * @param {string} apiUrl  后台接口
+     * @param {string} guid    订阅 GUID
+     * @param {string} title   弹层标题
+     */
+    #runAction(apiUrl, guid, title) {
+        window.$wslog = "";
+        this.$http.sendPost({
+            url: apiUrl,
+            data: {
+                guid
+            },
+            success: () => {
+                this.$helper.showLogLayer({
+                    title,
+                    okText: "关闭",
+                    onOk: () => {
+                        //this.#loadSubscriptionList();
+                        if (this.props.onUpdate) {
+                            this.props.onUpdate();
+                        }
+                    },
+                    content: () => window.$wslog
+                });
+            }
+        });
+    }
+
+    /**
      * 更新订阅节点
      * @param guid
      */
     #updateSubscriptionNodes(guid) {
-        this.$helper.toast("功能还在开发中，敬请期待！");
+        //this.$helper.toast("功能还在开发中，敬请期待！");
+        this.$helper.showAlertLayer({
+            title: "操作提示",
+            content: "更新会删除当前订阅的所有节点并重新拉取，确认更新吗？",
+            onCancel: () => {
+                this.$helper.warning("已取消更新订阅节点");
+            },
+            onOk: () => {
+                this.#runAction(this.$config.apis.comm_updateSubscriptionNodes, guid, "正在更新订阅节点");
+            }
+        });
     }
 
     /**

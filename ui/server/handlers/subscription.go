@@ -66,6 +66,8 @@ func DeleteSubscription(w http.ResponseWriter, r *http.Request) {
 		httpHelper.ResponseFailure(w, "删除订阅失败")
 		return
 	}
+	//清空数据库中该分类下的节点配置
+	dbHelper.DeleteNodesByCategory(requestData.Guid)
 	httpHelper.ResponseSuccess(w, "删除成功")
 }
 
@@ -81,4 +83,22 @@ func LoadSubscription(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpHelper.ResponseSuccess(w, sub)
+}
+
+// UpdateSubscriptionNodes 更新订阅节点，并异步返回脚本输出日志
+func UpdateSubscriptionNodes(w http.ResponseWriter, r *http.Request) {
+	requestData, ok := validateHelper.BindAndValidate[reqModel.SubscriptionGuidRequest](w, r)
+	if !ok {
+		return
+	}
+	model, err := dbHelper.GetSubscriptionByGuid(requestData.Guid)
+	if err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	if err := runServiceScriptAsync("tool", "sub2nodes", model.Link, model.Guid); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	httpHelper.ResponseSuccess[any](w, nil)
 }

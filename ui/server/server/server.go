@@ -111,6 +111,7 @@ func startHTTPServer(port int) {
 	router.Post("/api/load_subscription_list", handlers.GetSubscriptionList)
 	router.Post("/api/delete_subscription", handlers.DeleteSubscription)
 	router.Post("/api/load_subscription", handlers.LoadSubscription)
+	router.Post("/api/update_subscription_nodes", handlers.UpdateSubscriptionNodes)
 
 	logger.Success("HTTP server is running on port ", port)
 

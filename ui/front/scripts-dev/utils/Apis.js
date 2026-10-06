@@ -50,6 +50,7 @@ export default {
     comm_loadSubscriptionList: 'api/load_subscription_list',
     comm_deleteSubscription: 'api/delete_subscription',
     comm_loadSubscription: 'api/load_subscription',
+    comm_updateSubscriptionNodes: 'api/update_subscription_nodes'
 }
 
 
