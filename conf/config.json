@@ -27,31 +27,19 @@
   ],
   "outbounds": [
     {
-      "type": "hysteria2",
-      "server": "2.2.2.2",
-      "server_port": 90,
-      "password": "124",
-      "up_mbps": 10,
-      "down_mbps": 20,
-      "network": "tcp",
-      "obfs": {
-        "type": "gecko",
-        "password": "123"
-      },
-      "tls": {
-        "enabled": true,
-        "server_name": "www.cloudflare.com",
-        "alpn": [
-          "h3"
-        ]
-      },
+      "type": "shadowsocks",
+      "server": "1.1.1.1",
+      "server_port": 80,
+      "method": "2022-blake3-aes-128-gcm",
+      "password": "123465",
+      "udp_over_tcp": false,
       "tcp_fast_open": false,
-      "tag": "ada981dd-6c07-4030-869e-694df72c9d19",
+      "tag": "f5dfc2f3-2664-4391-9cbf-0c4eb05f14de",
       "routing_mark": 169
     }
   ],
   "route": {
     "rules": [],
-    "final": "ada981dd-6c07-4030-869e-694df72c9d19"
+    "final": "f5dfc2f3-2664-4391-9cbf-0c4eb05f14de"
   }
 }

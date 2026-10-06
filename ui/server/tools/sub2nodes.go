@@ -27,11 +27,36 @@ import (
 	"github.com/LandDuck/merlin-box/model/db"
 )
 
+// saveShadowsocksNode 保存 shadowsocks 节点配置到数据库中
+func saveShadowsocksNode(outbound map[string]any, category string) bool {
+
+	//var debugInfo, _ = json.MarshalIndent(outbound, "", "  ")
+	//logger.Debug("正在保存 shadowsocks 节点配置: ", string(debugInfo))
+
+	var nodeType = "shadowsocks"
+	method, _ := outbound["method"].(string)
+	password, _ := outbound["password"].(string)
+	network, _ := outbound["network"].(string)
+	nodeBase := getNodeBase(nodeType, category, outbound)
+	if nodeBase == nil {
+		tag, _ := outbound["tag"].(string)
+		logger.Error("保存“" + tag + "”节点失败: 无法解析服务器地址")
+		return false
+	}
+	var dbModel = db.ShadowsocksNode{
+		NodeBase: *nodeBase,
+		Method:   method,
+		Password: password,
+		Network:  network,
+	}
+	return persistNode(dbModel.NodeBase, dbModel)
+}
+
 // saveTrojanNode 保存 trojan 节点配置到数据库中
 func saveTrojanNode(outbound map[string]any, category string) bool {
 
-	var debugInfo, _ = json.MarshalIndent(outbound, "", "  ")
-	logger.Debug("正在保存 trojan 节点配置: ", string(debugInfo))
+	//var debugInfo, _ = json.MarshalIndent(outbound, "", "  ")
+	//logger.Debug("正在保存 trojan 节点配置: ", string(debugInfo))
 
 	var nodeType = "trojan"
 	password, _ := outbound["password"].(string)
@@ -176,6 +201,13 @@ func Sub2nodes(url string, category string) {
 				if saveTrojanNode(outbound, category) {
 					writeNodes++
 				}
+			case "shadowsocks":
+				if saveShadowsocksNode(outbound, category) {
+					writeNodes++
+				}
+			default:
+				logger.Warn("暂不支持的节点类型: ", nodeType, "，跳过该节点")
+				continue
 			}
 		}
 	}
