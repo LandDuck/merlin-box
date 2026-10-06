@@ -457,11 +457,16 @@ Tool commands:
 ```bash
 ./merlin-box.sh tool compress_singbox       #Compress sing-box executable ¹
 ./merlin-box.sh tool compress_smartdns      #Compress smartdns executable ¹
+./merlin-box.sh tool compress_merlinbox     #Compress merlin-box executable ¹
 ./merlin-box.sh tool show_devices           #Show current DHCP lease device list  
 ./merlin-box.sh tool update_rules           #Update rule files ²
 ./merlin-box.sh tool build_singbox          #Build sing-box executable ¹
 ./merlin-box.sh tool download_smartdns      #Download smartdns executable ¹
+./merlin-box.sh tool sub2nodes              #Convert subscription to node list 
 ./merlin-box.sh tool sub2box                #Convert subscription to sing-box configuration ³
+./merlin-box.sh tool build_ui               #Build WEB UI front-end and resources
+./merlin-box.sh tool build_merlinbox        #Build merlin-box server
+./merlin-box.sh tool package                #Build final package
 ./merlin-box.sh tool -h
 ```
 

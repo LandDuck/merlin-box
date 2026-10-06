@@ -458,12 +458,16 @@ chmod +x merlin-box.sh
 ```bash
 ./merlin-box.sh tool compress_singbox       #压缩 sing-box 可执行文件 ¹
 ./merlin-box.sh tool compress_smartdns      #压缩 smartdns 可执行文件 ¹
+./merlin-box.sh tool compress_merlinbox     #压缩 merlin-box 可执行文件 ¹
 ./merlin-box.sh tool show_devices           #显示当前 DHCP 租约的设备列表 
 ./merlin-box.sh tool update_rules           #更新规则文件 ²
 ./merlin-box.sh tool build_singbox          #构建 sing-box 可执行文件 ¹
 ./merlin-box.sh tool download_smartdns      #下载 smartdns 可执行文件 ¹
-./merlin-box.sh tool download_singbox       #下载 sing-box 可执行文件 ¹
+./merlin-box.sh tool sub2nodes              #将订阅转换为节点列表
 ./merlin-box.sh tool sub2box                #将订阅转换为 sing-box 配置 ³
+./merlin-box.sh tool build_ui               #构建 WEB UI 及 相关资源
+./merlin-box.sh tool build_merlinbox        #构建 merlin-box 服务端
+./merlin-box.sh tool package                #打包最终文件
 ./merlin-box.sh tool -h
 ```
 
