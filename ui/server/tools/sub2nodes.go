@@ -27,6 +27,60 @@ import (
 	"github.com/LandDuck/merlin-box/model/db"
 )
 
+// persistNode 验重并将节点写入数据库，node 为任意以 NodeBase 为基础的节点结构体
+func persistNode(base db.NodeBase, node any) bool {
+	exists, err := dbHelper.NodeTagExists(base.Tag)
+	if err != nil {
+		logger.Error("验重读取失败: " + err.Error())
+		return false
+	}
+	if exists {
+		logger.Error("节点 " + base.Name + " 已存在")
+		return false
+	}
+	toDbJson, _ := json.MarshalIndent(node, "", "  ")
+	if err = dbHelper.AppendNode(toDbJson); err != nil {
+		logger.Error("保存节点失败: " + err.Error())
+		return false
+	}
+	return true
+}
+
+// saveVmessNode 保存 vmess 节点配置到数据库中
+func saveVmessNode(outbound map[string]any, category string) bool {
+
+	//var debugInfo, _ = json.MarshalIndent(outbound, "", "  ")
+	//logger.Debug("正在保存 vmess 节点配置: ", string(debugInfo))
+
+	var nodeType = "vmess"
+	uuid, _ := outbound["uuid"].(string)
+	alterId, _ := outbound["alterId"].(int)
+	security, _ := outbound["security"].(string)
+	network, _ := outbound["network"].(string)
+	tls := getOutboundField[db.TLSConfig](outbound, "tls")
+	transport := getOutboundField[db.TransportConfig](outbound, "transport")
+	nodeBase := getNodeBase(nodeType, category, outbound)
+	if nodeBase == nil {
+		tag, _ := outbound["tag"].(string)
+		logger.Error("保存“" + tag + "”节点失败: 无法解析服务器地址")
+		return false
+	}
+	var dbModel = db.VmessNode{
+		NodeBase: *nodeBase,
+		UUID:     uuid,
+		AlterID:  alterId,
+		Security: security,
+		Network:  network,
+		NodeTransport: db.NodeTransport{
+			Transport: transport,
+		},
+		NodeTls: db.NodeTls{
+			Tls: tls,
+		},
+	}
+	return persistNode(dbModel.NodeBase, dbModel)
+}
+
 // saveShadowsocksNode 保存 shadowsocks 节点配置到数据库中
 func saveShadowsocksNode(outbound map[string]any, category string) bool {
 
@@ -81,25 +135,6 @@ func saveTrojanNode(outbound map[string]any, category string) bool {
 		},
 	}
 	return persistNode(dbModel.NodeBase, dbModel)
-}
-
-// persistNode 验重并将节点写入数据库，node 为任意以 NodeBase 为基础的节点结构体
-func persistNode(base db.NodeBase, node any) bool {
-	exists, err := dbHelper.NodeTagExists(base.Tag)
-	if err != nil {
-		logger.Error("验重读取失败: " + err.Error())
-		return false
-	}
-	if exists {
-		logger.Error("节点 " + base.Name + " 已存在")
-		return false
-	}
-	toDbJson, _ := json.MarshalIndent(node, "", "  ")
-	if err = dbHelper.AppendNode(toDbJson); err != nil {
-		logger.Error("保存节点失败: " + err.Error())
-		return false
-	}
-	return true
 }
 
 // saveVlessNode 保存 vless 节点配置到数据库中
@@ -203,6 +238,10 @@ func Sub2nodes(url string, category string) {
 				}
 			case "shadowsocks":
 				if saveShadowsocksNode(outbound, category) {
+					writeNodes++
+				}
+			case "vmess":
+				if saveVmessNode(outbound, category) {
 					writeNodes++
 				}
 			default:

@@ -204,23 +204,22 @@ func parseVMess(uri string) map[string]any {
 		}
 	}
 
-	switch withDefault(asString(data["net"]), "tcp") {
-	case "ws":
-		transport := map[string]any{
-			"type": "ws",
-			"path": withDefault(asString(data["path"]), "/"),
-		}
-		if host := asString(data["host"]); host != "" {
-			transport["headers"] = map[string]any{"Host": host}
-		} else {
-			transport["headers"] = map[string]any{}
-		}
+	var transportType string
+	if net := asString(data["net"]); net != "" {
+		transportType = net
+	} else if tp := asString(data["type"]); tp != "" {
+		transportType = tp
+	}
+	if transportType == "xhttp" {
+		logger.Warn("跳过不支持的 VMess xhttp 传输类型: " + raw)
+		return nil
+	}
+	var path = withDefault(asString(data["path"]), "/")
+	var host = asString(data["host"])
+
+	transport := buildTransport(transportType, host, path)
+	if transport != nil {
 		outbound["transport"] = transport
-	case "grpc":
-		outbound["transport"] = map[string]any{
-			"type":         "grpc",
-			"service_name": asString(data["path"]),
-		}
 	}
 
 	return outbound
@@ -329,7 +328,7 @@ func parseVLess(uri string) map[string]any {
 	flow := query.Get("flow")
 	transportType := withDefault(query.Get("type"), "")
 	if transportType == "xhttp" {
-		logger.Warn("跳过不支持的 Trojan xhttp 传输类型: " + uri)
+		logger.Warn("跳过不支持的 Vless xhttp 传输类型: " + uri)
 		return nil
 	}
 	path := withDefault(query.Get("path"), "/")
