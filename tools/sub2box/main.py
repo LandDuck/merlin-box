@@ -17,7 +17,7 @@
 
 """
 订阅链接 → sing-box 配置转换工具
-支持 Base64 URI 列表 和 Clash YAML
+支持 Base64 URI 列表
 """
 
 import base64
@@ -30,7 +30,6 @@ from urllib.parse import unquote, urlparse, parse_qs
 from typing import List, Dict, Any
 
 import requests
-import yaml
 
 
 RESET = "\033[0m"
@@ -141,6 +140,21 @@ def decode_base64_sub(content: str) -> List[str]:
         raise ValueError(f"Base64 解码失败: {e}")
 
 
+def build_transport(transport_type: str, host: str, path: str) -> Dict[str, Any]:
+    """根据传输类型构建 sing-box transport，与 Go 版 buildTransport 保持一致"""
+    if transport_type == "ws":
+        return {"type": "ws", "path": path}
+    if transport_type == "grpc":
+        return {"type": "grpc", "service_name": host}
+    if transport_type == "http":
+        return {"type": "http", "path": path, "host": host}
+    if transport_type == "quic":
+        return {"type": "quic"}
+    if transport_type == "httpupgrade":
+        return {"type": "http_upgrade", "path": path, "host": host}
+    return {"type": ""}
+
+
 def parse_ss(uri: str) -> Dict[str, Any] | None:
     """解析 ss://"""
     try:
@@ -217,18 +231,11 @@ def parse_vmess(uri: str) -> Dict[str, Any] | None:
             }
 
         # Transport
-        net = data.get("net", "tcp")
-        if net == "ws":
-            outbound["transport"] = {
-                "type": "ws",
-                "path": data.get("path", "/"),
-                "headers": {"Host": data.get("host", "")} if data.get("host") else {}
-            }
-        elif net == "grpc":
-            outbound["transport"] = {
-                "type": "grpc",
-                "service_name": data.get("path", "")
-            }
+        outbound["transport"] = build_transport(
+            data.get("net") or "",
+            data.get("host") or "",
+            data.get("path") or "/"
+        )
 
         return outbound
     except Exception:
@@ -251,7 +258,13 @@ def parse_trojan(uri: str) -> Dict[str, Any] | None:
             return None
 
         query = parse_qs(parsed.query)
-        sni = query.get("sni", [server])[0]
+        sni = query.get("sni", [server])[0] or server
+        transport_type = query.get("type", [""])[0]
+        if transport_type == "xhttp":
+            print_warning(f"跳过不支持的 Trojan xhttp 传输类型: {uri}")
+            return None
+        host = query.get("host", [""])[0]
+        path = query.get("path", ["/"])[0] or "/"
 
         outbound = {
             "type": "trojan",
@@ -264,6 +277,7 @@ def parse_trojan(uri: str) -> Dict[str, Any] | None:
                 "server_name": sni
             }
         }
+        outbound["transport"] = build_transport(transport_type, host, path)
         return outbound
     except Exception:
         print_warning(f"跳过无法解析的 Trojan URI: {uri}")
@@ -285,10 +299,13 @@ def parse_vless(uri: str) -> Dict[str, Any] | None:
 
         query = parse_qs(parsed.query)
         security = query.get("security", ["none"])[0]
-        sni = query.get("sni", [server])[0]
+        sni = query.get("sni", [server])[0] or server
         flow = query.get("flow", [""])[0]
-        typ = query.get("type", ["tcp"])[0]
-        path = query.get("path", ["/"])[0]
+        transport_type = query.get("type", [""])[0]
+        if transport_type == "xhttp":
+            print_warning(f"跳过不支持的 Vless xhttp 传输类型: {uri}")
+            return None
+        path = query.get("path", ["/"])[0] or "/"
         host = query.get("host", [""])[0]
 
         outbound = {
@@ -319,17 +336,7 @@ def parse_vless(uri: str) -> Dict[str, Any] | None:
                 }
                 print_warning(f"检测到 Reality 配置，已为节点启用 uTLS: {outbound['tag']}")
 
-        if typ == "ws":
-            outbound["transport"] = {
-                "type": "ws",
-                "path": path,
-                "headers": {"Host": host} if host else {}
-            }
-        elif typ == "grpc":
-            outbound["transport"] = {
-                "type": "grpc",
-                "service_name": path
-            }
+        outbound["transport"] = build_transport(transport_type, host, path)
 
         return outbound
     except Exception:
@@ -355,84 +362,6 @@ def parse_uri(uri: str) -> Dict[str, Any] | None:
     protocol = uri.split("://", 1)[0].upper() if "://" in uri else uri
     print_warning(f"跳过未实现的转换协议: {protocol}")
     return None
-
-
-def parse_clash_yaml(content: str) -> List[Dict[str, Any]]:
-    """从 Clash YAML 提取 proxies 并转成 sing-box outbound"""
-    data = yaml.safe_load(content)
-    proxies = data.get("proxies", [])
-    outbounds = []
-
-    for p in proxies:
-        t = p.get("type")
-        tag = p.get("name", "unnamed")
-        server = p.get("server") or p.get("host") or p.get("address")
-
-        if server and is_local_ip(server):
-            print_warning(f"跳过本地 IP 节点: {tag} ({server})")
-            continue
-
-        if t == "ss":
-            outbounds.append({
-                "type": "shadowsocks",
-                "tag": tag,
-                "server": server,
-                "server_port": p["port"],
-                "method": p.get("cipher", "aes-256-gcm"),
-                "password": p["password"]
-            })
-        elif t == "vmess":
-            ob = {
-                "type": "vmess",
-                "tag": tag,
-                "server": server,
-                "server_port": p["port"],
-                "uuid": p["uuid"],
-                "security": p.get("cipher", "auto"),
-                "alter_id": p.get("alterId", 0)
-            }
-            if p.get("tls"):
-                ob["tls"] = {"enabled": True, "server_name": p.get("servername") or server}
-            if p.get("network") == "ws":
-                ob["transport"] = {
-                    "type": "ws",
-                    "path": p.get("ws-opts", {}).get("path", "/"),
-                    "headers": p.get("ws-opts", {}).get("headers", {})
-                }
-            outbounds.append(ob)
-        elif t == "trojan":
-            outbounds.append({
-                "type": "trojan",
-                "tag": tag,
-                "server": server,
-                "server_port": p["port"],
-                "password": p["password"],
-                "tls": {
-                    "enabled": True,
-                    "server_name": p.get("sni") or server
-                }
-            })
-        elif t == "vless":
-            ob = {
-                "type": "vless",
-                "tag": tag,
-                "server": server,
-                "server_port": p["port"],
-                "uuid": p["uuid"],
-                "flow": p.get("flow", "")
-            }
-            if p.get("tls"):
-                ob["tls"] = {"enabled": True, "server_name": p.get("servername") or server}
-                if p.get("reality"):
-                    ob["tag"] = f"{ob['tag']}（不安全）"
-                    ob["tls"]["utls"] = {"enabled": True, "fingerprint": "chrome"}
-                    ob["tls"]["reality"] = {"enabled": True, "public_key": p.get("reality", {}).get("public_key", ""), "short_id": p.get("reality", {}).get("short_id", "")}
-                    print_warning(f"检测到 Reality 配置，已为节点启用 uTLS: {ob['tag']}")
-            outbounds.append(ob)
-        else:
-            print_warning(f"跳过不支持的 Clash 协议: {t}")
-
-    return outbounds
 
 
 def build_singbox_config(outbounds: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -497,10 +426,7 @@ def convert(subscription_url: str) -> Dict[str, Any]:
     outbounds = []
 
     # 判断格式
-    if content.startswith("proxies:") or "proxies:" in content[:200]:
-        print_success("检测到 Clash YAML 格式")
-        outbounds = parse_clash_yaml(content)
-    elif is_base64(content) or re.match(r'^[A-Za-z0-9+/=]+$', content.replace("\n", "")):
+    if is_base64(content) or re.match(r'^[A-Za-z0-9+/=]+$', content.replace("\n", "")):
         print_success("检测到 Base64 格式")
         uris = decode_base64_sub(content)
         print_success(f"共解析到 {len(uris)} 条 URI")
