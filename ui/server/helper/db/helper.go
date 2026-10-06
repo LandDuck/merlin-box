@@ -637,3 +637,27 @@ func DeleteNodesByCategory(category string) {
 	file.Nodes = nodes
 	_ = writeFile(file)
 }
+
+// SetDefaultNodeByIndex 根据索引设置默认节点，索引从 0 开始
+func SetDefaultNodeByIndex(index int) {
+	file, err := ReadFile()
+	if err != nil {
+		return
+	}
+	if index < 0 || index >= len(file.Nodes) {
+		return
+	}
+	for i := range file.Nodes {
+		var node map[string]any
+		if err := json.Unmarshal(file.Nodes[i], &node); err != nil {
+			continue
+		}
+		node["is_default"] = i == index
+		updated, err := json.MarshalIndent(node, "", "  ")
+		if err != nil {
+			continue
+		}
+		file.Nodes[i] = updated
+	}
+	_ = writeFile(file)
+}

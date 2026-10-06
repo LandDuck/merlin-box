@@ -249,6 +249,12 @@ func Sub2nodes(url string, category string) {
 				continue
 			}
 		}
+		_, err := dbHelper.GetDefaultNode()
+		if err != nil {
+			//未获取到默认节点，将第一个节点设置为默认节点
+			logger.Warn("由于不存在默认节点，系统尝试将第一个节点设置为默认节点")
+			dbHelper.SetDefaultNodeByIndex(0)
+		}
 	}
 
 	logger.Success("节点转换完成，共写入 ", writeNodes, " 个节点到 UI 列表")
