@@ -204,16 +204,7 @@ func parseVMess(uri string) map[string]any {
 		}
 	}
 
-	var transportType string
-	if net := asString(data["net"]); net != "" {
-		transportType = net
-	} else if tp := asString(data["type"]); tp != "" {
-		transportType = tp
-	}
-	if transportType == "xhttp" {
-		logger.Warn("跳过不支持的 VMess xhttp 传输类型: " + raw)
-		return nil
-	}
+	var transportType = withDefault(asString(data["net"]), "")
 	var path = withDefault(asString(data["path"]), "/")
 	var host = asString(data["host"])
 
