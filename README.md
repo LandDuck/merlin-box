@@ -154,6 +154,13 @@ This project aims to clearly separate responsibilities:
       </td>
     </tr>
     <tr>
+      <td>Subscription</td>
+      <td>✅ Supported</td>
+      <td>
+        Subscription parsing currently supports VLESS, VMess, Trojan, and Shadowsocks protocols, with compatibility for both standard URL and Base64-encoded formats.
+      </td>
+    </tr>
+    <tr>
       <td>Ping Proxy</td>
       <td>⏳ Not Supported</td>
       <td>

@@ -22,7 +22,7 @@
 [![视频教程](https://img.youtube.com/vi/KaHPKXHDzBU/default.jpg)](https://youtu.be/KaHPKXHDzBU)
 
 - 脚本模式使用教程
- 
+
 [![视频教程](https://img.youtube.com/vi/0-dqQMX74sE/default.jpg)](https://www.youtube.com/watch?v=0-dqQMX74sE&list=PLDyvs8NWsF2w)
 
 
@@ -155,6 +155,13 @@
       </td>
     </tr>
     <tr>
+      <td>订阅</td>
+      <td>✅ 已支持</td>
+      <td>
+        目前支持解析包含 VLESS、VMess、Trojan、Shadowsocks 协议的订阅，兼容标准 URL 及 Base64 编码格式。
+      </td>
+    </tr>
+    <tr>
       <td>ping 代理</td>
       <td>⏳ 不支持</td>
       <td>
@@ -171,8 +178,9 @@
 - IPv6 需要本地网络和上游服务器均支持；MB_ENABLE_IPV6=1 时脚本会自动检测本地网络 IPv6 可用性，不可用时自动降级到 IPv4 流程。
 - ⚠️脚本无法检测上游服务器是否支持 IPv6，若上游不支持 IPv6，且 MB_ENABLE_IPV6=1，由于会走IPV6优先模式，可能导致无法上网。
 - QUIC 属于 UDP，无论是否开启 UDP 代理，项目均采取拦截方案（DROP UDP 443），因此会导致依赖 H3/QUIC 的网站在客户端侧无法以 QUIC 访问（通常会回退到 TCP/TLS；个别站点可能表现为打不开或异常）。
-- ⚠️设备黑白名单功能依赖  device_blacklist.txt/device_whitelist.txt 文件是否存在，只要文件存在，脚本就会启用黑/白名单功能，如果不需要此功能，请删除这两个文件。
+- ⚠️设备黑白名单功能依赖 device_blacklist.txt/device_whitelist.txt 文件是否存在，只要文件存在，脚本就会启用黑/白名单功能，如果不需要此功能，请删除这两个文件。
 - WEB UI 使用 ./merlin-box.sh server 启动，默认端口为 8080，可以启动时指定端口号：./merlin-box.sh server 8081 。登录用户名密码默认为 admin/merlinbox。
+
 ---
 
 # 🖥️ UI 预览
@@ -329,8 +337,8 @@ merlin-box/
 
 1. 在 Release 页面下载与你的路由器 CPU 架构对应的程序包，并将项目文件上传至路由器。推荐放置在 /jffs/merlin-box 目录下。
 2. 可选：本项目提供 ARM64（64 位） 和 ARM（32 位） 版本。如果你的路由器 CPU 架构与程序包不匹配，可以尝试从 sing-box 和 SmartDNS 项目仓库下载对应架构的二进制文件，并替换项目中的相关文件。
-   - `bin/sing-box`
-   - `bin/smartdns`
+    - `bin/sing-box`
+    - `bin/smartdns`
 3. 给予执行权限（示例）：
 
 ```bash
@@ -339,6 +347,7 @@ chmod +x merlin-box.sh
 ```
 
 ---
+
 ## ▶️启动 UI 并初始化配置（WEB UI）
 
 1. **启动 WEB UI Server**
@@ -362,7 +371,7 @@ chmod +x merlin-box.sh
 
 4. **配置代理节点**
 
-   进入【节点管理】，添加代理节点，并将需要使用的节点设置为**默认节点**。
+   进入【节点管理】，添加代理节点，并将需要使用的节点设置为 **默认节点**。
 
 5. **修改其它配置**
 
@@ -434,7 +443,7 @@ chmod +x merlin-box.sh
 
 - ▶️`start`：清理旧规则 -> 启动 sing-box -> 启动 smartdns -> 重启 dnsmasq
 - `start` 参数（均可选，每个参数值为 `0` 或 `1`，默认值 `1 1 0 0 1`）：
-  - `enable_ipv6` `disable_quic_from_lan` `enable_udp` `enable_oneself_proxy` `enable_tcp_fast_open`
+    - `enable_ipv6` `disable_quic_from_lan` `enable_udp` `enable_oneself_proxy` `enable_tcp_fast_open`
 - ⏹️ `stop`：停止 sing-box/smartdns -> 清理 iptables/ip6tables/ip rule/ipset -> 重启 dnsmasq
 
 安装与卸载（开机启动）：
@@ -459,12 +468,17 @@ chmod +x merlin-box.sh
 ```
 
 1. 命令仅在本地系统（或WSL）中执行，不能在路由器上执行。压缩依赖 upx 工具。
+
 - 本仓库携带的二进制文件已经经过压缩。
 - ⚠️压缩虽然可以明显降低文件大小，但是启动时会比原始程序要慢。
+
 2. 规则更新有两种行为：
+
 - 在开发模式下，会调用python脚本从三个源下载最新规则文件并覆盖本地文件。
 - 在生产模式下（路由器中），使用wget从本仓库的 raw 文件下载最新规则文件并覆盖本地文件。
+
 3. 订阅转换有两种行为：
+
 - 在开发模式下，会调用python脚本将订阅转换为 sing-box 配置。
 - 在生产模式下（路由器中），调用 merlin-box（开发中） 二进制文件进行转换。
 
