@@ -35,6 +35,41 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// buildTransport
+func buildTransport(transportType, host, path string) map[string]any {
+	switch transportType {
+	case "ws":
+		return map[string]any{
+			"type": "ws",
+			"path": path,
+		}
+	case "grpc":
+		return map[string]any{
+			"type":         "grpc",
+			"service_name": host,
+		}
+	case "http":
+		return map[string]any{
+			"type": "http",
+			"path": path,
+			"host": host,
+		}
+	case "quic":
+		return map[string]any{
+			"type": "quic",
+		}
+	case "httpupgrade":
+		return map[string]any{
+			"type": "http_upgrade",
+			"path": path,
+			"host": host,
+		}
+	}
+	return map[string]any{
+		"type": "",
+	}
+}
+
 // parseSS 解析 ss:// URI 并转换为 sing-box 的 shadowsocks outbound。
 func parseSS(uri string) map[string]any {
 	raw := uri
@@ -229,7 +264,16 @@ func parseTrojan(uri string) map[string]any {
 	if sni == "" {
 		sni = server
 	}
-	return map[string]any{
+	query := u.Query()
+	transportType := withDefault(query.Get("type"), "")
+	if transportType == "xhttp" {
+		logger.Warn("跳过不支持的 Trojan xhttp 传输类型: " + uri)
+		return nil
+	}
+	host := query.Get("host")
+	path := withDefault(query.Get("path"), "/")
+
+	outbound := map[string]any{
 		"type":        "trojan",
 		"tag":         name,
 		"server":      server,
@@ -240,6 +284,10 @@ func parseTrojan(uri string) map[string]any {
 			"server_name": sni,
 		},
 	}
+	if transport := buildTransport(transportType, host, path); transport != nil {
+		outbound["transport"] = transport
+	}
+	return outbound
 }
 
 // parseVLess 解析 vless:// URI 并转换为 sing-box 的 vless outbound。
@@ -280,7 +328,11 @@ func parseVLess(uri string) map[string]any {
 	security := withDefault(query.Get("security"), "none")
 	sni := withDefault(query.Get("sni"), server)
 	flow := query.Get("flow")
-	typ := withDefault(query.Get("type"), "tcp")
+	transportType := withDefault(query.Get("type"), "")
+	if transportType == "xhttp" {
+		logger.Warn("跳过不支持的 Trojan xhttp 传输类型: " + uri)
+		return nil
+	}
 	path := withDefault(query.Get("path"), "/")
 	host := query.Get("host")
 
@@ -314,23 +366,8 @@ func parseVLess(uri string) map[string]any {
 		outbound["tls"] = tls
 	}
 
-	switch typ {
-	case "ws":
-		transport := map[string]any{
-			"type": "ws",
-			"path": path,
-		}
-		if host != "" {
-			transport["headers"] = map[string]any{"Host": host}
-		} else {
-			transport["headers"] = map[string]any{}
-		}
+	if transport := buildTransport(transportType, host, path); transport != nil {
 		outbound["transport"] = transport
-	case "grpc":
-		outbound["transport"] = map[string]any{
-			"type":         "grpc",
-			"service_name": path,
-		}
 	}
 
 	return outbound

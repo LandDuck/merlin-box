@@ -27,39 +27,68 @@ import (
 	"github.com/LandDuck/merlin-box/model/db"
 )
 
+// saveTrojanNode 保存 trojan 节点配置到数据库中
+func saveTrojanNode(outbound map[string]any, category string) bool {
+
+	var debugInfo, _ = json.MarshalIndent(outbound, "", "  ")
+	logger.Debug("正在保存 trojan 节点配置: ", string(debugInfo))
+
+	var nodeType = "trojan"
+	password, _ := outbound["password"].(string)
+	network, _ := outbound["network"].(string)
+	tls := getOutboundField[db.TLSConfig](outbound, "tls")
+	transport := getOutboundField[db.TransportConfig](outbound, "transport")
+	nodeBase := getNodeBase(nodeType, category, outbound)
+	if nodeBase == nil {
+		tag, _ := outbound["tag"].(string)
+		logger.Error("保存“" + tag + "”节点失败: 无法解析服务器地址")
+		return false
+	}
+	var dbModel = db.TrojanNode{
+		NodeBase: *nodeBase,
+		Password: password,
+		Network:  network,
+		NodeTransport: db.NodeTransport{
+			Transport: transport,
+		},
+		NodeTls: db.NodeTls{
+			Tls: tls,
+		},
+	}
+	return persistNode(dbModel.NodeBase, dbModel)
+}
+
+// persistNode 验重并将节点写入数据库，node 为任意以 NodeBase 为基础的节点结构体
+func persistNode(base db.NodeBase, node any) bool {
+	exists, err := dbHelper.NodeTagExists(base.Tag)
+	if err != nil {
+		logger.Error("验重读取失败: " + err.Error())
+		return false
+	}
+	if exists {
+		logger.Error("节点 " + base.Name + " 已存在")
+		return false
+	}
+	toDbJson, _ := json.MarshalIndent(node, "", "  ")
+	if err = dbHelper.AppendNode(toDbJson); err != nil {
+		logger.Error("保存节点失败: " + err.Error())
+		return false
+	}
+	return true
+}
+
 // saveVlessNode 保存 vless 节点配置到数据库中
 func saveVlessNode(outbound map[string]any, category string) bool {
 
-	var debugInfo, _ = json.MarshalIndent(outbound, "", "  ")
-	logger.Debug("正在保存 vless 节点配置: ", string(debugInfo))
+	//var debugInfo, _ = json.MarshalIndent(outbound, "", "  ")
+	//logger.Debug("正在保存 vless 节点配置: ", string(debugInfo))
 
 	var nodeType = "vless"
-	uuid, ok := outbound["uuid"].(string)
-	if !ok {
-		uuid = ""
-	}
-	flow, ok := outbound["flow"].(string)
-	if !ok {
-		flow = ""
-	}
-	network, ok := outbound["network"].(string)
-	if !ok {
-		network = ""
-	}
-	var tls db.TLSConfigWithReality
-	if tlsData, ok := outbound["tls"]; ok {
-		data, err := json.Marshal(tlsData)
-		if err == nil {
-			_ = json.Unmarshal(data, &tls)
-		}
-	}
-	var transport db.TransportConfig
-	if transportData, ok := outbound["transport"]; ok {
-		data, err := json.Marshal(transportData)
-		if err == nil {
-			_ = json.Unmarshal(data, &transport)
-		}
-	}
+	uuid, _ := outbound["uuid"].(string)
+	flow, _ := outbound["flow"].(string)
+	network, _ := outbound["network"].(string)
+	tls := getOutboundField[db.TLSConfigWithReality](outbound, "tls")
+	transport := getOutboundField[db.TransportConfig](outbound, "transport")
 	nodeBase := getNodeBase(nodeType, category, outbound)
 	if nodeBase == nil {
 		logger.Error("保存“" + outbound["tag"].(string) + "”节点失败: 无法解析服务器地址")
@@ -75,13 +104,18 @@ func saveVlessNode(outbound map[string]any, category string) bool {
 			Transport: transport,
 		},
 	}
-	toDbJson, _ := json.MarshalIndent(dbModel, "", "  ")
-	err := dbHelper.AppendNode(toDbJson)
-	if err != nil {
-		logger.Error("保存节点失败: " + err.Error())
-		return false
+	return persistNode(dbModel.NodeBase, dbModel)
+}
+
+// getOutboundField 从 outbound 中按 key 取出子配置并转换为指定类型，缺失或解析失败时返回零值
+func getOutboundField[T any](outbound map[string]any, key string) T {
+	var result T
+	if raw, ok := outbound[key]; ok {
+		if data, err := json.Marshal(raw); err == nil {
+			_ = json.Unmarshal(data, &result)
+		}
 	}
-	return true
+	return result
 }
 
 // getNodeBase 从 outbound 中提取公共节点信息，返回 NodeBase 对象
@@ -131,14 +165,15 @@ func Sub2nodes(url string, category string) {
 		dbHelper.DeleteNodesByCategory(category)
 		//开始执行
 		logger.Debug("开始转换 ", totalNodes, " 个节点配置并写入 UI 列表，请耐心等待...")
-		for index, outbound := range outbounds {
-			if index > 10 {
-				break
-			}
+		for _, outbound := range outbounds {
 			var nodeType = outbound["type"].(string)
 			switch nodeType {
 			case "vless":
 				if saveVlessNode(outbound, category) {
+					writeNodes++
+				}
+			case "trojan":
+				if saveTrojanNode(outbound, category) {
 					writeNodes++
 				}
 			}
