@@ -95,17 +95,19 @@ show_help() {
   $SCRIPT_NAME <command> [args]
 
 命令:
-  start           启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
-  stop            停止服务
-  restart         重启服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
-  server          启动WEBUI服务，子命令：start/stop/restart 默认start，可选参数: [port]
-  update          更新merlin-box
-  remote_version  显示远程仓库最新版本
-  install         设置 merlin-box 开机自启
-  uninstall       卸载 merlin-box 开机自启
-  doctor          检查环境兼容性
-  tool            工具命令
-  test            测试命令
+  start             启动服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
+  stop              停止服务
+  restart           重启服务，可选参数: [enable_ipv6] [disable_quic_from_lan] [enable_udp] [enable_oneself_proxy] [tcp_fast_open(0/1/2/3)]
+  restart_singbox   仅重启 sing-box 服务
+  restart_smartdns  仅重启 smartdns 服务
+  server            启动WEBUI服务，子命令：start/stop/restart 默认start，可选参数: [port]
+  update            更新merlin-box
+  remote_version    显示远程仓库最新版本
+  install           设置 merlin-box 开机自启
+  uninstall         卸载 merlin-box 开机自启
+  doctor            检查环境兼容性
+  tool              工具命令
+  test              测试命令
 
 tool 子命令:
   compress_singbox   压缩 sing-box 可执行文件
@@ -292,6 +294,37 @@ restart() {
   fi
   sleep 2
   start "$1" "$2" "$3" "$4" "$5"
+}
+
+#=========================================
+# 仅重启singbox服务
+#=========================================
+restart_singbox() {
+
+  #如果未在路由器中执行, 直接return并给出警告
+  if ! is_running_on_router; then
+      print_warning "⚠️ 当前环境非路由器，无法重启 sing-box。"
+      return 1
+  fi
+
+  start_singbox 1
+}
+
+#=========================================
+# 仅重启smartdns服务
+#=========================================
+restart_smartdns() {
+
+  #如果未在路由器中执行, 直接return并给出警告
+  if ! is_running_on_router; then
+      print_warning "⚠️ 当前环境非路由器，无法重启 smartdns。"
+      return 1
+  fi
+
+  # 启动smartdns服务
+  start_smartdns 1
+  # 重启dnsmasq服务
+  restart_dnsmasq
 }
 
 #=========================================
@@ -644,6 +677,12 @@ main() {
       fi
 			restart "$2" "$3" "$4" "$5" "$6"
 			;;
+	  restart_singbox)
+      restart_singbox
+      ;;
+    restart_smartdns)
+      restart_smartdns
+      ;;
 	  remote_version)
       VERSION=$(get_github_latest_release "LandDuck/merlin-box")
       print_warning "远程仓库最新版本: $VERSION"

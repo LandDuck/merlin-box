@@ -27,6 +27,8 @@ export default {
     comm_logout: 'api/logout',
     comm_stop: 'api/stop',
     comm_restart: 'api/restart',
+    comm_restartSingBox: 'api/restart_sing_box',
+    comm_restartSmartDNS: 'api/restart_smartdns',
     comm_restartUI: 'api/restart_ui',
     comm_start: 'api/start',
     comm_updateRules: 'api/update_rules',

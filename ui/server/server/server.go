@@ -97,6 +97,10 @@ func startHTTPServer(port int) {
 	router.Post("/api/start", handlers.Start)
 	router.Post("/api/stop", handlers.Stop)
 	router.Post("/api/restart", handlers.Restart)
+
+	router.Post("/api/restart_sing_box", handlers.RestartSingBox)
+	router.Post("/api/restart_smartdns", handlers.RestartSmartDNS)
+
 	router.Post("/api/restart_ui", handlers.RestartUI)
 	router.Post("/api/update_rules", handlers.UpdateRules)
 	router.Get("/api/ws/log", handlers.LogWS)

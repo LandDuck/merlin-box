@@ -216,6 +216,20 @@ class Status extends React.Component {
     }
 
     /**
+     * 重启 SING-BOX
+     */
+    #restartSingBox() {
+        this.#runAction(this.$config.apis.comm_restartSingBox, "正在重启 SING-BOX");
+    }
+
+    /**
+     * 重启 SMARTDNS
+     */
+    #restartSmartDNS() {
+        this.#runAction(this.$config.apis.comm_restartSmartDNS, "正在重启 SMARTDNS");
+    }
+
+    /**
      * 重启WEB UI服务
      */
     #restartUI() {
@@ -356,6 +370,39 @@ class Status extends React.Component {
                         }}>
                             <span className="icon-reboot"/>
                             重启代理
+                        </button>,
+
+                        <button className="btn-secondary" key={"reboot2"} onClick={(e) => {
+                            this.$helper.showAlertLayer({
+                                title: "操作提示",
+                                content: "确定要重启 SING-BOX 吗？",
+                                onCancel: () => {
+                                    this.$helper.warning("已取消重启 SING-BOX");
+                                },
+                                onOk: () => {
+                                    //this.#restart();
+                                    this.#restartSingBox();
+                                }
+                            });
+                        }}>
+                            <span className="icon-reboot"/>
+                            重启 SING-BOX
+                        </button>,
+                        <button className="btn-secondary" key={"reboot3"} onClick={(e) => {
+                            this.$helper.showAlertLayer({
+                                title: "操作提示",
+                                content: "确定要重启 SMARTDNS 吗？",
+                                onCancel: () => {
+                                    this.$helper.warning("已取消重启 SMARTDNS");
+                                },
+                                onOk: () => {
+                                    //this.#restart();
+                                    this.#restartSmartDNS();
+                                }
+                            });
+                        }}>
+                            <span className="icon-reboot"/>
+                            重启 SMARTDNS
                         </button>,
                         <button className="btn-secondary" key={"reboot-ui"} onClick={(e) => {
                             this.$helper.showAlertLayer({

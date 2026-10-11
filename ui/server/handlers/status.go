@@ -223,6 +223,24 @@ func Restart(w http.ResponseWriter, r *http.Request) {
 	httpHelper.ResponseSuccess[any](w, nil)
 }
 
+// RestartSingBox 重启 sing-box 服务
+func RestartSingBox(w http.ResponseWriter, r *http.Request) {
+	if err := runServiceScriptAsync("restart_singbox"); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	httpHelper.ResponseSuccess[any](w, nil)
+}
+
+// RestartSmartDNS 重启 smartdns 服务
+func RestartSmartDNS(w http.ResponseWriter, r *http.Request) {
+	if err := runServiceScriptAsync("restart_smartdns"); err != nil {
+		httpHelper.ResponseFailure(w, err.Error())
+		return
+	}
+	httpHelper.ResponseSuccess[any](w, nil)
+}
+
 // RestartUI 重启 merlin-box-ui 服务
 func RestartUI(w http.ResponseWriter, r *http.Request) {
 	if err := runServiceScriptAsync("server", "restart"); err != nil {

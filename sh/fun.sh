@@ -235,6 +235,9 @@ start_singbox() {
     local SINGBOX_CONF="${CUR_DIR}/conf/config.json"
     local SINGBOX_LOG="${CUR_DIR}/logs/sing-box.log"
 
+    #当为1时跳过设置iptables规则，主要用于在重启singbox时避免重复设置iptables
+    local skipSetIptables="${1:-0}"
+
     print_line "starting singbox"
 
     # 检查并清理可能残存的旧 sing-box 进程（防止重复启动套娃）
@@ -269,11 +272,14 @@ start_singbox() {
         print_success "🎉 sing-box 已经在后台稳稳垂钓！"
         print_normal "📝 实时日志已挂载至：$SINGBOX_LOG"
 
+        if [ "$skipSetIptables" = "1" ]; then
+            return 0
+        fi
+
         # setup lan tproxy
         setup_lan_tproxy
 
         # setup oneself redirect
-
         if [ "$MB_ENABLE_ONESELF_PROXY" -eq 1 ]; then
             setup_oneself_redirect
         else
@@ -318,6 +324,9 @@ start_smartdns() {
     local SMARTDNS_LOG="${CUR_DIR}/logs/smartdns.log"
     local dnsmasq_postconf="/jffs/scripts/dnsmasq.postconf"
     local dnsmasq_merlin_box_postconf="${CUR_DIR}/scripts/dnsmasq.postconf"
+
+    #当为1时跳过设置iptables规则，主要用于在重启smartdns时避免重复设置iptables
+    local skipSetIptables="${1:-0}"
 
     # 由于要运行在53端口接管dnsmasq的53端口，所以需要先处理下dnsmasq
 
@@ -415,6 +424,10 @@ start_smartdns() {
     if [ $success -eq 1 ]; then
         print_success "🎉 smartdns 已成功在后台挂载运行！（尝试了 $retry_count 次）"
         print_normal "📝 运行日志已重定向至：$SMARTDNS_LOG"
+
+        if [ "$skipSetIptables" = "1" ]; then
+            return 0
+        fi
 
         # 拦截局域网 DNS 53 端口流量送入 smartdns
         setup_dns_hijack
