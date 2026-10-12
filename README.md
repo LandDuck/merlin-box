@@ -492,6 +492,9 @@ In theory, any protocol supported by sing-box can be integrated into this soluti
 
 # 🙏 Reference Projects
 
+- ASUSWRT-Merlin
+  https://sourceforge.net/projects/asuswrt-merlin/files/
+
 - sing-box  
   https://github.com/sagernet/sing-box
 
