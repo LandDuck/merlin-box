@@ -390,6 +390,8 @@ export async function build() {
     //替换index.html中的v=0.0.1为v=版本号
     const indexHtmlWithVersion = indexHtml.replace(/v=0\.0\.1/g, `v=${version}`);
     await fs.writeFile(path.join(DIST, "index.html"), indexHtmlWithVersion.replace(/\/merlin-box-ui\/front\//g, "/"), "utf8")
+    //复制favicon.ico到dist目录
+    await fs.copyFile("favicon.ico", path.join(DIST, "favicon.ico"));
     //await fs.writeFile(path.join(DIST, "main.html"), mainHtml.replace(/\/merlin-box-ui\/front\//g, "/"), "utf8");
     //将dist目录下的文件拷贝到www目录
     await copyToWww();
