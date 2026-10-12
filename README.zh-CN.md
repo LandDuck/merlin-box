@@ -496,7 +496,8 @@ chmod +x merlin-box.sh
 
 # 🙏 参考项目
 
-- ASUSWRT-Merlin
+- ASUSWRT-Merlin  
+  https://github.com/RMerl/asuswrt-merlin.ng  
   https://sourceforge.net/projects/asuswrt-merlin/files/
 
 - sing-box  
