@@ -223,7 +223,7 @@ restart_dnsmasq(){
       usleep 250000
     done
 
-    #print_line "dnsmasq complete"
+    print_line "dnsmasq complete"
 }
 
 # ==========================================
@@ -467,6 +467,14 @@ stop_smartdns() {
         print_normal "🔍 未检测到 dnsmasq.postconf，无需删除。"
     fi
 
+    # 恢复路由器自身的 DNS 配置
+    local dns_servers
+    dns_servers="$(nvram get wan0_dns)"
+
+    if [ -n "$dns_servers" ]; then
+        printf 'nameserver %s\n' $dns_servers > /etc/resolv.conf
+    fi
+
     #print_line "smartdns stop complete"
 }
 
@@ -488,6 +496,12 @@ setup_dns_hijack()
     # 3. 在 PREROUTING 主链中正式挂载引流规则：只拦截从 br+ 进来的 53 端口流量
     iptables -t nat -A PREROUTING -i br+ -p udp --dport 53 -j "$MB_DNS_CHAIN"
     iptables -t nat -A PREROUTING -i br+ -p tcp --dport 53 -j "$MB_DNS_CHAIN"
+
+    if [ "$MB_ENABLE_ONESELF_PROXY" -eq 1 ]; then
+      # 4. 如果启用了路由器自身代理，需要修改路由器的 DNS 配置，让路由器自身的 DNS 请求也走 smartdns
+      print_normal "🔄 检测到已启用路由器自身代理，正在修改路由器 DNS 配置..."
+      printf 'nameserver 127.0.0.1\n' > /etc/resolv.conf
+    fi
 
     #print_line "lan dns hijack setup complete"
 
