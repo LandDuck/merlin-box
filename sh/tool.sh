@@ -206,6 +206,14 @@ update(){
     cp -rf "${tmp_dir}/RELEASE.md" "${CUR_DIR}/RELEASE.md"
     cp -rf "${tmp_dir}/start_merlin_box.sh" "${CUR_DIR}/start_merlin_box.sh"
 
+    print_normal "修改脚本中的 MD_ROOT_DIR 为当前目录"
+    # 修改脚本中的 MD_ROOT_DIR 为当前目录
+    sed -i "s|^readonly MD_ROOT_DIR=.*|readonly MD_ROOT_DIR=\"${CUR_DIR}\"|" "${CUR_DIR}/start_merlin_box.sh"
+
+    print_normal "修改脚本中的 INSTALL_YEAR 为当前年份"
+    # 修改脚本中的 INSTALL_YEAR 为当前年份
+    sed -i "s|^readonly INSTALL_YEAR=.*|readonly INSTALL_YEAR=$(date +%Y)|" "${CUR_DIR}/start_merlin_box.sh"
+
     rm -rf "${tmp_dir}"
     print_success "更新完成，重启相关服务后生效"
 
