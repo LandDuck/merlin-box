@@ -1,7 +1,7 @@
 {
   "name": "merlin-box-ui",
   "description": "",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "author": "LandDurk",
   "devDependencies": {
     "chokidar": "^5.0.0",
