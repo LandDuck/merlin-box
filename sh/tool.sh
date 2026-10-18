@@ -1043,7 +1043,11 @@ package() {
 
   for valid in $valids; do
       # 创建当前平台标识
-      echo "$valid" > "${CUR_DIR}/.valid"
+      if [ "$valid" = "arm" ]; then
+          printf '%s\n' arm arm384 arm386 > "${CUR_DIR}/.valid"
+      else
+          echo "$valid" > "${CUR_DIR}/.valid"
+      fi
 
       local package_name_koolcenter="merlin-box-koolcenter-${valid}-${arch}_${SCRIPT_VERSION}.tar.gz"
 
