@@ -61,10 +61,12 @@ window.React = React;
 
 import {Switch} from 'antd';
 import {Select} from 'antd';
+import { Tooltip } from 'antd';
 
 window.antd = {};
 window.antd.Switch = Switch;
 window.antd.Select = Select;
+window.antd.Tooltip = Tooltip;
 
 /**
  * 加载页面

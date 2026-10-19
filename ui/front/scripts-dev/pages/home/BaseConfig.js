@@ -231,14 +231,16 @@ class BaseConfig extends React.Component {
                             启用IPV6
                         </div>
                         <div className="item-comp">
-                            <antd.Switch
-                                checked={this.state.enableIPv6 === 1}
-                                onChange={(checked) => {
-                                    const val = checked ? 1 : 0;
-                                    this.setState({enableIPv6: val});
-                                    this.#saveWith({enableIPv6: val});
-                                }}
-                            />
+                            <antd.Tooltip title="启用后，将代理IPv6流量。请确保您的本地网络及节点网络环境支持IPv6，否则可能导致网络连接问题。">
+                                <antd.Switch
+                                    checked={this.state.enableIPv6 === 1}
+                                    onChange={(checked) => {
+                                        const val = checked ? 1 : 0;
+                                        this.setState({enableIPv6: val});
+                                        this.#saveWith({enableIPv6: val});
+                                    }}
+                                />
+                            </antd.Tooltip>
                         </div>
                     </div>
                     <div className="item">
@@ -246,14 +248,16 @@ class BaseConfig extends React.Component {
                             启用UDP
                         </div>
                         <div className="item-comp">
-                            <antd.Switch
-                                checked={this.state.enableUDP === 1}
-                                onChange={(checked) => {
-                                    const val = checked ? 1 : 0;
-                                    this.setState({enableUDP: val});
-                                    this.#saveWith({enableUDP: val});
-                                }}
-                            />
+                            <antd.Tooltip title="启用后，将代理UDP流量。请确保您的节点协议支持代理UDP，否则可能导致网络连接问题。">
+                                <antd.Switch
+                                    checked={this.state.enableUDP === 1}
+                                    onChange={(checked) => {
+                                        const val = checked ? 1 : 0;
+                                        this.setState({enableUDP: val});
+                                        this.#saveWith({enableUDP: val});
+                                    }}
+                                />
+                            </antd.Tooltip>
                         </div>
                     </div>
                     <div className="item">
@@ -261,14 +265,16 @@ class BaseConfig extends React.Component {
                             禁用QUIC
                         </div>
                         <div className="item-comp">
-                            <antd.Switch
-                                checked={this.state.disableQUIC === 1}
-                                onChange={(checked) => {
-                                    const val = checked ? 1 : 0;
-                                    this.setState({disableQUIC: val});
-                                    this.#saveWith({disableQUIC: val});
-                                }}
-                            />
+                            <antd.Tooltip title="QUIC协议（也就是俗称的HTTP3），走的是UDP协议，如果未启用UDP代理，流量会走直连，从而导致支持QUIC协议的网站访问异常，尤其是一些AI网站。启用后，将屏蔽QUIC协议，浏览器会退回TCP（HTTP2/1.1）。">
+                                <antd.Switch
+                                    checked={this.state.disableQUIC === 1}
+                                    onChange={(checked) => {
+                                        const val = checked ? 1 : 0;
+                                        this.setState({disableQUIC: val});
+                                        this.#saveWith({disableQUIC: val});
+                                    }}
+                                />
+                            </antd.Tooltip>
                         </div>
                     </div>
                     <div className="item">
@@ -276,14 +282,16 @@ class BaseConfig extends React.Component {
                             路由自身代理
                         </div>
                         <div className="item-comp">
-                            <antd.Switch
-                                checked={this.state.routeSelfProxy === 1}
-                                onChange={(checked) => {
-                                    const val = checked ? 1 : 0;
-                                    this.setState({routeSelfProxy: val});
-                                    this.#saveWith({routeSelfProxy: val});
-                                }}
-                            />
+                            <antd.Tooltip title="启用后，路由自身的流量会走分流代理逻辑。但注意，仅支持代理TCP流量。">
+                                <antd.Switch
+                                    checked={this.state.routeSelfProxy === 1}
+                                    onChange={(checked) => {
+                                        const val = checked ? 1 : 0;
+                                        this.setState({routeSelfProxy: val});
+                                        this.#saveWith({routeSelfProxy: val});
+                                    }}
+                                />
+                            </antd.Tooltip>
                         </div>
                     </div>
                     <div className="item">
