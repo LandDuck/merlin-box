@@ -1036,9 +1036,9 @@ package() {
   local valids=""
 
   if [ "$arch" = "arm64" ]; then
-    valids="hnd_v8 ipq64 qca mtk"
+    valids="hnd_v8 mtk" #2026年10月25日02:29:10 删除 qca  删除 ipq64
   elif [ "$arch" = "arm" ]; then
-    valids="hnd arm ipq32 qca mtk"
+    valids="hnd arm qca mtk" #2026-10-25 02:34:58 删除 ipq32
   fi
 
   for valid in $valids; do
