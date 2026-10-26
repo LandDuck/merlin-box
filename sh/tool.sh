@@ -97,7 +97,7 @@ download_file() {
   fi
 
   if type wget >/dev/null 2>&1; then
-      if wget --no-hsts -O "$target_path" "$url"; then
+      if wget --no-hsts --timeout=5 --tries=1 -O "$target_path" "$url"; then
           print_normal "使用 wget 下载成功"
           return 0
       fi
@@ -400,7 +400,7 @@ download_smartdns() {
 
   # 下载到 bin 目录下 smartdns
   # mkdir -p "${CUR_DIR}/bin"
-  wget -O "${file_path}" "$smartdns_url"
+  wget --no-hsts --timeout=5 --tries=1 -O "${file_path}" "$smartdns_url"
 
   # 检查下载是否成功
   if [ $? -ne 0 ]; then
@@ -862,7 +862,7 @@ get_github_latest_release() {
             print_normal "curl 代理请求失败，尝试使用 wget 直连" >&2
 
             if type wget >/dev/null 2>&1; then
-                release_json=$(wget --no-hsts -qO- "$api_url")
+                release_json=$(wget --no-hsts --timeout=5 --tries=1 -qO- "$api_url")
             fi
         fi
     else
@@ -876,7 +876,7 @@ get_github_latest_release() {
             print_normal "curl 请求失败，尝试使用 wget" >&2
 
             if type wget >/dev/null 2>&1; then
-                release_json=$(wget --no-hsts -qO- "$api_url")
+                release_json=$(wget --no-hsts --timeout=5 --tries=1 -qO- "$api_url")
             fi
         fi
     fi
