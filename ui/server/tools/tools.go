@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 
+	httpHelper "github.com/LandDuck/merlin-box/helper/http"
 	logger "github.com/LandDuck/merlin-box/helper/log"
 )
 
@@ -70,7 +71,7 @@ func init() {
 
 		return nil
 	}
-
+	// 将订阅链接转换为数据库节点配置
 	toolRegistry["sub2nodes"] = func(args []string) error {
 		if len(args) < 2 {
 			return fmt.Errorf("tool sub2nodes requires --url and --category arguments")
@@ -104,6 +105,39 @@ func init() {
 
 		// 调用 Sub2nodes 函数进行转换
 		Sub2nodes(url, category)
+
+		return nil
+	}
+	// 内置的下载工具
+	toolRegistry["download"] = func(args []string) error {
+		//--url <url> --output <path> [--proxy]
+		if len(args) < 4 {
+			return fmt.Errorf("tool download requires --url and --output arguments; optional --proxy")
+		}
+
+		var url, output string
+		var useProxy bool
+
+		for i, arg := range args {
+			if arg == "--url" && i+1 < len(args) {
+				url = args[i+1]
+			} else if arg == "--output" && i+1 < len(args) {
+				output = args[i+1]
+			} else if arg == "--proxy" {
+				useProxy = true
+			}
+		}
+
+		if url == "" || output == "" {
+			return fmt.Errorf("tool download requires --url and --output arguments")
+		}
+
+		err := httpHelper.DownloadFileToPath(url, output, useProxy)
+		if err != nil {
+			logger.Error("下载失败: " + err.Error())
+			return err
+		}
+		logger.Success("下载成功: " + output)
 
 		return nil
 	}
