@@ -214,7 +214,19 @@ update(){
     # 修改脚本中的 INSTALL_YEAR 为当前年份
     sed -i "s|^readonly INSTALL_YEAR=.*|readonly INSTALL_YEAR=$(date +%Y)|" "${CUR_DIR}/start_merlin_box.sh"
 
+    # 如果存在 post-update.sh，则复制并执行
+    if [ -f "${tmp_dir}/post-update.sh" ]; then
+        cp -f "${tmp_dir}/post-update.sh" "${CUR_DIR}/post-update.sh"
+        chmod +x "${CUR_DIR}/post-update.sh"
+        print_normal "执行 post-update.sh 脚本"
+        if ! (cd "${CUR_DIR}" && ./post-update.sh); then
+            print_error "post-update.sh 执行失败"
+        fi
+    fi
+
     rm -rf "${tmp_dir}"
+    rm -f "${CUR_DIR}/post-update.sh"
+
     print_success "更新完成，重启相关服务后生效"
 
 }
