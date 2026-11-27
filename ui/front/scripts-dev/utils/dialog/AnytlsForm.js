@@ -20,6 +20,7 @@ import React from "react";
 
 /**
  * AnytlsForm
+ * https://sing-box.sagernet.org/configuration/outbound/anytls/
  * {
  *   "type": "anytls",
  *   "tag": "anytls-out", //这个东西添加的时候自动生成一个uuid

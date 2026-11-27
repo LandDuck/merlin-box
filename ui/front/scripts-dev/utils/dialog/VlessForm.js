@@ -304,7 +304,7 @@ class VlessForm extends React.Component {
         const uuidError =
             !this.#isUuidValid(uuid);
         const realityPublicKeyError = realityEnabled && (!realityPublicKey || !realityPublicKey.trim());
-        const realityShortIdError = realityEnabled && (!realityShortId || !realityShortId.trim());
+        const realityShortIdError = realityEnabled && !/^(?:[0-9a-f]{2}){0,8}$/i.test(realityShortId.trim());
 
         this.setState({
             nameError,
@@ -717,7 +717,7 @@ class VlessForm extends React.Component {
                             <div className={`nlc-input ${this.state.realityShortIdError ? "error" : ""}`}>
                                 <input
                                     type="text"
-                                    placeholder="Reality short_id"
+                                    placeholder="可留空，最多 16 个十六进制字符，长度须为偶数"
                                     value={this.state.realityShortId}
                                     onChange={(e) => {
                                         this.state.realityShortId = e.target.value;
