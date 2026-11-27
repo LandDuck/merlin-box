@@ -293,9 +293,7 @@ class TrojanForm extends React.Component {
             !name ||
             !name.trim();
 
-        const serverError =
-            !server ||
-            !server.trim().isHost();
+        const serverError = !server || !server.isHost();
 
         const serverNameError =
             !serverName ||
@@ -566,7 +564,7 @@ class TrojanForm extends React.Component {
                         <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
                             <input
                                 type="text"
-                                placeholder="IPv4或IPv6"
+                                placeholder="IPv4 / IPv6 / 域名"
                                 value={this.state.server}
                                 onChange={(e) => {
                                     this.state.server = e.target.value;

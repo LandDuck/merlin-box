@@ -24,7 +24,7 @@ import React from "react";
  *   "type": "hysteria2",
  *   "tag": "hy2-out",  //这个东西添加的时候自动生成一个uuid
  *
- *   "server": "127.0.0.1",                 //普通 input  必须输入  ip4或ip6, 注意这里不能填写域名.
+ *   "server": "127.0.0.1",                 // IPv4 / IPv6 / domain
  *   "server_name" : "example.com",        //普通 input  必须输入 域名.   这个不是标准属性, 最终会填入 tls.server_name
  *   "server_port": 1080,                 //普通 input 只能输入数字  1->65535
  *
@@ -97,7 +97,7 @@ class Hysteria2Form extends React.Component {
         this.state = {
             category: "UI",
             name: "", // 节点名称
-            server: "", // 服务器地址，仅支持 IPv4 / IPv6
+            server: "", // IPv4 / IPv6 / domain
             serverName: "", // TLS Server Name
             serverPort: "", // 端口
             upMbps: "100", // 上行速率 Mbps
@@ -227,7 +227,7 @@ class Hysteria2Form extends React.Component {
     #validate() {
         const {name, server, serverName, serverPort, upMbps, downMbps, obfsPassword, password, enableHop, serverPorts, hopInterval} = this.state;
         const nameError = !name || !name.trim();
-        const serverError = !server || !(server.trim().isIPv4() || server.trim().isIPv6());
+        const serverError = !server || !server.isHost();
         const serverNameError = !serverName || !serverName.trim().isDomain();
         const serverPortError = !serverPort || !serverPort.isPort();
         const upMbpsError = !this.#isMbpsValid(upMbps);
@@ -278,7 +278,7 @@ class Hysteria2Form extends React.Component {
                 <label>服务器</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
-                        <input type="text" placeholder="IPv4或IPv6" value={this.state.server} onChange={(e) => {
+                        <input type="text" placeholder="IPv4 / IPv6 / 域名" value={this.state.server} onChange={(e) => {
                             this.state.server = e.target.value;
                             this.setState({
                                 server: this.state.server

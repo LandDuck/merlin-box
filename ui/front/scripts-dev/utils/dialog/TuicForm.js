@@ -175,7 +175,7 @@ class TuicForm extends React.Component {
     #validate() {
         const {name, server, serverName, serverPort, uuid, password} = this.state;
         const nameError = !name || !name.trim();
-        const serverError = !server || !(server.trim().isIPv4() || server.trim().isIPv6() || server.trim().isDomain());
+        const serverError = !server || !server.isHost();
         const serverNameError = !serverName || !serverName.trim().isDomain();
         const serverPortError = !serverPort || !serverPort.isPort();
         const uuidError = !this.#isUuidValid(uuid);
@@ -214,7 +214,7 @@ class TuicForm extends React.Component {
                 <label>服务器</label>
                 <div className="form-field">
                     <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
-                        <input type="text" placeholder="IPv4或IPv6" value={this.state.server} onChange={(e) => {
+                        <input type="text" placeholder="IPv4 / IPv6 / 域名" value={this.state.server} onChange={(e) => {
                             this.state.server = e.target.value;
                             this.setState({server: this.state.server});
                             this.#validate();

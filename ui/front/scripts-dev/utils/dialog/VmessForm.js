@@ -291,13 +291,7 @@ class VmessForm extends React.Component {
 
         const nameError = !name || !name.trim();
 
-        const serverError =
-            !server ||
-            !(
-                server.trim().isIPv4() ||
-                server.trim().isIPv6() ||
-                server.trim().isDomain()
-            );
+        const serverError = !server || !server.isHost();
 
         const serverPortError =
             !serverPort ||
@@ -557,7 +551,7 @@ class VmessForm extends React.Component {
                         <div className={`nlc-input ${this.state.serverError ? "error" : ""}`}>
                             <input
                                 type="text"
-                                placeholder="IPv4或IPv6"
+                                placeholder="IPv4 / IPv6 / 域名"
                                 value={this.state.server}
                                 onChange={(e) => {
                                     this.state.server = e.target.value;
