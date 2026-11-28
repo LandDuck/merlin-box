@@ -82,6 +82,16 @@ download_file() {
 
   print_normal "下载文件: $url 到 $target_path"
 
+  local merlinbox_path="${CUR_DIR}/bin/merlin-box"
+  if [ -f "$merlinbox_path" ]; then
+      print_normal "尝试使用 merlin-box 下载文件"
+      if "$merlinbox_path" tool download --url "$url" --output "$target_path" --proxy; then
+          print_normal "使用 merlin-box 下载成功"
+          return 0
+      fi
+      print_error "merlin-box 下载失败，尝试使用其他工具下载"
+  fi
+
   if type curl >/dev/null 2>&1; then
       print_normal "尝试使用 SOCKS5 代理(127.0.0.1:65001)下载文件"
 

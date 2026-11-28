@@ -360,6 +360,9 @@ test_debug() {
   #print_warning "远程仓库最新版本: $VERSION"
   #check_and_load_tproxy
 
+  #测试下载
+  download_file "https://raw.githubusercontent.com/LandDuck/merlin-box/main/res/chn-ip4.txt" "${CUR_DIR}/chn-ip4.txt"
+
 	:
 }
 
