@@ -129,7 +129,7 @@ wait_time_sync()
 log_msg "收到触发事件: FROM=$FROM, P1=$P1, P2=$P2"
 
 # wan 连接事件触发，重新拨号后merlin-box重启
-if { [ "$FROM" = "wan_event" ] && [ "$P1" = "0" ] && [ "$P2" = "connected" ]; } || [ "$FROM" = "wan_start" ]; then
+if { [ "$FROM" = "wan_event" ] && [ "$P1" = "0" ] && [ "$P2" = "connected" ]; } || [ "$FROM" = "wan_start" ] || [ "$FROM" = "post_mount" ]; then
 
     # 开始执行脚本
     lock
@@ -140,7 +140,7 @@ if { [ "$FROM" = "wan_event" ] && [ "$P1" = "0" ] && [ "$P2" = "connected" ]; } 
 
     sleep 2
 
-    log_msg "WAN 事件匹配成功，准备重启 merlin-box..."
+    log_msg "启动事件匹配成功，准备重启 merlin-box..."
 
     if cd "$MD_ROOT_DIR"; then
         log_msg "已进入目录: $MD_ROOT_DIR，开始执行 ./merlin-box.sh restart"

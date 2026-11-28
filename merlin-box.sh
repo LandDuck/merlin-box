@@ -422,6 +422,15 @@ init() {
   fi
 }
 
+# 删除本实例的 post-mount 配置。
+remove_post_mount_hook() {
+  local hook="$1"
+  local boot_script="$2"
+  local escaped_script
+  escaped_script=$(printf '%s\n' "$boot_script" | sed 's/[][\\.^$*|]/\\&/g')
+  sed -i "\|^# merlin-box post-mount begin: ${escaped_script}$|,\|^# merlin-box post-mount end: ${escaped_script}$|d" "$hook"
+}
+
 #=========================================
 # 生成启动脚本 & 将 当前脚本放在 /jffs/scripts/wan-event 中以便每次拨号后自动启动
 #=========================================
@@ -430,12 +439,27 @@ install() {
 
   # 目标启动脚本的绝对路径
   local boot_script="${CUR_DIR}/start_merlin_box.sh"
+  local mount_info mount_point quoted_mount_point quoted_boot_script
+  if ! mount_info=$(df -P "${CUR_DIR}"); then
+    print_error "无法确定启动脚本所在的挂载点：${CUR_DIR}"
+    return 1
+  fi
+  mount_point=$(printf '%s\n' "$mount_info" | awk 'NR == 2 { for (i = 0; i < 5; i++) sub(/^[[:space:]]*[^[:space:]]+[[:space:]]+/, ""); print; exit }')
+  if [ -z "$mount_point" ]; then
+    print_error "无法确定启动脚本所在的挂载点：${CUR_DIR}"
+    return 1
+  fi
+  quoted_mount_point=$(printf '%s' "$mount_point" | sed 's/["\\$`]/\\&/g')
+  quoted_boot_script=$(printf '%s' "$boot_script" | sed 's/["\\$`]/\\&/g')
   # wan状态改变时触发的脚本路径
   local merlin_wan_event="/jffs/scripts/wan-event"
   local merlin_wan_event_cifs="/cifs2/scripts/wan-event" # 此脚本用于安装了 USB2JFFS v2.2.0 的路由，因jffs目录被迁移，有可能在未挂载时不执行，原版merlin应该没有这个。
   # WAN 接口起来之后 384.15 起已 deprecated
   local merlin_wan_start="/jffs/scripts/wan-start"
   local merlin_wan_start_cifs="/cifs2/scripts/wan-start" # 此脚本用于安装了 USB2JFFS v2.2.0 的路由，因jffs目录被迁移，有可能在未挂载时不执行，原版merlin应该没有这个。
+  # U盘挂载后执行
+  local merlin_post_mount="/jffs/scripts/post-mount"
+  local merlin_post_mount_cifs="/cifs2/scripts/post-mount" # 此脚本用于安装了 USB2JFFS v2.2.0 的路由，因jffs目录被迁移，有可能在未挂载时不执行，原版merlin应该没有这个。
 
   print_normal "修改脚本中的 MD_ROOT_DIR 为当前目录"
 
@@ -469,10 +493,21 @@ install() {
     echo "#!/bin/sh" > "${merlin_wan_start_cifs}" 2>/dev/null
     chmod +x "${merlin_wan_start_cifs}" 2>/dev/null
   fi
+  # 检查并开启梅林固件的 post-mount
+  if [ ! -f "${merlin_post_mount}" ]; then
+    print_normal "创建 merlin post-mount 脚本"
+    echo "#!/bin/sh" > "${merlin_post_mount}"
+    chmod +x "${merlin_post_mount}"
+  fi
+  if grep -qsE '^[^ ]+ /cifs2 ' /proc/mounts && [ ! -f "${merlin_post_mount_cifs}" ]; then
+    print_normal "创建 merlin post-mount 脚本 on cifs"
+    echo "#!/bin/sh" > "${merlin_post_mount_cifs}" 2>/dev/null
+    chmod +x "${merlin_post_mount_cifs}" 2>/dev/null
+  fi
 
-  print_normal "将启动脚本添加到 merlin wan-event 和 wan-start 中"
+  print_normal "将启动脚本添加到 merlin wan-event 和 wan-start 以及 post-mount 中"
 
-  # 将脚本放入 wan-event 和 wan-start（先清理旧的历史写入）
+  # 将脚本放入 wan-event 和 wan-start 还有 post-mount（先清理旧的历史写入）
   sed -i "\|${boot_script}|d" "${merlin_wan_event}"
   if [ -f "${merlin_wan_event_cifs}" ]; then
     sed -i "\|${boot_script}|d" "${merlin_wan_event_cifs}" 2>/dev/null
@@ -480,6 +515,10 @@ install() {
   sed -i "\|${boot_script}|d" "${merlin_wan_start}"
   if [ -f "${merlin_wan_start_cifs}" ]; then
     sed -i "\|${boot_script}|d" "${merlin_wan_start_cifs}" 2>/dev/null
+  fi
+  remove_post_mount_hook "${merlin_post_mount}" "${boot_script}"
+  if [ -f "${merlin_post_mount_cifs}" ]; then
+    remove_post_mount_hook "${merlin_post_mount_cifs}" "${boot_script}" 2>/dev/null
   fi
 
   # 执行脚本，将 $1 $2 作为参数传递给 wan_event 以便开机自动启动。$1 WAN unit、$2 事件类型
@@ -492,8 +531,23 @@ install() {
   if [ -f "${merlin_wan_start_cifs}" ]; then
     echo "${boot_script} wan_start \"\$1\" >/dev/null 2>&1 &" >> "${merlin_wan_start_cifs}" 2>/dev/null
   fi
+  # 仅在启动脚本所在分区挂载时执行。
+  local post_mount_hook
+  post_mount_hook=$(cat <<EOF
+# merlin-box post-mount begin: ${boot_script}
+if [ "\$1" = "${quoted_mount_point}" ]; then
+    "${quoted_boot_script}" post_mount >/dev/null 2>&1 &
+fi
+# merlin-box post-mount end: ${boot_script}
+EOF
+)
+  printf '%s\n' "$post_mount_hook" >> "${merlin_post_mount}"
+  if [ -f "${merlin_post_mount_cifs}" ]; then
+    printf '%s\n' "$post_mount_hook" >> "${merlin_post_mount_cifs}" 2>/dev/null
+  fi
 
-  print_success "merlin-box启动脚本已设置完成，wan-event 和 wan-start 已配置。"
+
+  print_success "merlin-box启动脚本已设置完成，wan-event、wan-start 和 post-mount 已配置。"
 }
 
 #=========================================
@@ -507,6 +561,8 @@ uninstall() {
   local merlin_wan_event_cifs="/cifs2/scripts/wan-event"
   local merlin_wan_start="/jffs/scripts/wan-start"
   local merlin_wan_start_cifs="/cifs2/scripts/wan-start"
+  local merlin_post_mount="/jffs/scripts/post-mount"
+  local merlin_post_mount_cifs="/cifs2/scripts/post-mount"
 
   # 从 /jffs/scripts/wan-event 中删除启动脚本行
   if [ -f "${merlin_wan_event}" ]; then
@@ -525,6 +581,14 @@ uninstall() {
   if [ -f "${merlin_wan_start_cifs}" ]; then
     print_normal "从 merlin wan-start on cifs 中删除启动脚本行"
     sed -i "\|${boot_script}|d" "${merlin_wan_start_cifs}" 2>/dev/null
+  fi
+  if [ -f "${merlin_post_mount}" ]; then
+    print_normal "从 merlin post-mount 中删除启动脚本行"
+    remove_post_mount_hook "${merlin_post_mount}" "${boot_script}"
+  fi
+  if [ -f "${merlin_post_mount_cifs}" ]; then
+    print_normal "从 merlin post-mount on cifs 中删除启动脚本行"
+    remove_post_mount_hook "${merlin_post_mount_cifs}" "${boot_script}" 2>/dev/null
   fi
 
   print_line "merlin-box开机自启已卸载完成"
